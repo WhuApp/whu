@@ -1,21 +1,28 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import {StatusBar} from 'expo-status-bar';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   TextInput,
   View,
 } from 'react-native';
 import {
-    logInWithEmailAndPassword,
+  logInWithEmailAndPassword,
+  auth,
 } from '../firebase'
 import Button from '../components/Button';
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../types";
 
-const SignIn: React.FC = () => {
+type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>
+
+const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [mail, setMail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
   const signIn = () => {
-    logInWithEmailAndPassword(mail, password)
+    logInWithEmailAndPassword(mail, password).then(() => {
+      navigation.navigate('Home')
+    })
   };
 
   return (
@@ -35,7 +42,7 @@ const SignIn: React.FC = () => {
         text='Sign In'
         onPress={signIn}
       />
-      <StatusBar style='auto' />
+      <StatusBar style='auto'/>
     </View>
   )
 }

@@ -7,6 +7,8 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  updateProfile,
+  User,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -49,15 +51,16 @@ const signInWithGoogle = async () => {
     alert(err.message);
   }
 };
-const logInWithEmailAndPassword = async (email, password) => {
+const logInWithEmailAndPassword = async (email, password):Promise<User> => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (err) {
     console.error(err);
     alert(err.message);
   }
+  return auth.currentUser
 };
-const registerWithEmailAndPassword = async (name, email, password) => {
+const registerWithEmailAndPassword = async (name, email, password):Promise<User> => {
   try {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     const user = res.user;
@@ -71,6 +74,10 @@ const registerWithEmailAndPassword = async (name, email, password) => {
     console.error(err);
     alert(err.message);
   }
+  updateProfile(auth.currentUser, {
+    displayName: name,
+  })
+  return auth.currentUser
 };
 const sendPasswordReset = async (email) => {
   try {

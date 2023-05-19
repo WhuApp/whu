@@ -9,8 +9,12 @@ import {
   registerWithEmailAndPassword
 } from '../firebase'
 import Button from '../components/Button';
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../types";
 
-const SignUp: React.FC = () => {
+type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>
+
+const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const [name, setName] = useState<string>('')
   const [mail, setMail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -25,7 +29,10 @@ const SignUp: React.FC = () => {
       alert("Passwords do not match")
       return;
     }
-    registerWithEmailAndPassword(name, mail, password)
+    registerWithEmailAndPassword(name, mail, password).then((user) => {
+
+    })
+    navigation.navigate('Home')
   };
 
   return (
