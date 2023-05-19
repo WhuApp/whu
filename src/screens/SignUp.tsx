@@ -1,16 +1,16 @@
-import {StatusBar} from 'expo-status-bar';
-import React, {useState} from 'react';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   TextInput,
   View,
+  Text,
 } from 'react-native';
-import {
-  registerWithEmailAndPassword
-} from '../firebase'
 import Button from '../components/Button';
-import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../types";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types";
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { getAuth } from 'firebase/auth';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>
 
@@ -20,23 +20,19 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('')
   const [repeatPassword, setRepeatPassword] = useState<string>('')
 
-  const signUp = () => {
-    if (!name) {
-      alert("Please enter name")
-      return
-    }
-    if (password != repeatPassword) {
-      alert("Passwords do not match")
-      return;
-    }
-    registerWithEmailAndPassword(name, mail, password).then((user) => {
+  const auth = getAuth();
+  const [createUserWithEmailAndPassword, user, loading, error] = useCreateUserWithEmailAndPassword(auth);
 
-    })
-    navigation.navigate('Home')
+  const signUp = () => {
+    createUserWithEmailAndPassword(mail, password);
+    navigation.navigate('Home');
   };
 
   return (
     <View style={styles.wrapper}>
+      <Text>
+        {loading} {error?.message} {user?.user?.email}
+      </Text>
       <TextInput
         style={styles.textInput}
         placeholder='Name'
