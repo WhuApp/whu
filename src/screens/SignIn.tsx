@@ -21,6 +21,7 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
 
   const signIn = () => {
     logInWithEmailAndPassword(mail, password).then(() => {
+      if (auth.currentUser == null) return;
       navigation.navigate('Home')
     })
   };
