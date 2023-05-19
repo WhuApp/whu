@@ -7,10 +7,14 @@ import {
   Image
 } from 'react-native';
 import Button from '../components/Button';
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { RootStackParamList } from '../types';
 
 const earthImage = require('./../../assets/earth.jpg');
 
-const Welcome: React.FC = () => {
+type WelcomeProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>
+
+const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.header}>
@@ -24,7 +28,7 @@ const Welcome: React.FC = () => {
       <Image source={earthImage} style={styles.earth} />
       <View style={styles.footer}>
         <View style={styles.form}>
-          <Button text='Sign In' onPress={() => {}} />
+        <Button text='Sign In' onPress={() => { navigation.navigate('SignIn') }} />
           <Text style={styles.text}>
             No account yet? <Text style={styles.link}>Sign Up</Text>
           </Text>
