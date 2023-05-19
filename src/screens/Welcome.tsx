@@ -9,14 +9,25 @@ import {
 import Button from '../components/Button';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const earthImage = require('./../../assets/earth.jpg');
 
 type WelcomeProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 
 const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+  const defaultInset = 15;
+
+  const paddings = {
+    paddingTop: defaultInset + insets.top,
+    paddingBottom: defaultInset + insets.bottom,
+    paddingLeft: defaultInset + insets.left,
+    paddingRight: defaultInset + insets.right,
+  };
+
   return (
-    <View style={styles.wrapper}>
+    <View style={[ styles.wrapper, paddings ]}>
       <View style={styles.header}>
         <Text style={styles.name}>
           Whu
@@ -48,7 +59,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignContent: 'center',
     backgroundColor: '#0F0F31',
-    padding: 15,
   },
   earth: {
     width: 400,
