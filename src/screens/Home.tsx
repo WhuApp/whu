@@ -15,11 +15,14 @@ type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
   const auth = getAuth();
-  const [signOut, loading, error] = useSignOut(auth);
-  const [user, a, b] = useAuthState(auth);
+  const [signOut, , error] = useSignOut(auth);
+  const [user, , ] = useAuthState(auth);
 
   return (
     <View style={styles.wrapper}>
+      <Text>
+        {error?.message}
+      </Text>
       <Text>
         Current user: {user?.email}
       </Text>

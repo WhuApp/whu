@@ -21,39 +21,40 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const [repeatPassword, setRepeatPassword] = useState<string>('')
 
   const auth = getAuth();
-  const [createUserWithEmailAndPassword, user, loading, error] = useCreateUserWithEmailAndPassword(auth);
+  const [createUserWithEmailAndPassword, , , error] = useCreateUserWithEmailAndPassword(auth);
 
   const signUp = () => {
-    createUserWithEmailAndPassword(mail, password);
-    navigation.navigate('Home');
+    createUserWithEmailAndPassword(mail, password).then((user) => {
+      if (user?.user) navigation.navigate('Home');
+    });
   };
 
   return (
     <View style={styles.wrapper}>
       <Text>
-        {loading} {error?.message} {user?.user?.email}
+        {error?.message}
       </Text>
       <TextInput
         style={styles.textInput}
         placeholder='Name'
-        onChangeText={(text) => setName(text)}
+        onChangeText={setName}
       />
       <TextInput
         style={styles.textInput}
         placeholder='E-Mail'
-        onChangeText={(text) => setMail(text)}
+        onChangeText={setMail}
       />
       <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Password'
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={setPassword}
       />
       <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Repeat Password'
-        onChangeText={(text) => setRepeatPassword(text)}
+        onChangeText={setRepeatPassword}
       />
       <Button
         text='Sign Up'

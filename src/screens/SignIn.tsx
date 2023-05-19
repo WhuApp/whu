@@ -7,8 +7,8 @@ import {
   Text,
 } from 'react-native';
 import Button from '../components/Button';
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 
@@ -19,28 +19,29 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('')
 
   const auth = getAuth();
-  const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth);
+  const [signInWithEmailAndPassword, , , error] = useSignInWithEmailAndPassword(auth);
 
   const signIn = () => {
-    signInWithEmailAndPassword(mail, password);
-    navigation.navigate('Home');
+    signInWithEmailAndPassword(mail, password).then((user) => {
+      if (user?.user) navigation.navigate('Home');
+    });
   };
 
   return (
     <View style={styles.wrapper}>
       <Text>
-        {loading} {error?.message} {user?.user?.email}
+        {error?.message}
       </Text>
       <TextInput
         style={styles.textInput}
         placeholder='E-Mail'
-        onChangeText={(text) => setMail(text)}
+        onChangeText={setMail}
       />
       <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Password'
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={setPassword}
       />
       <Button
         text='Sign In'
