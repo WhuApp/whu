@@ -18,7 +18,7 @@ import {
 } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCB39wInSoZA2gA60dnpUJid4kQ44-ZVhg",
+  apiKey: "AIzaSyD8pwH_V0cqNFbZ8ydJuvM3NVBDvYWhFDg",
   authDomain: "whuapp-bce7b.firebaseapp.com",
   projectId: "whuapp-bce7b",
   storageBucket: "whuapp-bce7b.appspot.com",
