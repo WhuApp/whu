@@ -8,9 +8,9 @@ const Stack = createNativeStackNavigator();
 const App: React.FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
+      <Stack.Navigator
         initialRouteName='Welcome' 
-        screenOptions={{ headerShown: false }}
+        screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
       >
         <Stack.Screen name='Welcome' component={Welcome} />
         <Stack.Screen name='SignIn' component={SignIn} />
