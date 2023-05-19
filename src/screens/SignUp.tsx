@@ -7,14 +7,21 @@ import {
 } from 'react-native';
 import Button from '../components/Button';
 
-const SignIn: React.FC = () => {
+const SignUp: React.FC = () => {
+  const [name, setName] = useState<string>('')
   const [mail, setMail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [repeatPassword, setRepeatPassword] = useState<string>('')
 
-  const signIn = () => { };
+  const signUp = () => { };
 
   return (
     <View style={styles.wrapper}>
+      <TextInput 
+        style={styles.textInput}
+        placeholder='Name'
+        onChangeText={(text) => setName(text)}
+      />
       <TextInput 
         style={styles.textInput}
         placeholder='E-Mail'
@@ -26,9 +33,15 @@ const SignIn: React.FC = () => {
         placeholder='Password'
         onChangeText={(text) => setPassword(text)}
       />
+      <TextInput 
+        style={styles.textInput}
+        secureTextEntry
+        placeholder='Repeat Password'
+        onChangeText={(text) => setRepeatPassword(text)}
+      />
       <Button
-        text='Sign In'
-        onPress={signIn}
+        text='Sign Up'
+        onPress={signUp}
       />
       <StatusBar style='auto' />
     </View>
@@ -52,4 +65,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignIn;
+export default SignUp;

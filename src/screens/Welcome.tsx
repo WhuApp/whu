@@ -4,7 +4,8 @@ import {
   View, 
   Text,
   StyleSheet,
-  Image
+  Image,
+  Pressable
 } from 'react-native';
 import Button from '../components/Button';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -41,7 +42,10 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
         <View style={styles.form}>
         <Button text='Sign In' onPress={() => { navigation.navigate('SignIn') }} />
           <Text style={styles.text}>
-            No account yet? <Text style={styles.link}>Sign Up</Text>
+            No account yet? 
+            <Pressable onPress={() => { navigation.navigate('SignUp') }}>
+              <Text style={styles.link}>Sign Up</Text>
+            </Pressable>
           </Text>
         </View>
         <Text style={styles.copyright}>
@@ -57,7 +61,7 @@ const styles = StyleSheet.create({
   wrapper: {
     height: '100%',
     justifyContent: 'space-between',
-    alignContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#0F0F31',
   },
   earth: {
