@@ -1,10 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { 
+import {StatusBar} from 'expo-status-bar';
+import React, {useState} from 'react';
+import {
   StyleSheet,
   TextInput,
-  View, 
+  View,
 } from 'react-native';
+import {
+  registerWithEmailAndPassword
+} from '../firebase'
 import Button from '../components/Button';
 
 const SignUp: React.FC = () => {
@@ -13,27 +16,37 @@ const SignUp: React.FC = () => {
   const [password, setPassword] = useState<string>('')
   const [repeatPassword, setRepeatPassword] = useState<string>('')
 
-  const signUp = () => { };
+  const signUp = () => {
+    if (!name) {
+      alert("Please enter name")
+      return
+    }
+    if (password != repeatPassword) {
+      alert("Passwords do not match")
+      return;
+    }
+    registerWithEmailAndPassword(name, mail, password)
+  };
 
   return (
     <View style={styles.wrapper}>
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         placeholder='Name'
         onChangeText={(text) => setName(text)}
       />
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         placeholder='E-Mail'
         onChangeText={(text) => setMail(text)}
       />
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Password'
         onChangeText={(text) => setPassword(text)}
       />
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Repeat Password'
@@ -43,7 +56,7 @@ const SignUp: React.FC = () => {
         text='Sign Up'
         onPress={signUp}
       />
-      <StatusBar style='auto' />
+      <StatusBar style='auto'/>
     </View>
   )
 }

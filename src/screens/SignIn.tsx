@@ -1,26 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { 
+import {
   StyleSheet,
   TextInput,
-  View, 
+  View,
 } from 'react-native';
+import {
+    logInWithEmailAndPassword,
+} from '../firebase'
 import Button from '../components/Button';
 
 const SignIn: React.FC = () => {
   const [mail, setMail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
-  const signIn = () => { };
+  const signIn = () => {
+    logInWithEmailAndPassword(mail, password)
+  };
 
   return (
     <View style={styles.wrapper}>
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         placeholder='E-Mail'
         onChangeText={(text) => setMail(text)}
       />
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Password'
