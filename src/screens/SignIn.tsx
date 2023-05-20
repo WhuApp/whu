@@ -1,39 +1,66 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { 
+import {
   StyleSheet,
   TextInput,
-  View, 
+  View,
+  Text,
 } from 'react-native';
 import Button from '../components/Button';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { getAuth } from 'firebase/auth';
 
-const SignIn: React.FC = () => {
+const errorByCode = new Map<string, string>([
+  ['auth/missing-password', 'Missing password'],
+  ['auth/wrong-password', 'Wrong password'],
+  ['auth/user-not-found', 'User not found'],
+  ['auth/invalid-email', 'Invalid E-Mail'],
+  ['auth/too-many-requests', 'Too many attempts'],
+]);
+
+type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
+
+const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [mail, setMail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
-  const signIn = () => { };
+  const auth = getAuth();
+  const [signInWithEmailAndPassword, , , error] = useSignInWithEmailAndPassword(auth);
+
+  const signIn = () => {
+    signInWithEmailAndPassword(mail, password).then((user) => {
+      if (user?.user) navigation.navigate('Home');
+    });
+  };
 
   return (
     <View style={styles.wrapper}>
-      <TextInput 
+      {error &&
+        <Text style={styles.error}>
+          {errorByCode.get(error.code) ?? 'Unknown Error'}
+        </Text>
+      }
+      <TextInput
         style={styles.textInput}
         placeholder='E-Mail'
-        onChangeText={(text) => setMail(text)}
+        onChangeText={setMail}
       />
-      <TextInput 
+      <TextInput
         style={styles.textInput}
         secureTextEntry
         placeholder='Password'
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={setPassword}
       />
       <Button
         text='Sign In'
         onPress={signIn}
       />
-      <StatusBar style='auto' />
+      <StatusBar style='auto'/>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -49,6 +76,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     borderColor: '#777',
+  },
+  error: {
+    color: '#FF3040',
   },
 });
 
