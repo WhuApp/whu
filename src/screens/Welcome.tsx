@@ -30,13 +30,13 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
         <Image source={earthImage} style={{ width: 400, height: 400 }} />
         <View style={{ alignItems: 'center', gap: 50 }}>
           <View style={{ alignItems: 'center', gap: 5 }}>
-          <Button text='Sign In' onPress={() => { navigation.navigate('SignIn') }} />
-            <Text style={styles('text')}>
-              No account yet? 
+            <Button text='Sign In' onPress={() => { navigation.navigate('SignIn') }} />
+            <View style={{ flexDirection: 'row', gap: 3 }}>
+              <Text style={styles('text')}>No account yet?</Text>
               <Pressable onPress={() => { navigation.navigate('SignUp') }}>
                 <Text style={styles('link')}>Sign Up</Text>
               </Pressable>
-            </Text>
+            </View>
           </View>
           <Text style={{ fontSize: 12, fontWeight: '300', color: '#D3D3D3' }}>
             © 2023 Whu
