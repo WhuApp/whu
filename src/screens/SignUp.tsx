@@ -29,7 +29,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [createUserWithEmailAndPassword, , , error] = useCreateUserWithEmailAndPassword(getAuth());
+  const [createUserWithEmailAndPassword, , loading, error] = useCreateUserWithEmailAndPassword(getAuth());
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
@@ -70,7 +70,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
               <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword} />
             </View>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign Up' onPress={signUp} />
+          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading} onPress={signUp} />
         </View>
         <Text style={styles('text')}>
           Already have an account?
