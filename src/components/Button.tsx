@@ -3,7 +3,8 @@ import {
   Pressable, 
   View, 
   Text, 
-  StyleSheet
+  StyleSheet,
+  ViewProps
 } from 'react-native';
 
 interface ButtonProps {
@@ -11,9 +12,9 @@ interface ButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({ onPress, text }) => {
+const Button: React.FC<ButtonProps & ViewProps> = ({ onPress, text, ...props }) => {
   return (
-    <View>
+    <View {...props}>
       <Pressable onPress={onPress} style={styles.button}>
         <Text style={styles.text}>
           {text}
