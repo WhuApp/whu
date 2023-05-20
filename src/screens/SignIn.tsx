@@ -61,12 +61,12 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
           </View>
           <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={signIn} />
         </View>
-        <Text style={styles('text')}>
-          No account yet?
+        <View style={{ flexDirection: 'row', gap: 3 }}>
+          <Text style={styles('text')}>No account yet?</Text>
           <Pressable onPress={() => { navigation.navigate('SignUp') }}>
             <Text style={styles('link')}>Sign Up</Text>
           </Pressable>
-        </Text>
+        </View>
       </InsetView>
       <StatusBar style='auto' />
     </View>
