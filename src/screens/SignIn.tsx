@@ -27,7 +27,7 @@ type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [signInWithEmailAndPassword, , , error] = useSignInWithEmailAndPassword(getAuth());
+  const [signInWithEmailAndPassword, , loading, error] = useSignInWithEmailAndPassword(getAuth());
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
@@ -59,14 +59,14 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
             </View>
             <Text style={styles('link')}>Forgot password?</Text>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign In' onPress={signIn} />
+          <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={signIn} />
         </View>
-        <Text style={styles('text')}>
-          No account yet?
+        <View style={{ flexDirection: 'row', gap: 3 }}>
+          <Text style={styles('text')}>No account yet?</Text>
           <Pressable onPress={() => { navigation.navigate('SignUp') }}>
             <Text style={styles('link')}>Sign Up</Text>
           </Pressable>
-        </Text>
+        </View>
       </InsetView>
       <StatusBar style='auto' />
     </View>
