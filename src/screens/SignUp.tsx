@@ -9,7 +9,10 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import {
+  useCreateUserWithEmailAndPassword, useDeleteUser,
+  useUpdateProfile
+} from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
@@ -25,22 +28,42 @@ const errorByCode = new Map<string, string>([
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
+  const auth = getAuth();
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [createUserWithEmailAndPassword, , loading, error] = useCreateUserWithEmailAndPassword(getAuth());
-  const [pwdNotEqualError, setPwdNotEqualError] = useState<boolean>(false);
+  const [createUserWithEmailAndPassword, , loading, createUserError] = useCreateUserWithEmailAndPassword(auth);
+  const [updateProfile, updating, updateProfileError] = useUpdateProfile(auth);
+  const [errorMessage, setError] = useState<string>();
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const signUp = () => {
-    setPwdNotEqualError(password != repeatPassword)
-    if (password != repeatPassword) return;
+    if(password != repeatPassword)
+    {
+      setError('Passwords do not match');
+      return
+    }
+    if(!name.match("^[A-Za-z][A-Za-z0-9_]{2,29}$"))
+    {
+      setError('Name is invalid');
+      return
+    }
     createUserWithEmailAndPassword(mail, password).then((user) => {
-      if (user?.user) navigation.navigate('Home');
+      if (user?.user) {
+        updateProfile({ displayName: name }).then(() => {
+          if (updateProfileError)
+            useDeleteUser(auth);
+          navigation.navigate('Home');
+        })
+      }
     });
+    if (createUserError || updateProfileError)
+      setError(errorByCode.get(createUserError.code) ?? 'Unknown Firebase Error');
+    else
+      setError(undefined);
   };
 
   return (
@@ -51,9 +74,10 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
         </Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
-            {(error || pwdNotEqualError) &&
+            {
+              errorMessage !== undefined &&
               <Text style={[ styles('error'), { alignSelf: 'center' } ]}>
-                {pwdNotEqualError ? 'Passwords do not match' : errorByCode.get(error.code) ?? 'Unknown Error'}
+                {errorMessage}
               </Text>
             }
             <View style={styles('inputWrapper')}>
