@@ -28,7 +28,6 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           Current user: {user?.email}
         </Text>
         <Button text='Log Out' onPress={signOut} />
-        <Button text='Back' onPress={() => { navigation.navigate('Welcome') }} />
       </InsetView>
       <StatusBar style='auto' />
     </View>
