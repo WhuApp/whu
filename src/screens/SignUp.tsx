@@ -7,12 +7,20 @@ import {
   Text,
 } from 'react-native';
 import Button from '../components/Button';
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 
-type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>
+const errorByCode = new Map<string, string>([
+  ['auth/missing-password', 'Missing password'],
+  ['auth/invalid-email', 'Invalid E-Mail'],
+  ['auth/weak-password', 'Password too weak'],
+  ['auth/email-already-in-use', 'E-Mail already in use'],
+  ['auth/too-many-requests', 'Too many attempts'],
+]);
+
+type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const [name, setName] = useState<string>('')
@@ -31,9 +39,11 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
 
   return (
     <View style={styles.wrapper}>
-      <Text>
-        {error?.message}
-      </Text>
+      {error &&
+        <Text style={styles.error}>
+          {errorByCode.get(error.code) ?? 'Unknown Error'} {error.code}
+        </Text>
+      }
       <TextInput
         style={styles.textInput}
         placeholder='Name'
@@ -62,8 +72,8 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
       />
       <StatusBar style='auto'/>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -79,6 +89,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     borderColor: '#777',
+  },
+  error: {
+    color: '#FF3040',
   },
 });
 

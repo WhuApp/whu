@@ -12,7 +12,15 @@ import { RootStackParamList } from '../types';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 
-type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>
+const errorByCode = new Map<string, string>([
+  ['auth/missing-password', 'Missing password'],
+  ['auth/wrong-password', 'Wrong password'],
+  ['auth/user-not-found', 'User not found'],
+  ['auth/invalid-email', 'Invalid E-Mail'],
+  ['auth/too-many-requests', 'Too many attempts'],
+]);
+
+type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
 const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [mail, setMail] = useState<string>('')
@@ -29,9 +37,11 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
 
   return (
     <View style={styles.wrapper}>
-      <Text>
-        {error?.message}
-      </Text>
+      {error &&
+        <Text style={styles.error}>
+          {errorByCode.get(error.code) ?? 'Unknown Error'}
+        </Text>
+      }
       <TextInput
         style={styles.textInput}
         placeholder='E-Mail'
@@ -49,8 +59,8 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
       />
       <StatusBar style='auto'/>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -66,6 +76,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     borderColor: '#777',
+  },
+  error: {
+    color: '#FF3040',
   },
 });
 
