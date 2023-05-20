@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import {
   Home,
   SignIn,
@@ -40,6 +40,6 @@ const App: React.FC = () => {
       </NavigationContainer>
     </SafeAreaProvider>
   );
-}
+};
 
 export default App;

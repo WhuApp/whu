@@ -7,62 +7,55 @@ import {
   Image,
   Pressable
 } from 'react-native';
-import Button from '../components/Button';
+import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const earthImage = require('./../../assets/earth.jpg');
 
 type WelcomeProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 
 const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
-  const insets = useSafeAreaInsets();
-  const defaultInset = 15;
-
-  const paddings = {
-    paddingTop: defaultInset + insets.top,
-    paddingBottom: defaultInset + insets.bottom,
-    paddingLeft: defaultInset + insets.left,
-    paddingRight: defaultInset + insets.right,
-  };
-
   return (
-    <View style={[ styles.wrapper, paddings ]}>
-      <View style={styles.header}>
-        <Text style={styles.name}>
-          Whu
-        </Text>
-        <Text style={styles.description}>
-          Put some insane advertisement slogan here
-        </Text>
-      </View>
-      <Image source={earthImage} style={styles.earth} />
-      <View style={styles.footer}>
-        <View style={styles.form}>
-        <Button text='Sign In' onPress={() => { navigation.navigate('SignIn') }} />
-          <Text style={styles.text}>
-            No account yet? 
-            <Pressable onPress={() => { navigation.navigate('SignUp') }}>
-              <Text style={styles.link}>Sign Up</Text>
-            </Pressable>
+    <View style={styles.wrapper}>
+      <InsetView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.name}>
+            Whu
+          </Text>
+          <Text style={styles.description}>
+            Put some insane advertisement slogan here
           </Text>
         </View>
-        <Text style={styles.copyright}>
-          © 2023 Whu
-        </Text>
-      </View>
-      <StatusBar style='light' />
+        <Image source={earthImage} style={styles.earth} />
+        <View style={styles.footer}>
+          <View style={styles.form}>
+          <Button text='Sign In' onPress={() => { navigation.navigate('SignIn') }} />
+            <Text style={styles.text}>
+              No account yet? 
+              <Pressable onPress={() => { navigation.navigate('SignUp') }}>
+                <Text style={styles.link}>Sign Up</Text>
+              </Pressable>
+            </Text>
+          </View>
+          <Text style={styles.copyright}>
+            © 2023 Whu
+          </Text>
+        </View>
+        <StatusBar style='light' />
+      </InsetView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrapper: {
-    height: '100%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 15,
     backgroundColor: '#0F0F31',
+  },
+  container: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   earth: {
     width: 400,
