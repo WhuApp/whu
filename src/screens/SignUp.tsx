@@ -30,11 +30,14 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
   const [createUserWithEmailAndPassword, , loading, error] = useCreateUserWithEmailAndPassword(getAuth());
+  const [pwdNotEqualError, setPwdNotEqualError] = useState<boolean>(false);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const signUp = () => {
+    setPwdNotEqualError(password != repeatPassword)
+    if (password != repeatPassword) return;
     createUserWithEmailAndPassword(mail, password).then((user) => {
       if (user?.user) navigation.navigate('Home');
     });
@@ -48,9 +51,9 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
         </Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
-            {error &&
+            {(error || pwdNotEqualError) &&
               <Text style={[ styles('error'), { alignSelf: 'center' } ]}>
-                {errorByCode.get(error.code) ?? 'Unknown Error'}
+                {pwdNotEqualError ? 'Passwords do not match' : errorByCode.get(error.code) ?? 'Unknown Error'}
               </Text>
             }
             <View style={styles('inputWrapper')}>
