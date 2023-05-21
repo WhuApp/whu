@@ -5,7 +5,7 @@ import {
   Text,
   useColorScheme,
 } from 'react-native';
-import { Button, InsetView } from '../components';
+import { Button, FriendList, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
 import { getAuth } from 'firebase/auth';
@@ -26,7 +26,8 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   return (
     <View style={[ styles('page'), { padding: 15 } ]}>
       <InsetView style={styles('container')}>
-        <Text style={styles('text')}>{user.email}</Text>
+        <Text style={styles('label')}>Signed in as {user.email}</Text>
+        <FriendList style={{ gap: 15 }} uid={user.uid} />
         <Button text='Log Out' loading={loading} onPress={signOut} />
       </InsetView>
       <StatusBar style='auto' />
