@@ -18,13 +18,13 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   const auth = getAuth();
   const user = auth.currentUser;
 
-  const [signOut, loading, ] = useSignOut(auth);
+  const [signOut, loading,] = useSignOut(auth);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   return (
-    <View style={[ styles('page'), { padding: 15 } ]}>
+    <View style={[styles('page'), { padding: 15 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('text')}>{user.email}</Text>
         <Button text='Log Out' loading={loading} onPress={signOut} />

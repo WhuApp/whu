@@ -1,7 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { 
-  View, 
+import {
+  View,
   Text,
   Image,
   Pressable,

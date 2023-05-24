@@ -1,9 +1,9 @@
-import { 
+import {
   ColorSchemeName,
-  ImageStyle, 
-  StyleSheet, 
-  TextStyle, 
-  ViewStyle 
+  ImageStyle,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
 } from 'react-native';
 
 type Style = TextStyle | ViewStyle | ImageStyle;
@@ -18,7 +18,7 @@ export interface Elements {
   error?: Style;
   text?: Style;
   title?: Style;
-};
+}
 
 export const colors = {
   lightBackground: '#f2f2f2',
@@ -105,7 +105,7 @@ const darkStyles: Elements = {
 
 export const getStyles = (element: keyof Elements, theme: ColorSchemeName) => {
   return StyleSheet.compose(
-    defaultStyles[element] ?? { }, 
-    (theme === 'dark' ? darkStyles[element] : lightStyles[element]) ?? { }
+    defaultStyles[element] ?? {},
+    (theme === 'dark' ? darkStyles[element] : lightStyles[element]) ?? {},
   );
 };

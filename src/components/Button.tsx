@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  Pressable, 
-  View, 
-  Text, 
+import {
+  Pressable,
+  View,
+  Text,
   StyleSheet,
   ViewProps,
   ActivityIndicator

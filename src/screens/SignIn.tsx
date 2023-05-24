@@ -39,13 +39,13 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={[ styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 } ]}>
+    <View style={[styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('title')}>Sign in to Whu</Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
             {error &&
-              <Text style={[ styles('error'), { alignSelf: 'center' } ]}>
+              <Text style={[styles('error'), { alignSelf: 'center' }]}>
                 {errorByCode.get(error.code) ?? 'Unknown Error'}
               </Text>
             }

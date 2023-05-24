@@ -12,7 +12,7 @@ const firebaseConfig = {
   storageBucket: 'whuapp-bce7b.appspot.com',
   messagingSenderId: '917151787296',
   appId: '1:917151787296:web:764e32c1bc102bb3a40f45',
-  measurementId: 'G-7K5CHEJ8L2'
+  measurementId: 'G-7K5CHEJ8L2',
 };
 
 const app = initializeApp(firebaseConfig);

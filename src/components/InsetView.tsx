@@ -14,7 +14,7 @@ const InsetView: React.FC<ViewProps> = ({ children, style, ...props }) => {
   };
 
   return (
-    <View style={[ customStyle, style ]} {...props} >
+    <View style={[customStyle, style]} {...props} >
       {children}
     </View>
   );
