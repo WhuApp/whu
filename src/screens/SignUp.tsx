@@ -9,7 +9,11 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import {
+  useCreateUserWithEmailAndPassword, 
+  useDeleteUser,
+  useUpdateProfile
+} from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
@@ -24,60 +28,84 @@ const errorByCode = new Map<string, string>([
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
-const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
+const SignUp: React.FC<SignUpProps> = ({navigation}) => {
+  const auth = getAuth();
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [createUserWithEmailAndPassword, , loading, error] = useCreateUserWithEmailAndPassword(getAuth());
-  const [pwdNotEqualError, setPwdNotEqualError] = useState<boolean>(false);
+  const [createUserWithEmailAndPassword, , loading, createUserError] = useCreateUserWithEmailAndPassword(auth);
+  const [updateProfile, updating, updateProfileError] = useUpdateProfile(auth);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(null);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const signUp = () => {
-    setPwdNotEqualError(password != repeatPassword)
-    if (password != repeatPassword) return;
+    if (password != repeatPassword) {
+      setErrorMessage('Passwords do not match');
+      return;
+    }
+  
+    if (!name.match("^[A-Za-z][A-Za-z0-9_]{2,29}$")) {
+      setErrorMessage('Name is invalid');
+      return;
+    }
+    
     createUserWithEmailAndPassword(mail, password).then((user) => {
-      if (user?.user) navigation.navigate('Home');
+      if (user?.user) {
+        updateProfile({displayName: name}).then(() => {
+          if (updateProfileError)
+            useDeleteUser(auth);
+          else
+            navigation.navigate('Home');
+        });
+      }
     });
+  
+    if (createUserError || updateProfileError)
+      setErrorMessage(errorByCode.get(createUserError.code) ?? 'Unknown Error');
+    else
+      setErrorMessage(undefined);
   };
 
   return (
-    <View style={[ styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 } ]}>
+    <View style={[styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('title')}>
           Sign up for Whu
         </Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
-            {(error || pwdNotEqualError) &&
-              <Text style={[ styles('error'), { alignSelf: 'center' } ]}>
-                {pwdNotEqualError ? 'Passwords do not match' : errorByCode.get(error.code) ?? 'Unknown Error'}
+            { errorMessage &&
+              <Text style={[styles('error'), { alignSelf: 'center' }]}>
+                {errorMessage}
               </Text>
             }
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>Name</Text>
-              <TextInput style={styles('textInput')} onChangeText={setName} />
+              <TextInput style={styles('textInput')} onChangeText={setName}/>
             </View>
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>E-Mail</Text>
-              <TextInput style={styles('textInput')} onChangeText={setMail} />
+              <TextInput style={styles('textInput')} onChangeText={setMail}/>
             </View>
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>Password</Text>
-              <TextInput style={styles('textInput')} secureTextEntry onChangeText={setPassword} />
+              <TextInput style={styles('textInput')} secureTextEntry onChangeText={setPassword}/>
             </View>
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>Repeat Password</Text>
-              <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword} />
+              <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword}/>
             </View>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading} onPress={signUp} />
+          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading || updating} onPress={signUp}/>
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>Already have an account?</Text>
-          <Pressable onPress={() => { navigation.navigate('SignIn') }}>
+          <Pressable onPress={() => {
+            navigation.navigate('SignIn')
+          }}>
             <Text style={styles('link')}>Sign in</Text>
           </Pressable>
         </View>
