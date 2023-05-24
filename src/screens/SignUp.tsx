@@ -1,5 +1,5 @@
-import {StatusBar} from 'expo-status-bar';
-import React, {useState} from 'react';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
 import {
   TextInput,
   View,
@@ -7,15 +7,16 @@ import {
   useColorScheme,
   Pressable,
 } from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../types';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 import {
-  useCreateUserWithEmailAndPassword, useDeleteUser,
+  useCreateUserWithEmailAndPassword, 
+  useDeleteUser,
   useUpdateProfile
 } from 'react-firebase-hooks/auth';
-import {getAuth} from 'firebase/auth';
-import {InsetView, Button} from '../components';
-import {getStyles, Elements} from '../styles';
+import { getAuth } from 'firebase/auth';
+import { InsetView, Button } from '../components';
+import { getStyles, Elements } from '../styles';
 
 const errorByCode = new Map<string, string>([
   ['auth/missing-password', 'Missing password'],
@@ -43,12 +44,14 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
   const signUp = () => {
     if (password != repeatPassword) {
       setErrorMessage('Passwords do not match');
-      return
+      return;
     }
+  
     if (!name.match("^[A-Za-z][A-Za-z0-9_]{2,29}$")) {
       setErrorMessage('Name is invalid');
-      return
+      return;
     }
+    
     createUserWithEmailAndPassword(mail, password).then((user) => {
       if (user?.user) {
         updateProfile({displayName: name}).then(() => {
@@ -56,9 +59,10 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
             useDeleteUser(auth);
           else
             navigation.navigate('Home');
-        })
+        });
       }
     });
+  
     if (createUserError || updateProfileError)
       setErrorMessage(errorByCode.get(createUserError.code) ?? 'Unknown Error');
     else
@@ -66,17 +70,17 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
   };
 
   return (
-    <View style={[styles('page'), {paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80}]}>
+    <View style={[styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('title')}>
           Sign up for Whu
         </Text>
-        <View style={{gap: 30}}>
-          <View style={{gap: 10}}>
-            {errorMessage !== undefined &&
-                <Text style={[styles('error'), {alignSelf: 'center'}]}>
-                  {errorMessage}
-                </Text>
+        <View style={{ gap: 30 }}>
+          <View style={{ gap: 10 }}>
+            { errorMessage &&
+              <Text style={[styles('error'), { alignSelf: 'center' }]}>
+                {errorMessage}
+              </Text>
             }
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>Name</Text>
@@ -95,9 +99,9 @@ const SignUp: React.FC<SignUpProps> = ({navigation}) => {
               <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword}/>
             </View>
           </View>
-          <Button style={{alignSelf: 'center'}} text='Sign Up' loading={loading || updating} onPress={signUp}/>
+          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading || updating} onPress={signUp}/>
         </View>
-        <View style={{flexDirection: 'row', gap: 3}}>
+        <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>Already have an account?</Text>
           <Pressable onPress={() => {
             navigation.navigate('SignIn')
