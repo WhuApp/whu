@@ -8,16 +8,15 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { User, getAuth } from 'firebase/auth';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | 'loading'>('loading');
+  // const [user, setUser] = useState<User | 'loading'>('loading');
 
-  getAuth().onAuthStateChanged(setUser);
+  // getAuth().onAuthStateChanged(setUser);
 
-  if (user === 'loading') { return <></> }
+  // if (user === 'loading') { return <></> }
 
   return (
     <SafeAreaProvider>

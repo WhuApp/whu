@@ -9,12 +9,6 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import {
-  useCreateUserWithEmailAndPassword,
-  useDeleteUser,
-  useUpdateProfile
-} from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
 
@@ -29,7 +23,6 @@ const errorByCode = new Map<string, string>([
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
-  const auth = getAuth();
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
