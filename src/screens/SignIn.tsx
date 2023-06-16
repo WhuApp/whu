@@ -31,9 +31,9 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const signIn = () => {
-    signInWithEmailAndPassword(mail, password).then((user) => {
-      if (user?.user) navigation.navigate('Home');
-    });
+    // signInWithEmailAndPassword(mail, password).then((user) => {
+    //   if (user?.user) navigation.navigate('Home');
+    // });
   };
 
   return (
@@ -42,11 +42,11 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
         <Text style={styles('title')}>Sign in to Whu</Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
-            {error &&
+            {/* {error &&
               <Text style={[styles('error'), { alignSelf: 'center' }]}>
                 {errorByCode.get(error.code) ?? 'Unknown Error'}
               </Text>
-            }
+            } */}
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>E-Mail</Text>
               <TextInput style={styles('textInput')} onChangeText={setMail} />

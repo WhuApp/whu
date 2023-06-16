@@ -11,6 +11,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
+import { Account, ID } from 'appwrite';
+import { client } from '../appwrite';
 
 const errorByCode = new Map<string, string>([
   ['auth/missing-password', 'Missing password'],
@@ -23,12 +25,14 @@ const errorByCode = new Map<string, string>([
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
+  const account = new Account(client);
+
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [createUserWithEmailAndPassword, , loading, createUserError] = useCreateUserWithEmailAndPassword(auth);
-  const [updateProfile, updating, updateProfileError] = useUpdateProfile(auth);
+
+  const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(null);
 
   const colorScheme = useColorScheme();
@@ -38,28 +42,42 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
     if (password != repeatPassword) {
       setErrorMessage('Passwords do not match');
       return;
-    }
+    };
 
     if (!name.match("^[A-Za-z][A-Za-z0-9_]{2,29}$")) {
       setErrorMessage('Name is invalid');
       return;
-    }
+    };
 
-    createUserWithEmailAndPassword(mail, password).then((user) => {
-      if (user?.user) {
-        updateProfile({ displayName: name }).then(() => {
-          if (updateProfileError)
-            useDeleteUser(auth);
-          else
-            navigation.navigate('Home');
-        });
-      }
-    });
+    account.create(ID.unique(), mail, password, name)
+      .then(
+        (response) => { 
+          console.log(response);
 
-    if (createUserError || updateProfileError)
-      setErrorMessage(errorByCode.get(createUserError.code) ?? 'Unknown Error');
-    else
-      setErrorMessage(undefined);
+          setErrorMessage(null);
+          setLoading(false);
+        },
+        (error) => { 
+          setErrorMessage(error);
+          setLoading(false);
+        }
+      );
+
+    // createUserWithEmailAndPassword(mail, password).then((user) => {
+    //   if (user?.user) {
+    //     updateProfile({ displayName: name }).then(() => {
+    //       if (updateProfileError)
+    //         useDeleteUser(auth);
+    //       else
+    //         navigation.navigate('Home');
+    //     });
+    //   }
+    // });
+
+    // if (createUserError || updateProfileError)
+    //   setErrorMessage(errorByCode.get(createUserError.code) ?? 'Unknown Error');
+    // else
+    //   setErrorMessage(undefined);
   };
 
   return (
@@ -92,7 +110,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
               <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword} />
             </View>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading || updating} onPress={signUp} />
+          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading} onPress={signUp} />
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>Already have an account?</Text>
