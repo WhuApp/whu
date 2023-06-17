@@ -11,29 +11,36 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-
-const errorByCode = new Map<string, string>([
-  ['auth/missing-password', 'Missing password'],
-  ['auth/wrong-password', 'Wrong password'],
-  ['auth/user-not-found', 'User not found'],
-  ['auth/invalid-email', 'Invalid E-Mail'],
-  ['auth/too-many-requests', 'Too many attempts'],
-]);
+import { createSession } from '../appwrite';
 
 type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
 const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  // const [signInWithEmailAndPassword, , loading, error] = useSignInWithEmailAndPassword(getAuth());
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const signIn = () => {
-    // signInWithEmailAndPassword(mail, password).then((user) => {
-    //   if (user?.user) navigation.navigate('Home');
-    // });
+    setLoading(true);
+
+    createSession(mail, password)
+      .then(
+        (response) => {
+          console.log(response);
+
+          setError(undefined);
+          setLoading(false);
+        },
+        (reason) => {
+          setError(reason.toString());
+          setLoading(false);
+        },
+      );
   };
 
   return (
@@ -42,11 +49,11 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
         <Text style={styles('title')}>Sign in to Whu</Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
-            {/* {error &&
+            {error &&
               <Text style={[styles('error'), { alignSelf: 'center' }]}>
-                {errorByCode.get(error.code) ?? 'Unknown Error'}
+                {error}
               </Text>
-            } */}
+            }
             <View style={styles('inputWrapper')}>
               <Text style={styles('label')}>E-Mail</Text>
               <TextInput style={styles('textInput')} onChangeText={setMail} />
@@ -57,7 +64,7 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
             </View>
             <Text style={styles('link')}>Forgot password?</Text>
           </View>
-          {/* <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={signIn} /> */}
+          <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={signIn} />
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>No account yet?</Text>

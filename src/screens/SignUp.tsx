@@ -11,34 +11,25 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-import { Account, ID } from 'appwrite';
-import { client } from '../appwrite';
-
-const errorByCode = new Map<string, string>([
-  ['auth/missing-password', 'Missing password'],
-  ['auth/invalid-email', 'Invalid E-Mail'],
-  ['auth/weak-password', 'Password too weak'],
-  ['auth/email-already-in-use', 'E-Mail already in use'],
-  ['auth/too-many-requests', 'Too many attempts'],
-]);
+import { createUser } from '../appwrite';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
-  const account = new Account(client);
-
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(null);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const signUp = () => {
+    setLoading(true);
+
     if (password != repeatPassword) {
       setErrorMessage('Passwords do not match');
       return;
@@ -49,7 +40,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
       return;
     };
 
-    account.create(ID.unique(), mail, password, name)
+    createUser(mail, password, name)
       .then(
         (response) => { 
           console.log(response);
@@ -57,27 +48,11 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
           setErrorMessage(null);
           setLoading(false);
         },
-        (error) => { 
-          setErrorMessage(error);
+        (reason) => { 
+          setErrorMessage(reason.toString());
           setLoading(false);
         }
       );
-
-    // createUserWithEmailAndPassword(mail, password).then((user) => {
-    //   if (user?.user) {
-    //     updateProfile({ displayName: name }).then(() => {
-    //       if (updateProfileError)
-    //         useDeleteUser(auth);
-    //       else
-    //         navigation.navigate('Home');
-    //     });
-    //   }
-    // });
-
-    // if (createUserError || updateProfileError)
-    //   setErrorMessage(errorByCode.get(createUserError.code) ?? 'Unknown Error');
-    // else
-    //   setErrorMessage(undefined);
   };
 
   return (
