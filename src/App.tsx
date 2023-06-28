@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Home,
   SignIn,
@@ -8,15 +8,15 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import useAuth from './useAuth';
+import { ActivityIndicator, Text } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  // const [user, setUser] = useState<User | 'loading'>('loading');
+  const { loggedIn, loading } = useAuth();
 
-  // getAuth().onAuthStateChanged(setUser);
-
-  // if (user === 'loading') { return <></> }
+  if (loading) { return <ActivityIndicator /> }
 
   return (
     <SafeAreaProvider>
@@ -24,7 +24,7 @@ const App: React.FC = () => {
         <Stack.Navigator
           screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
         >
-          {false ? (
+          {loggedIn ? (
             <Stack.Screen name='Home' component={Home} />
           ) : (
             <>
@@ -35,6 +35,7 @@ const App: React.FC = () => {
           )}
         </Stack.Navigator>
       </NavigationContainer>
+      <Text>{loggedIn.toString()}</Text>
     </SafeAreaProvider>
   );
 };

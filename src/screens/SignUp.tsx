@@ -11,11 +11,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-import { createUser } from '../appwrite';
+import useAuth from '../useAuth';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
+  const { signUp } = useAuth();
+
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -27,7 +29,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const signUp = () => {
+  const handleSignUp = () => {
     setLoading(true);
 
     if (password != repeatPassword) {
@@ -40,7 +42,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
       return;
     };
 
-    createUser(mail, password, name)
+    signUp(name, mail, password)
       .then(
         (response) => { 
           console.log(response);
@@ -85,7 +87,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
               <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword} />
             </View>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading} onPress={signUp} />
+          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading} onPress={handleSignUp} />
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>Already have an account?</Text>

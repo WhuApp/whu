@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   View,
@@ -9,11 +9,37 @@ import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
 import { getStyles, Elements } from '../styles';
+import useAuth from '../useAuth';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
-  // const [signOut, loading,] = useSignOut(auth);
+  const { signOut, getSession } = useAuth();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [name, setName] = useState<string>('Loading..');
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const session = await getSession();
+
+      setName(session.name);
+    };
+
+    fetchSession();
+  }, []);
+
+  const handleSignOut = () => {
+    setLoading(true);
+
+    signOut().then(
+      () => setLoading(false),
+      (error) => {
+        console.log('Failed to sign out because', error);
+        setLoading(false);
+      }
+    );
+  };
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
@@ -21,8 +47,8 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   return (
     <View style={[styles('page'), { padding: 15 }]}>
       <InsetView style={styles('container')}>
-        <Text style={styles('text')}>Username</Text>
-        {/* <Button text='Log Out' loading={loading} onPress={signOut} /> */}
+        <Text style={styles('text')}>{name}</Text>
+        <Button text='Log Out' loading={loading} onPress={handleSignOut} />
       </InsetView>
       <StatusBar style='auto' />
     </View>

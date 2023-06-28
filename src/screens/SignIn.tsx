@@ -11,11 +11,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-import { createSession } from '../appwrite';
+import useAuth from '../useAuth';
 
 type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
 const SignIn: React.FC<SignInProps> = ({ navigation }) => {
+  const { signIn } = useAuth();
+
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -25,10 +27,10 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const signIn = () => {
+  const handleSignIn = () => {
     setLoading(true);
 
-    createSession(mail, password)
+    signIn(mail, password)
       .then(
         (response) => {
           console.log(response);
@@ -64,7 +66,7 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
             </View>
             <Text style={styles('link')}>Forgot password?</Text>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={signIn} />
+          <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={handleSignIn} />
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>No account yet?</Text>
