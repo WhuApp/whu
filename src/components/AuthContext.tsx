@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Account, Client, ID } from 'appwrite';
 
 const client = new Client()
   .setEndpoint('https://cloud.appwrite.io/v1')
   .setProject('648644a80adadf63b7d4');
+const account = new Account(client);
 
-const useAuth = () => {
+const AuthContext = React.createContext(undefined);
+
+const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const account = new Account(client);
-
+  
   useEffect(() => {
     const init = async () => {
       try {
@@ -48,7 +50,11 @@ const useAuth = () => {
 
   const getSession = () => account.get();
 
-  return { signIn, signOut, signUp, getSession, loggedIn, loading };
-}
+  const auth = { signIn, signOut, signUp, getSession, loggedIn, loading };
 
-export default useAuth;
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+};
+
+const useAuth = () => React.useContext(AuthContext);
+
+export { useAuth, AuthProvider };

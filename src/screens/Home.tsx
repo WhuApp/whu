@@ -9,7 +9,7 @@ import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
 import { getStyles, Elements } from '../styles';
-import useAuth from '../useAuth';
+import {useAuth} from '../components/AuthContext';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 

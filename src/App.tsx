@@ -8,34 +8,34 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import useAuth from './useAuth';
-import { ActivityIndicator, Text } from 'react-native';
+import { AuthProvider, useAuth } from './components/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   const { loggedIn, loading } = useAuth();
 
-  if (loading) { return <ActivityIndicator /> }
+  if (loading) { return <></> }
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
-        >
-          {loggedIn ? (
-            <Stack.Screen name='Home' component={Home} />
-          ) : (
-            <>
-              <Stack.Screen name='Welcome' component={Welcome} />
-              <Stack.Screen name='SignIn' component={SignIn} />
-              <Stack.Screen name='SignUp' component={SignUp} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-      <Text>{loggedIn.toString()}</Text>
+      <AuthProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
+          >
+            {loggedIn ? (
+              <Stack.Screen name='Home' component={Home} />
+            ) : (
+              <>
+                <Stack.Screen name='Welcome' component={Welcome} />
+                <Stack.Screen name='SignIn' component={SignIn} />
+                <Stack.Screen name='SignUp' component={SignUp} />
+              </>
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 };

@@ -11,7 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-import useAuth from '../useAuth';
+import { useAuth } from '../components/AuthContext';
 
 type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
