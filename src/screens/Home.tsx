@@ -10,6 +10,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
 import { getStyles, Elements } from '../styles';
 import { useAuth } from '../components/AuthContext';
+import FriendList from '../components/FriendList';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -41,6 +42,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
     <View style={[styles('page'), { padding: 15 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('text')}>{name}</Text>
+        <FriendList />
         <Button text='Log Out' loading={loading} onPress={handleSignOut} />
       </InsetView>
       <StatusBar style='auto' />
