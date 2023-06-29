@@ -22,7 +22,7 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('');
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(null);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
@@ -30,19 +30,16 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const handleSignIn = () => {
     setLoading(true);
 
-    signIn(mail, password)
-      .then(
-        (response) => {
-          console.log(response);
-
-          setError(undefined);
-          setLoading(false);
-        },
-        (reason) => {
-          setError(reason.toString());
-          setLoading(false);
-        },
-      );
+    signIn(mail, password).then(
+      () => {
+        setError(null);
+        setLoading(false);
+      },
+      (reason) => {
+        setError(reason.toString());
+        setLoading(false);
+      },
+    );
   };
 
   return (

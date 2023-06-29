@@ -37,24 +37,16 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
       return;
     };
 
-    if (!name.match("^[A-Za-z][A-Za-z0-9_]{2,29}$")) {
-      setErrorMessage('Name is invalid');
-      return;
-    };
-
-    signUp(name, mail, password)
-      .then(
-        (response) => { 
-          console.log(response);
-
-          setErrorMessage(null);
-          setLoading(false);
-        },
-        (reason) => { 
-          setErrorMessage(reason.toString());
-          setLoading(false);
-        }
-      );
+    signUp(name, mail, password).then(
+      () => {
+        setErrorMessage(null);
+        setLoading(false);
+      },
+      (reason) => { 
+        setErrorMessage(reason.toString());
+        setLoading(false);
+      }
+    );
   };
 
   return (

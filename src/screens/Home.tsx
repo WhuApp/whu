@@ -9,7 +9,7 @@ import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
 import { getStyles, Elements } from '../styles';
-import {useAuth} from '../components/AuthContext';
+import { useAuth } from '../components/AuthContext';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -20,25 +20,18 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   const [name, setName] = useState<string>('Loading..');
 
   useEffect(() => {
-    const fetchSession = async () => {
-      const session = await getSession();
+    const fetchUser = async () => {
+      const user = await getSession();
 
-      setName(session.name);
+      setName(user.name);
     };
 
-    fetchSession();
+    fetchUser();
   }, []);
 
   const handleSignOut = () => {
     setLoading(true);
-
-    signOut().then(
-      () => setLoading(false),
-      (error) => {
-        console.log('Failed to sign out because', error);
-        setLoading(false);
-      }
-    );
+    signOut().then(() => setLoading(false));
   };
 
   const colorScheme = useColorScheme();

@@ -6,51 +6,49 @@ const client = new Client()
   .setProject('648644a80adadf63b7d4');
 const account = new Account(client);
 
-const AuthContext = React.createContext(undefined);
+const AuthContext = React.createContext(null);
 
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   
   useEffect(() => {
-    const init = async () => {
-      try {
-        await account.get();
-
-        setLoggedIn(true);
-        setLoading(false);
-      } catch(e) {
-        setLoggedIn(false);
-        setLoading(false);
-      };
-    };
-
-    init();
+    account.get().then(
+      () => setLoggedIn(true),
+      () => setLoggedIn(false)
+    );
   }, []);
 
-  useEffect(() => {
-    console.log('Changed auth state', loggedIn);
-  }, [loggedIn])
-
   const signIn = (mail: string, password: string) => {
-    return account.createEmailSession(mail, password)
-      .then((res) => { setLoggedIn(true); return res; });
+    return account.createEmailSession(mail, password).then((result) => { 
+      setLoggedIn(true);
+      return result;
+    });
   };
 
   const signOut = () => {
-    return account.deleteSessions() // TODO use deleteSession(...)
-      .then((res) => { setLoggedIn(false); return res; });
+    return account.deleteSession('current').then((result) => {
+      setLoggedIn(false);
+      return result;
+    });
   };
 
-  // really big int
-  const signUp = (name, mail, password) => {
-    return account.create(ID.unique(), mail, password, name)
-      .then(() => signIn(mail, password));
+  const signUp = (name: string, mail: string, password: string) => {
+    return account.create(ID.unique(), mail, password, name).then(
+      () => { return signIn(mail, password) },
+      (reason) => { Promise.reject(reason) }
+    );
   };
 
-  const getSession = () => account.get();
+  const getSession = () =>
+    account.get();
 
-  const auth = { signIn, signOut, signUp, getSession, loggedIn, loading };
+  const auth = { 
+    signIn,
+    signOut,
+    signUp,
+    getSession,
+    loggedIn,
+  };
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
