@@ -9,44 +9,48 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-
-const errorByCode = new Map<string, string>([
-  ['auth/missing-password', 'Missing password'],
-  ['auth/wrong-password', 'Wrong password'],
-  ['auth/user-not-found', 'User not found'],
-  ['auth/invalid-email', 'Invalid E-Mail'],
-  ['auth/too-many-requests', 'Too many attempts'],
-]);
+import { useAuth } from '../components/AuthContext';
 
 type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
 const SignIn: React.FC<SignInProps> = ({ navigation }) => {
+  const { signIn } = useAuth();
+
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [signInWithEmailAndPassword, , loading, error] = useSignInWithEmailAndPassword(getAuth());
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>(null);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const signIn = () => {
-    signInWithEmailAndPassword(mail, password).then((user) => {
-      if (user?.user) navigation.navigate('Home');
-    });
+  const handleSignIn = () => {
+    setLoading(true);
+
+    signIn(mail, password).then(
+      () => {
+        setError(null);
+        setLoading(false);
+      },
+      (reason) => {
+        setError(reason.toString());
+        setLoading(false);
+      },
+    );
   };
 
   return (
-    <View style={[ styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 } ]}>
+    <View style={[styles('page'), { paddingLeft: 15, paddingRight: 15, paddingTop: 80, paddingBottom: 80 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('title')}>Sign in to Whu</Text>
         <View style={{ gap: 30 }}>
           <View style={{ gap: 10 }}>
             {error &&
-              <Text style={[ styles('error'), { alignSelf: 'center' } ]}>
-                {errorByCode.get(error.code) ?? 'Unknown Error'}
+              <Text style={[styles('error'), { alignSelf: 'center' }]}>
+                {error}
               </Text>
             }
             <View style={styles('inputWrapper')}>
@@ -59,7 +63,7 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
             </View>
             <Text style={styles('link')}>Forgot password?</Text>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={signIn} />
+          <Button style={{ alignSelf: 'center' }} text='Sign In' loading={loading} onPress={handleSignIn} />
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>No account yet?</Text>
