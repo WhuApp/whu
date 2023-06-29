@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Home,
   SignIn,
@@ -6,37 +6,30 @@ import {
   Welcome
 } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { User, getAuth } from 'firebase/auth';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAuth } from './components/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | 'loading'>('loading');
-
-  getAuth().onAuthStateChanged(setUser);
-
-  if (user === 'loading') { return <></> }
+  const { loggedIn } = useAuth();
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
-        >
-          {user ? (
-            <Stack.Screen name='Home' component={Home} />
-          ) : (
-            <>
-              <Stack.Screen name='Welcome' component={Welcome} />
-              <Stack.Screen name='SignIn' component={SignIn} />
-              <Stack.Screen name='SignUp' component={SignUp} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
+      >
+        {loggedIn ? (
+          <Stack.Screen name='Home' component={Home} />
+        ) : (
+          <>
+            <Stack.Screen name='Welcome' component={Welcome} />
+            <Stack.Screen name='SignIn' component={SignIn} />
+            <Stack.Screen name='SignUp' component={SignUp} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

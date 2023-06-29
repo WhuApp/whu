@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   View,
@@ -8,17 +8,31 @@ import {
 import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types';
-import { getAuth } from 'firebase/auth';
-import { useSignOut } from 'react-firebase-hooks/auth';
 import { getStyles, Elements } from '../styles';
+import { useAuth } from '../components/AuthContext';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const { signOut, getSession } = useAuth();
 
-  const [signOut, loading,] = useSignOut(auth);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [name, setName] = useState<string>('Loading..');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getSession();
+
+      setName(user.name);
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleSignOut = () => {
+    setLoading(true);
+    signOut().then(() => setLoading(false));
+  };
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
@@ -26,8 +40,8 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   return (
     <View style={[styles('page'), { padding: 15 }]}>
       <InsetView style={styles('container')}>
-        <Text style={styles('text')}>{user.email}</Text>
-        <Button text='Log Out' loading={loading} onPress={signOut} />
+        <Text style={styles('text')}>{name}</Text>
+        <Button text='Log Out' loading={loading} onPress={handleSignOut} />
       </InsetView>
       <StatusBar style='auto' />
     </View>

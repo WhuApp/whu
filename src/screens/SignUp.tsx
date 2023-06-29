@@ -9,64 +9,44 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import {
-  useCreateUserWithEmailAndPassword,
-  useDeleteUser,
-  useUpdateProfile
-} from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
 import { InsetView, Button } from '../components';
 import { getStyles, Elements } from '../styles';
-
-const errorByCode = new Map<string, string>([
-  ['auth/missing-password', 'Missing password'],
-  ['auth/invalid-email', 'Invalid E-Mail'],
-  ['auth/weak-password', 'Password too weak'],
-  ['auth/email-already-in-use', 'E-Mail already in use'],
-  ['auth/too-many-requests', 'Too many attempts'],
-]);
+import { useAuth } from '../components/AuthContext';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
-  const auth = getAuth();
+  const { signUp } = useAuth();
+
   const [name, setName] = useState<string>('');
   const [mail, setMail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [createUserWithEmailAndPassword, , loading, createUserError] = useCreateUserWithEmailAndPassword(auth);
-  const [updateProfile, updating, updateProfileError] = useUpdateProfile(auth);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const signUp = () => {
+  const handleSignUp = () => {
+    setLoading(true);
+
     if (password != repeatPassword) {
       setErrorMessage('Passwords do not match');
       return;
-    }
+    };
 
-    if (!name.match("^[A-Za-z][A-Za-z0-9_]{2,29}$")) {
-      setErrorMessage('Name is invalid');
-      return;
-    }
-
-    createUserWithEmailAndPassword(mail, password).then((user) => {
-      if (user?.user) {
-        updateProfile({ displayName: name }).then(() => {
-          if (updateProfileError)
-            useDeleteUser(auth);
-          else
-            navigation.navigate('Home');
-        });
+    signUp(name, mail, password).then(
+      () => {
+        setErrorMessage(null);
+        setLoading(false);
+      },
+      (reason) => { 
+        setErrorMessage(reason.toString());
+        setLoading(false);
       }
-    });
-
-    if (createUserError || updateProfileError)
-      setErrorMessage(errorByCode.get(createUserError.code) ?? 'Unknown Error');
-    else
-      setErrorMessage(undefined);
+    );
   };
 
   return (
@@ -99,7 +79,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
               <TextInput style={styles('textInput')} secureTextEntry onChangeText={setRepeatPassword} />
             </View>
           </View>
-          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading || updating} onPress={signUp} />
+          <Button style={{ alignSelf: 'center' }} text='Sign Up' loading={loading} onPress={handleSignUp} />
         </View>
         <View style={{ flexDirection: 'row', gap: 3 }}>
           <Text style={styles('text')}>Already have an account?</Text>
