@@ -12,9 +12,7 @@ import { useAuth } from './components/AuthContext';
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  const { loggedIn, loading } = useAuth();
-
-  if (loading) { return <></> }
+  const { loggedIn } = useAuth();
 
   return (
     <NavigationContainer>
