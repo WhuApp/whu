@@ -8,25 +8,26 @@ type Friend = {
 };
 
 const FriendList: React.FC = () => {
-  const { getDocument } = useAuth();
-  
+  const { getFriends } = useAuth();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [friends, setFriends] = useState([]);
 
   useEffect(() => {
-    getDocument().then((document) => {
-      setFriends(document.friends.map(x => ({ name: x })));
+    console.log('test');
+    getFriends().then((document) => {
+      setFriends(document.friends.map((x) => ({ name: x })));
       setLoading(false);
     });
   }, []);
 
-  if (loading) return (<Text>Loading..</Text>);
-  if (!friends.length) return (<Text>You dont have any friends</Text>);
+  if (loading) return <Text>Loading..</Text>;
+  if (!friends.length) return <Text>You dont have any friends</Text>;
 
   return (
     <>
       {friends.map((friend, index) => (
-        <FriendListItem key={index} friend={friend} /> 
+        <FriendListItem key={index} friend={friend} />
       ))}
     </>
   );
@@ -34,10 +35,10 @@ const FriendList: React.FC = () => {
 
 interface FriendListItemProps {
   friend: Friend;
-};
+}
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
-  return (<Text>{friend.name}</Text>)
+  return <Text>{friend.name}</Text>;
 };
 
 export default FriendList;
