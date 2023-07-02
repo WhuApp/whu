@@ -4,8 +4,6 @@ import {
   Client,
   Databases,
   ID,
-  Query,
-  Models,
   Permission,
   Role,
 } from 'appwrite';
@@ -48,79 +46,57 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const signUp = (name: string, mail: string, password: string) => {
-    (async () => {
-      try {
-        let data = await account.create(ID.unique(), mail, password, name);
-        let documents: Promise<Models.Document>[] = [
-          (async () => {
-            return await databases.createDocument(
-              DATABASE_ID,
-              COLLECTION_FRIENDS_ID,
-              data.$id,
-              { friends: ['649d9184e0627ccff6a2'] },
-              [
-                Permission.read(Role.user(data.$id)),
-                Permission.update(Role.user(data.$id)),
-                Permission.delete(Role.user(data.$id)),
-                Permission.write(Role.user(data.$id)),
-              ],
-            );
-          })(),
-          (async () => {
-            return await databases.createDocument(
-              DATABASE_ID,
-              COLLECTION_LOCATION_ID,
-              data.$id,
-              normalizeLatitude({
-                latitude: 47.619093,
-                longitude: 7.635496,
-                altitude: 460.2,
-              }),
-              [
-                Permission.read(Role.user(data.$id)),
-                Permission.update(Role.user(data.$id)),
-                Permission.delete(Role.user(data.$id)),
-                Permission.write(Role.user(data.$id)),
-              ],
-            );
-          })(),
-        ];
-        for (let p of documents) {
-          try {
-            await p;
-          } catch {
-            for (let p of documents) {
-              try {
-                const result = await p;
-                await databases.deleteDocument(
-                  result.$databaseId,
-                  result.$collectionId,
-                  result.$id,
-                );
-              } catch {
-                /* ignore at this point */
-              }
-            }
-            break;
-          }
-        }
-      } catch (reason) {
-        Promise.reject(reason);
-      }
-    })().then(
-      () => signIn(mail, password),
-      (reason) => Promise.reject(reason),
-    );
+    return account.create(ID.unique(), mail, password, name).then((user) => {
+      return account.createEmailSession(mail, password).then(() => {
+        return createStartDocuments(user.$id).then(() => setLoggedIn(true));
+      });
+    });
+  };
+
+  const createStartDocuments = (id: string) => {
+    const permissions = [
+      Permission.read(Role.user(id)),
+      Permission.update(Role.user(id)),
+      Permission.delete(Role.user(id)),
+      Permission.write(Role.user(id))
+    ];
+
+    return Promise.all([
+      databases.createDocument(
+        DATABASE_ID, 
+        COLLECTION_FRIENDS_ID, 
+        id, 
+        { friends: ['649d9184e0627ccff6a2'] }, 
+        permissions
+      ),
+      databases.createDocument(
+        DATABASE_ID, 
+        COLLECTION_LOCATION_ID,
+        id, 
+        {
+          time_stamp: new Date().toISOString(),
+          ...normalizeLatitude({ 
+            latitude: 47.619093, 
+            longitude: 7.635496, 
+            altitude: 460.2 
+          })
+        }, 
+        permissions
+      )
+    ]).catch(() => {
+      databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+      databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
+    });
   };
 
   const getSession = () => account.get();
 
   const getFriends = () => {
-    return getSession().then((data) => {
+    return getSession().then((user) => {
       return databases.getDocument(
         DATABASE_ID,
         COLLECTION_FRIENDS_ID,
-        data.$id,
+        user.$id,
       );
     });
   };

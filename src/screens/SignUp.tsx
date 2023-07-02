@@ -34,6 +34,8 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
 
     if (password != repeatPassword) {
       setErrorMessage('Passwords do not match');
+      setLoading(false);
+      
       return;
     };
 

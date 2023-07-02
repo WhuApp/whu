@@ -14,7 +14,6 @@ const FriendList: React.FC = () => {
   const [friends, setFriends] = useState([]);
 
   useEffect(() => {
-    console.log('test');
     getFriends().then((document) => {
       setFriends(document.friends.map((x) => ({ name: x })));
       setLoading(false);
