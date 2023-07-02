@@ -4,7 +4,7 @@ type GeoPoint = {
   altitude: number;
 };
 
-function normalizeLatitude(raw: GeoPoint): GeoPoint {
+function normalizeCoordinates(raw: GeoPoint): GeoPoint {
   let longitude = raw.longitude;
   let latitude = raw.latitude;
 
@@ -21,8 +21,16 @@ function normalizeLatitude(raw: GeoPoint): GeoPoint {
   return {
     longitude: longitude / 90,
     latitude: latitude / 180,
-    altitude: raw.altitude,
+    altitude: raw.altitude / 100000,
   };
 }
 
-export { normalizeLatitude };
+function denormalizeCoordiantes(normalized: GeoPoint): GeoPoint {
+  return {
+    longitude: normalized.longitude * 90,
+    latitude: normalized.latitude * 180,
+    altitude: normalized.altitude * 100000,
+  };
+}
+
+export { normalizeCoordinates, denormalizeCoordiantes, GeoPoint };

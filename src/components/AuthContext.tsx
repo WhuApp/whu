@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Account,
-  Client,
-  Databases,
-  ID,
-  Permission,
-  Role,
-} from 'appwrite';
-import { normalizeLatitude } from '../Location';
+import { Account, Client, Databases, ID, Permission, Role } from 'appwrite';
+import { normalizeCoordinates, denormalizeCoordiantes } from '../Location';
+import * as Location from 'expo-location';
 
 const ENDPOINT = 'https://cloud.appwrite.io/v1';
 const PROJECT_ID = '648644a80adadf63b7d4';
@@ -58,34 +52,39 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       Permission.read(Role.user(id)),
       Permission.update(Role.user(id)),
       Permission.delete(Role.user(id)),
-      Permission.write(Role.user(id))
+      Permission.write(Role.user(id)),
     ];
 
-    return Promise.all([
-      databases.createDocument(
-        DATABASE_ID, 
-        COLLECTION_FRIENDS_ID, 
-        id, 
-        { friends: ['649d9184e0627ccff6a2'] }, 
-        permissions
-      ),
-      databases.createDocument(
-        DATABASE_ID, 
-        COLLECTION_LOCATION_ID,
-        id, 
-        {
-          time_stamp: new Date().toISOString(),
-          ...normalizeLatitude({ 
-            latitude: 47.619093, 
-            longitude: 7.635496, 
-            altitude: 460.2 
-          })
-        }, 
-        permissions
-      )
-    ]).catch(() => {
-      databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-      databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
+    return Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Lowest,
+      mayShowUserSettingsDialog: true,
+    }).then((location) => {
+      return Promise.all([
+        databases.createDocument(
+          DATABASE_ID,
+          COLLECTION_FRIENDS_ID,
+          id,
+          { friends: ['649d9184e0627ccff6a2'] },
+          permissions,
+        ),
+        databases.createDocument(
+          DATABASE_ID,
+          COLLECTION_LOCATION_ID,
+          id,
+          {
+            time_stamp: new Date().toISOString(),
+            ...normalizeCoordinates({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              altitude: location.coords.altitude,
+            }),
+          },
+          permissions,
+        ),
+      ]).catch(() => {
+        databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+        databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
+      });
     });
   };
 
@@ -101,12 +100,27 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
   };
 
+  const getLocation = async () => {
+    const user = await getSession();
+    const doc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_LOCATION_ID,
+      user.$id,
+    );
+    return denormalizeCoordiantes({
+      longitude: doc.longitude,
+      latitude: doc.latitude,
+      altitude: doc.altitude,
+    });
+  };
+
   const auth = {
     signIn,
     signOut,
     signUp,
     getSession,
     getFriends,
+    getLocation,
     loggedIn,
   };
 

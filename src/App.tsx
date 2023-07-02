@@ -1,18 +1,24 @@
-import React from 'react';
-import {
-  Home,
-  SignIn,
-  SignUp,
-  Welcome
-} from './screens';
+import React, { useEffect } from 'react';
+import { Home, SignIn, SignUp, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
+import * as Location from 'expo-location';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   const { loggedIn } = useAuth();
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      }
+    })();
+  }, []);
 
   return (
     <NavigationContainer>
