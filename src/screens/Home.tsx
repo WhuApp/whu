@@ -11,20 +11,23 @@ import { RootStackParamList } from '../types';
 import { getStyles, Elements } from '../styles';
 import { useAuth } from '../components/AuthContext';
 import FriendList from '../components/FriendList';
+import { GeoPoint } from '../Location';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
-  const { signOut, getSession } = useAuth();
+  const { signOut, getSession, getLocation } = useAuth();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [location, setLocation] = useState<GeoPoint>();
   const [name, setName] = useState<string>('Loading..');
 
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getSession();
-
       setName(user.name);
+
+      setLocation(await getLocation());
     };
 
     fetchUser();
@@ -42,6 +45,11 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
     <View style={[styles('page'), { padding: 15 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('text')}>{name}</Text>
+        <Text> 
+          Latitude: {location?.latitude} 
+          Longitude: {location?.longitude} 
+          Altitude: {location?.altitude} 
+        </Text>
         <FriendList />
         <Button text='Log Out' loading={loading} onPress={handleSignOut} />
       </InsetView>

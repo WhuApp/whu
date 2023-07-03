@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Account, Client, Databases, ID, Query } from 'appwrite';
+import { Account, Client, Databases, ID, Permission, Role } from 'appwrite';
+import { normalizeCoordinates, denormalizeCoordiantes } from '../Location';
+import * as Location from 'expo-location';
 
 const ENDPOINT = 'https://cloud.appwrite.io/v1';
 const PROJECT_ID = '648644a80adadf63b7d4';
 const DATABASE_ID = '6488df9565380dad0d54';
-const COLLECTION_ID = '6488e5cd3eb651e484d1';
+const COLLECTION_FRIENDS_ID = '649df56d2fc10d735314';
+const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
 
-const client = new Client()
-  .setEndpoint(ENDPOINT)
-  .setProject(PROJECT_ID);
+const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
 const account = new Account(client);
 const databases = new Databases(client);
 
@@ -16,16 +17,16 @@ const AuthContext = React.createContext(null);
 
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  
+
   useEffect(() => {
     account.get().then(
       () => setLoggedIn(true),
-      () => setLoggedIn(false)
+      () => setLoggedIn(false),
     );
   }, []);
 
   const signIn = (mail: string, password: string) => {
-    return account.createEmailSession(mail, password).then((result) => { 
+    return account.createEmailSession(mail, password).then((result) => {
       setLoggedIn(true);
       return result;
     });
@@ -39,37 +40,77 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const signUp = (name: string, mail: string, password: string) => {
-    return account.create(ID.unique(), mail, password, name).then(
-      (data) => {
-        databases.createDocument(
-          DATABASE_ID,
-          COLLECTION_ID,
-          ID.unique(),
-          {
-            id: data.$id,
-            friends: ['649d9184e0627ccff6a2'],
-            lastSeen: new Date().toISOString(),
-            location: '+47.619093+007.635496+00460.2000', // ±DD.DDDDDD±DDD.DDDDDD±AAAAA.AAAA
-          }
-        ).then(() => {
-          return signIn(mail, password);
-        },
-        (reason) => { 
-          Promise.reject(reason) 
-        });
-      },
-      (reason) => { Promise.reject(reason) }
-    );
+    return account.create(ID.unique(), mail, password, name).then((user) => {
+      return account.createEmailSession(mail, password).then(() => {
+        return createStartDocuments(user.$id).then(() => setLoggedIn(true));
+      });
+    });
   };
 
-  const getSession = () =>
-    account.get();
+  const createStartDocuments = (id: string) => {
+    const permissions = [
+      Permission.read(Role.user(id)),
+      Permission.update(Role.user(id)),
+      Permission.delete(Role.user(id)),
+      Permission.write(Role.user(id)),
+    ];
 
-  const getDocument = () => {
-    return getSession().then((data) => {
-      return databases.listDocuments(DATABASE_ID, COLLECTION_ID, [ Query.equal('id', data.$id) ]).then((all) => { 
-        return all.documents[0];
+    return Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Lowest,
+      mayShowUserSettingsDialog: true,
+    }).then((location) => {
+      return Promise.all([
+        databases.createDocument(
+          DATABASE_ID,
+          COLLECTION_FRIENDS_ID,
+          id,
+          { friends: ['649d9184e0627ccff6a2'] },
+          permissions,
+        ),
+        databases.createDocument(
+          DATABASE_ID,
+          COLLECTION_LOCATION_ID,
+          id,
+          {
+            time_stamp: new Date().toISOString(),
+            ...normalizeCoordinates({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              altitude: location.coords.altitude,
+            }),
+          },
+          permissions,
+        ),
+      ]).catch(() => {
+        databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+        databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
       });
+    });
+  };
+
+  const getSession = () => account.get();
+
+  const getFriends = () => {
+    return getSession().then((user) => {
+      return databases.getDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        user.$id,
+      );
+    });
+  };
+
+  const getLocation = async () => {
+    const user = await getSession();
+    const doc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_LOCATION_ID,
+      user.$id,
+    );
+    return denormalizeCoordiantes({
+      longitude: doc.longitude,
+      latitude: doc.latitude,
+      altitude: doc.altitude,
     });
   };
 
@@ -78,7 +119,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     signOut,
     signUp,
     getSession,
-    getDocument,
+    getFriends,
+    getLocation,
     loggedIn,
   };
 

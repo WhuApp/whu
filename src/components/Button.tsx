@@ -5,7 +5,7 @@ import {
   Text,
   StyleSheet,
   ViewProps,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
 interface ButtonProps {
@@ -14,7 +14,12 @@ interface ButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps & ViewProps> = ({ onPress, text, loading = false, ...props }) => {
+const Button: React.FC<ButtonProps & ViewProps> = ({
+  onPress,
+  text,
+  loading = false,
+  ...props
+}) => {
   return (
     <View {...props}>
       <Pressable onPress={onPress} style={styles.button}>
@@ -23,7 +28,7 @@ const Button: React.FC<ButtonProps & ViewProps> = ({ onPress, text, loading = fa
       </Pressable>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   button: {
