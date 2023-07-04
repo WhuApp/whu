@@ -64,7 +64,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
           DATABASE_ID,
           COLLECTION_FRIENDS_ID,
           id,
-          { friends: ['649d9184e0627ccff6a2'] },
+          { friends: [] },
           permissions,
         ),
         databases.createDocument(
@@ -131,15 +131,14 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const result = [];
 
     if (docSelf.friends.includes(friendId)) return Promise.reject;
-
     if (docSelf.in.includes(friendId)) {
       result.push(
         databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
-          in: docSelf.in.pop(friendId),
+          in: docSelf.in.filter((x: string) => x !== friendId),
           friends: [friendId, ...docSelf.friends],
         }),
         databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-          out: docSelf.out.pop(user.$id),
+          out: docSelf.out.filter((x: string) => x !== user.$id),
           friends: [user.$id, ...docFriend.friends],
         }),
       );
@@ -153,9 +152,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         }),
       );
     }
-
-    console.log("result:");
-    console.log(result);
 
     return Promise.all(result).catch(() => {
       //restore documents to state before update
