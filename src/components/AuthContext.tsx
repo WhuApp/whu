@@ -90,14 +90,14 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const getSession = () => account.get();
 
-  const getFriends = () => {
-    return getSession().then((user) => {
-      return databases.getDocument(
-        DATABASE_ID,
-        COLLECTION_FRIENDS_ID,
-        user.$id,
-      );
-    });
+  const getFriends = async () => {
+    const user = await getSession();
+    const doc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      user.$id,
+    );
+    return doc.friends;
   };
 
   const getLocation = async () => {
@@ -116,6 +116,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const sendFriendRequest = async (friendId: string) => {
     const user = await getSession();
+
     const docFriend = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
@@ -130,15 +131,19 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     const result = [];
 
-    if (docSelf.friends.includes(friendId)) return Promise.reject;
+    if (docSelf.friends.includes(friendId))
+      return Promise.reject('You are already Friends');
+    if (docSelf.out.includes(friendId))
+      return Promise.reject('Friend request already sent');
+
     if (docSelf.in.includes(friendId)) {
       result.push(
         databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
-          in: docSelf.in.filter((x: string) => x !== friendId),
+          in: docSelf.in.filter((id: string) => id !== friendId),
           friends: [friendId, ...docSelf.friends],
         }),
         databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-          out: docSelf.out.filter((x: string) => x !== user.$id),
+          out: docSelf.out.filter((id: string) => id !== user.$id),
           friends: [user.$id, ...docFriend.friends],
         }),
       );
@@ -170,6 +175,145 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
   };
 
+  const getFriendRequests = async () => {
+    const user = await getSession();
+    const doc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      user.$id,
+    );
+    return { in: doc.in, out: doc.out };
+  };
+
+  const cancelFriendRequest = async (friendId: string) => {
+    const user = await getSession();
+
+    const docFriend = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      friendId,
+    );
+
+    const docSelf = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      user.$id,
+    );
+
+    const result = [
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+        out: docSelf.out.filter((id) => id !== friendId),
+      }),
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
+        in: docFriend.in.filter((id) => id !== user.$id),
+      }),
+    ];
+
+    return Promise.all(result).catch(() => {
+      //restore documents to state before update
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        user.$id,
+        docSelf,
+      );
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        friendId,
+        docFriend,
+      );
+    });
+  };
+
+  const declineFriendRequest = async (friendId: string) => {
+    const user = await getSession();
+
+    const docFriend = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      friendId,
+    );
+
+    const docSelf = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      user.$id,
+    );
+
+    if (!docSelf.in.includes(friendId))
+      return Promise.reject('You dont have a friend request from this user');
+
+    const result = [
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+        in: docSelf.in.filter((id: string) => id !== friendId),
+      }),
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
+        out: docFriend.out.filter((id: string) => id !== user.$id),
+      }),
+    ]
+
+    return Promise.all(result).catch(() => {
+      //restore documents to state before update
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        user.$id,
+        docSelf,
+      );
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        friendId,
+        docFriend,
+      );
+    });
+  };
+
+  const removeFriend = async (friendId: string) => {
+    const user = await getSession();
+
+    const docFriend = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      friendId,
+    );
+
+    const docSelf = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      user.$id,
+    );
+
+    if (docSelf.friends.includes(friendId))
+      return Promise.reject('You are not friends with this user');
+
+    const result = [
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+        friends: docSelf.friends.filter((id: string) => id !== friendId),
+      }),
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
+        friends: docSelf.friends.filter((id: string) => id !== user.$id),
+      }),
+    ]
+
+    return Promise.all(result).catch(() => {
+      //restore documents to state before update
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        user.$id,
+        docSelf,
+      );
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        friendId,
+        docFriend,
+      );
+    });
+  };
+
   const auth = {
     signIn,
     signOut,
@@ -178,6 +322,10 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     getFriends,
     getLocation,
     sendFriendRequest,
+    getFriendRequests,
+    cancelFriendRequest,
+    declineFriendRequest,
+    removeFriend,
     loggedIn,
   };
 
