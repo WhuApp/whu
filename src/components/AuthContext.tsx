@@ -114,6 +114,66 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
   };
 
+  const sendFriendRequest = async (friendId: string) => {
+    const user = await getSession();
+    const docFriend = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      friendId,
+    );
+
+    const docSelf = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_FRIENDS_ID,
+      user.$id,
+    );
+
+    const result = [];
+
+    if (docSelf.friends.includes(friendId)) return Promise.reject;
+
+    if (docSelf.in.includes(friendId)) {
+      result.push(
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+          in: docSelf.in.pop(friendId),
+          friends: [friendId, ...docSelf.friends],
+        }),
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
+          out: docSelf.out.pop(user.$id),
+          friends: [user.$id, ...docFriend.friends],
+        }),
+      );
+    } else {
+      result.push(
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+          out: [friendId, ...docSelf.out],
+        }),
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
+          in: [user.$id, ...docFriend.in],
+        }),
+      );
+    }
+
+    console.log("result:");
+    console.log(result);
+
+    return Promise.all(result).catch(() => {
+      //restore documents to state before update
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        user.$id,
+        docSelf,
+      );
+      databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        friendId,
+        docFriend,
+      );
+    });
+  };
+
   const auth = {
     signIn,
     signOut,
@@ -121,6 +181,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     getSession,
     getFriends,
     getLocation,
+    sendFriendRequest,
     loggedIn,
   };
 

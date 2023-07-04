@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Home, SignIn, SignUp, Welcome } from './screens';
+import { AddFriends, Home, SignIn, SignUp, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
@@ -26,7 +26,10 @@ const App: React.FC = () => {
         screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
       >
         {loggedIn ? (
-          <Stack.Screen name='Home' component={Home} />
+          <>
+            <Stack.Screen name='Home' component={Home} />
+            <Stack.Screen name='AddFriends' component={AddFriends} />
+          </>
         ) : (
           <>
             <Stack.Screen name='Welcome' component={Welcome} />

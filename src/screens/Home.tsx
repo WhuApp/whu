@@ -45,12 +45,13 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
     <View style={[styles('page'), { padding: 15 }]}>
       <InsetView style={styles('container')}>
         <Text style={styles('text')}>{name}</Text>
-        <Text> 
-          Latitude: {location?.latitude} 
-          Longitude: {location?.longitude} 
-          Altitude: {location?.altitude} 
+        <Text style={styles('text')}> 
+          Latitude: {location?.latitude + "\n"} 
+          Longitude: {location?.longitude + "\n"} 
+          Altitude: {location?.altitude + "\n"} 
         </Text>
         <FriendList />
+        <Button text='Add Friends' loading={loading} onPress={() => navigation.navigate('AddFriends')} />
         <Button text='Log Out' loading={loading} onPress={handleSignOut} />
       </InsetView>
       <StatusBar style='auto' />

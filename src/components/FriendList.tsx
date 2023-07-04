@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Text } from 'react-native';
+import { Text, useColorScheme } from 'react-native';
 import { useAuth } from './AuthContext';
+import { getStyles, Elements } from '../styles';
+
 
 type Friend = {
   name: string;
@@ -24,11 +26,11 @@ const FriendList: React.FC = () => {
   if (!friends.length) return <Text>You dont have any friends</Text>;
 
   return (
-    <>
-      {friends.map((friend, index) => (
-        <FriendListItem key={index} friend={friend} />
-      ))}
-    </>
+      <>
+        {friends.map((friend, index) => (
+          <FriendListItem key={index} friend={friend} />
+        ))}
+      </>
   );
 };
 
@@ -37,7 +39,10 @@ interface FriendListItemProps {
 }
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
-  return <Text>{friend.name}</Text>;
+  const colorScheme = useColorScheme();
+  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+
+  return <Text style={styles('text')}>{friend.name}</Text>;
 };
 
 export default FriendList;
