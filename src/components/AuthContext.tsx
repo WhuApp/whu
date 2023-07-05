@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Account, Client, Databases, ID, Permission, Role } from 'appwrite';
-import { normalizeCoordinates, denormalizeCoordiantes } from '../Location';
+import { normalizeCoordinates, denormalizeCoordiantes } from '../location';
 import * as Location from 'expo-location';
 
 const ENDPOINT = 'https://cloud.appwrite.io/v1';
@@ -9,7 +9,9 @@ const DATABASE_ID = '6488df9565380dad0d54';
 const COLLECTION_FRIENDS_ID = '649df56d2fc10d735314';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
 
-const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
+const client = new Client()
+  .setEndpoint(ENDPOINT)
+  .setProject(PROJECT_ID);
 const account = new Account(client);
 const databases = new Databases(client);
 
@@ -42,12 +44,12 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const signUp = (name: string, mail: string, password: string) => {
     return account.create(ID.unique(), mail, password, name).then((user) => {
       return account.createEmailSession(mail, password).then(() => {
-        return createStartDocuments(user.$id).then(() => setLoggedIn(true));
+        return setupNewUser(user.$id).then(() => setLoggedIn(true));
       });
     });
   };
 
-  const createStartDocuments = (id: string) => {
+  const setupNewUser = (id: string) => {
     const permissions = [
       Permission.read(Role.user(id)),
       Permission.update(Role.user(id)),
@@ -182,7 +184,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       COLLECTION_FRIENDS_ID,
       user.$id,
     );
-    return { in: doc.in, out: doc.out };
+    return { incoming: doc.in, outgoing: doc.out };
   };
 
   const cancelFriendRequest = async (friendId: string) => {
@@ -226,47 +228,28 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
   };
 
-  const declineFriendRequest = async (friendId: string) => {
+  const declineFriendRequest = async (id: string) => {
+    // TODO store session as state?
     const user = await getSession();
 
-    const docFriend = await databases.getDocument(
-      DATABASE_ID,
-      COLLECTION_FRIENDS_ID,
-      friendId,
-    );
+    // TODO single request to get both?
+    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id);
 
-    const docSelf = await databases.getDocument(
-      DATABASE_ID,
-      COLLECTION_FRIENDS_ID,
-      user.$id,
-    );
+    if (!self.in.includes(id)) throw new Error(`No request from user ${id}`);
 
-    if (!docSelf.in.includes(friendId))
-      return Promise.reject('You dont have a friend request from this user');
-
-    const result = [
+    await Promise.all([
       databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
-        in: docSelf.in.filter((id: string) => id !== friendId),
+        in: self.in.filter((x: string) => x !== id)
       }),
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-        out: docFriend.out.filter((id: string) => id !== user.$id),
-      }),
-    ]
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
+        out: other.out.filter((x: string) => x !== user.$id)
+      })
+    ]).catch((reason) => {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, self);
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
 
-    return Promise.all(result).catch(() => {
-      //restore documents to state before update
-      databases.updateDocument(
-        DATABASE_ID,
-        COLLECTION_FRIENDS_ID,
-        user.$id,
-        docSelf,
-      );
-      databases.updateDocument(
-        DATABASE_ID,
-        COLLECTION_FRIENDS_ID,
-        friendId,
-        docFriend,
-      );
+      throw new Error(`Decline failed because ${reason}`);
     });
   };
 

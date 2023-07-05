@@ -11,7 +11,7 @@ import { RootStackParamList } from '../types';
 import { getStyles, Elements } from '../styles';
 import { useAuth } from '../components/AuthContext';
 import FriendList from '../components/FriendList';
-import { GeoPoint } from '../Location';
+import { GeoPoint } from '../location';
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
