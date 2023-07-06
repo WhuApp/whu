@@ -137,6 +137,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       return Promise.reject('You are already Friends');
     if (docSelf.out.includes(friendId))
       return Promise.reject('Friend request already sent');
+    if (Array.isArray(docFriend?.documents))
+      return Promise.reject('Friend ID not found');
 
     if (docSelf.in.includes(friendId)) {
       result.push(

@@ -21,27 +21,42 @@ const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
   const [requests, setRequests] = useState<PendingRequests | undefined>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>(null);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   useEffect(() => {
-    getFriendRequests().then(
-      (requests) => setRequests(requests),
-      (reason) => console.log(reason)
-    );
-  }, []);
+    setLoading(!requests);
+    if (!requests) {
+      getFriendRequests().then(
+        (requests) => {
+          setRequests(requests);
+          setError(undefined);
+        },
+        (reason) => {
+          console.log(reason);
+          setError(reason);
+          setLoading(false);
+        },
+      );
+    }
+  }, [requests]);
 
   const handleAdd = () => {
     setLoading(true);
 
     sendFriendRequest(input).then(
       () => {
-        setRequests((old) => ({ incoming: old.incoming, outgoing: [input, ...old.outgoing] }));
+        setRequests((old) => ({
+          incoming: old.incoming,
+          outgoing: [input, ...old.outgoing],
+        }));
         setLoading(false);
       },
       (reason) => {
         console.log(reason);
+        setError(reason);
         setLoading(false);
       },
     );
@@ -52,21 +67,39 @@ const AddFriends: React.FC = () => {
       <InsetView>
         <Text style={styles('title')}>Add Friends</Text>
         <Text style={styles('label')}>Pending</Text>
-        {requests ? <OutgoingRequests requests={requests.outgoing ?? []} /> : <ActivityIndicator />}
+        {requests ? (
+          <OutgoingRequests requests={requests.outgoing ?? []} />
+        ) : (
+          <ActivityIndicator />
+        )}
         <Text style={styles('label')}>Added Me</Text>
-        {requests ? <IncomingRequests requests={requests.incoming ?? []} /> : <ActivityIndicator />}
+        {requests ? (
+          <IncomingRequests requests={requests.incoming ?? []} />
+        ) : (
+          <ActivityIndicator />
+        )}
         <View style={styles('inputWrapper')}>
           <Text style={styles('label')}>Friend ID</Text>
-          <TextInput 
-            style={styles('textInput')} 
-            onChangeText={setInput} 
-          />
+          <TextInput style={styles('textInput')} onChangeText={setInput} />
         </View>
         <Button
           loading={loading}
           text='Add Friend'
-          onPress={handleAdd}
+          onPress={() => {
+            handleAdd();
+            setRequests(undefined);
+          }}
         />
+        <Button
+          loading={loading}
+          text='Refresh'
+          onPress={() => setRequests(undefined)}
+        />
+        {error && (
+          <Text style={[styles('error'), { alignSelf: 'center' }]}>
+            {error}
+          </Text>
+        )}
       </InsetView>
       <StatusBar style='auto' />
     </View>
@@ -79,19 +112,31 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 
   const handleAccept = (id: string) => {
     sendFriendRequest(id).then(
-      () => setUsers(users.filter((user) => user !== id)),
-      (reason) => console.log(reason)
+      () => {
+        setUsers(users.filter((user) => user !== id));
+        //setRequests(undefined); todo: state not in scope
+      },
+      (reason) => {
+        console.log(reason);
+        //setError(reason);   todo: state not in scope
+      },
     );
   };
 
   const handleDecline = (id: string) => {
     declineFriendRequest(id).then(
-      () => setUsers(users.filter((user) => user !== id)),
-      (reason) => console.log(reason)
+      () => {
+        setUsers(users.filter((user) => user !== id));
+        //setRequests(undefined); todo: state not in scope
+      },
+      (reason) => {
+        console.log(reason);
+        //setError(reason); todo: state not in scope
+      },
     );
   };
 
-  if (!users.length) return (<Text>No incoming requests!</Text>);
+  if (!users.length) return <Text>No incoming requests!</Text>;
 
   return (
     <View>
@@ -114,12 +159,18 @@ const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 
   const handleCancel = (id: string) => {
     cancelFriendRequest(id).then(
-      () => setUsers(users.filter((user) => user !== id)),
-      (reason) => console.log(reason)
+      () => {
+        setUsers(users.filter((user) => user !== id));
+        //setRequest(undefined) todo: state not in scope
+      },
+      (reason) => {
+        console.log(reason);
+        //setError(reason) todo: state not in scope
+      },
     );
   };
 
-  if (!users.length) return (<Text>No outgoing requests!</Text>);
+  if (!users.length) return <Text>No outgoing requests!</Text>;
 
   return (
     <View>
