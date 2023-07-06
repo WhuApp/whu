@@ -27,21 +27,20 @@ const AddFriends: React.FC = () => {
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   useEffect(() => {
-    setLoading(!requests);
-    if (!requests) {
-      getFriendRequests().then(
-        (requests) => {
-          setRequests(requests);
-          setError(undefined);
-        },
-        (reason) => {
-          console.log(reason);
-          setError(reason);
-          setLoading(false);
-        },
-      );
-    }
-  }, [requests]);
+    setLoading(false);
+    getFriendRequests().then(
+      (requests) => {
+        setRequests(requests);
+        setError(undefined);
+        setLoading(false);
+      },
+      (reason) => {
+        console.log(reason);
+        setError(reason);
+        setLoading(false);
+      },
+    );
+  }, []);
 
   const handleAdd = async () => {
     setLoading(true);
@@ -75,15 +74,7 @@ const AddFriends: React.FC = () => {
         <Button
           loading={loading}
           text='Add Friend'
-          onPress={() => {
-            handleAdd();
-            setRequests(undefined);
-          }}
-        />
-        <Button
-          loading={loading}
-          text='Refresh'
-          onPress={() => setRequests(undefined)}
+          onPress={handleAdd}
         />
         {error && (
           <Text style={[styles('error'), { alignSelf: 'center' }]}>
@@ -102,27 +93,15 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 
   const handleAccept = (id: string) => {
     sendFriendRequest(id).then(
-      () => {
-        setUsers(users.filter((user) => user !== id));
-        //setRequests(undefined); todo: state not in scope
-      },
-      (reason) => {
-        console.log(reason);
-        //setError(reason);   todo: state not in scope
-      },
+      () => setUsers(users.filter((user) => user !== id)),
+      (reason) => console.log(reason),
     );
   };
 
   const handleDecline = (id: string) => {
     declineFriendRequest(id).then(
-      () => {
-        setUsers(users.filter((user) => user !== id));
-        //setRequests(undefined); todo: state not in scope
-      },
-      (reason) => {
-        console.log(reason);
-        //setError(reason); todo: state not in scope
-      },
+      () => setUsers(users.filter((user) => user !== id)),
+      (reason) => console.log(reason),
     );
   };
 
@@ -149,14 +128,8 @@ const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 
   const handleCancel = (id: string) => {
     cancelFriendRequest(id).then(
-      () => {
-        setUsers(users.filter((user) => user !== id));
-        //setRequest(undefined) todo: state not in scope
-      },
-      (reason) => {
-        console.log(reason);
-        //setError(reason) todo: state not in scope
-      },
+      () => setUsers(users.filter((user) => user !== id)),
+      (reason) => console.log(reason),
     );
   };
 

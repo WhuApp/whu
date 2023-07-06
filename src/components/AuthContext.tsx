@@ -101,13 +101,16 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const sendFriendRequest = async (id: string): Promise<never | string> => {
-    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+    if (id === '') return 'ID can not be empty';
+    if (id === session.userId) return 'nice that you like yourself. but you can not send yourself a friend reqeust :/'
+    
+    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id).catch(() => {return undefined});
     const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
     const result = [];
 
+    if(!other) return 'friend id not found'
     if (self.friends.includes(id)) return 'Already friends';
     if (self.out.includes(id)) return 'Already requested';
-    if (Array.isArray(other?.documents)) return 'Not found';
 
     if (self.in.includes(id)) {
       result.push(
