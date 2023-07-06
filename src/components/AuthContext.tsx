@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Account, Client, Databases, ID, Permission, Role } from 'appwrite';
+import { Account, Client, Databases, ID, Models, Permission, Role } from 'appwrite';
 import { normalizeCoordinates, denormalizeCoordiantes } from '../location';
 import * as Location from 'expo-location';
 
@@ -18,33 +18,32 @@ const databases = new Databases(client);
 const AuthContext = React.createContext(null);
 
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [session, setSession] = useState<Models.Session | undefined>();
 
   useEffect(() => {
-    account.get().then(
-      () => setLoggedIn(true),
-      () => setLoggedIn(false),
+    account.getSession('current').then(
+      (current) => setSession(current),
+      () => setSession(null),
     );
   }, []);
 
   const signIn = (mail: string, password: string) => {
-    return account.createEmailSession(mail, password).then((result) => {
-      setLoggedIn(true);
-      return result;
+    return account.createEmailSession(mail, password).then((session) => {
+      setSession(session);
+      return session;
     });
   };
 
   const signOut = () => {
-    return account.deleteSession('current').then((result) => {
-      setLoggedIn(false);
-      return result;
+    return account.deleteSession('current').then(() => {
+      setSession(null);
     });
   };
 
   const signUp = (name: string, mail: string, password: string) => {
     return account.create(ID.unique(), mail, password, name).then((user) => {
-      return account.createEmailSession(mail, password).then(() => {
-        return setupNewUser(user.$id).then(() => setLoggedIn(true));
+      return account.createEmailSession(mail, password).then((session) => {
+        return setupNewUser(user.$id).then(() => setSession(session));
       });
     });
   };
@@ -90,24 +89,20 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
   };
 
-  const getSession = () => account.get();
-
   const getFriends = async () => {
-    const user = await getSession();
     const doc = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
-      user.$id,
+      session.userId,
     );
     return doc.friends;
   };
 
   const getLocation = async () => {
-    const user = await getSession();
     const doc = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_LOCATION_ID,
-      user.$id,
+      session.userId,
     );
     return denormalizeCoordiantes({
       longitude: doc.longitude,
@@ -117,8 +112,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const sendFriendRequest = async (friendId: string) => {
-    const user = await getSession();
-
     const docFriend = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
@@ -128,7 +121,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const docSelf = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
-      user.$id,
+      session.userId,
     );
 
     const result = [];
@@ -142,22 +135,22 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     if (docSelf.in.includes(friendId)) {
       result.push(
-        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
           in: docSelf.in.filter((id: string) => id !== friendId),
           friends: [friendId, ...docSelf.friends],
         }),
         databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-          out: docSelf.out.filter((id: string) => id !== user.$id),
-          friends: [user.$id, ...docFriend.friends],
+          out: docSelf.out.filter((id: string) => id !== session.userId),
+          friends: [session.userId, ...docFriend.friends],
         }),
       );
     } else {
       result.push(
-        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
           out: [friendId, ...docSelf.out],
         }),
         databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-          in: [user.$id, ...docFriend.in],
+          in: [session.userId, ...docFriend.in],
         }),
       );
     }
@@ -167,7 +160,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       databases.updateDocument(
         DATABASE_ID,
         COLLECTION_FRIENDS_ID,
-        user.$id,
+        session.userId,
         docSelf,
       );
       databases.updateDocument(
@@ -180,18 +173,15 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const getFriendRequests = async () => {
-    const user = await getSession();
     const doc = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
-      user.$id,
+      session.userId,
     );
     return { incoming: doc.in, outgoing: doc.out };
   };
 
   const cancelFriendRequest = async (friendId: string) => {
-    const user = await getSession();
-
     const docFriend = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
@@ -201,15 +191,15 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const docSelf = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
-      user.$id,
+      session.userId,
     );
 
     const result = [
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
         out: docSelf.out.filter((id) => id !== friendId),
       }),
       databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-        in: docFriend.in.filter((id) => id !== user.$id),
+        in: docFriend.in.filter((id) => id !== session.userId),
       }),
     ];
 
@@ -218,7 +208,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       databases.updateDocument(
         DATABASE_ID,
         COLLECTION_FRIENDS_ID,
-        user.$id,
+        session.userId,
         docSelf,
       );
       databases.updateDocument(
@@ -231,24 +221,21 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const declineFriendRequest = async (id: string) => {
-    // TODO store session as state?
-    const user = await getSession();
-
     // TODO single request to get both?
     const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id);
+    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
 
     if (!self.in.includes(id)) throw new Error(`No request from user ${id}`);
 
     await Promise.all([
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
         in: self.in.filter((x: string) => x !== id)
       }),
       databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
-        out: other.out.filter((x: string) => x !== user.$id)
+        out: other.out.filter((x: string) => x !== session.userId)
       })
     ]).catch((reason) => {
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, self);
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
       databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
 
       throw new Error(`Decline failed because ${reason}`);
@@ -256,8 +243,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const removeFriend = async (friendId: string) => {
-    const user = await getSession();
-
     const docFriend = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
@@ -267,18 +252,18 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const docSelf = await databases.getDocument(
       DATABASE_ID,
       COLLECTION_FRIENDS_ID,
-      user.$id,
+      session.userId,
     );
 
     if (docSelf.friends.includes(friendId))
       return Promise.reject('You are not friends with this user');
 
     const result = [
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, user.$id, {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
         friends: docSelf.friends.filter((id: string) => id !== friendId),
       }),
       databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, friendId, {
-        friends: docSelf.friends.filter((id: string) => id !== user.$id),
+        friends: docSelf.friends.filter((id: string) => id !== session.userId),
       }),
     ]
 
@@ -287,7 +272,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       databases.updateDocument(
         DATABASE_ID,
         COLLECTION_FRIENDS_ID,
-        user.$id,
+        session.userId,
         docSelf,
       );
       databases.updateDocument(
@@ -303,7 +288,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     signIn,
     signOut,
     signUp,
-    getSession,
     getFriends,
     getLocation,
     sendFriendRequest,
@@ -311,7 +295,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     cancelFriendRequest,
     declineFriendRequest,
     removeFriend,
-    loggedIn,
+    session,
   };
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;

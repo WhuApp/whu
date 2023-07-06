@@ -16,7 +16,7 @@ import { GeoPoint } from '../location';
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
-  const { signOut, getSession, getLocation } = useAuth();
+  const { signOut, session, getLocation } = useAuth();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<GeoPoint>();
@@ -24,8 +24,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const user = await getSession();
-      setName(user.name);
+      setName(session.userId);
 
       setLocation(await getLocation());
     };

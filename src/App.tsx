@@ -8,7 +8,7 @@ import * as Location from 'expo-location';
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  const { loggedIn } = useAuth();
+  const { session } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -25,7 +25,7 @@ const App: React.FC = () => {
       <Stack.Navigator
         screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
       >
-        {loggedIn ? (
+        {session ? (
           <>
             <Stack.Screen name='Home' component={Home} />
             <Stack.Screen name='AddFriends' component={AddFriends} />
