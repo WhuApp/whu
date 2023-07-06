@@ -43,23 +43,13 @@ const AddFriends: React.FC = () => {
     }
   }, [requests]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     setLoading(true);
 
-    sendFriendRequest(input).then(
-      () => {
-        setRequests((old) => ({
-          incoming: old.incoming,
-          outgoing: [input, ...old.outgoing],
-        }));
-        setLoading(false);
-      },
-      (reason) => {
-        console.log(reason);
-        setError(reason);
-        setLoading(false);
-      },
-    );
+    const reason = await sendFriendRequest(input);
+
+    setError(reason);
+    setLoading(false);
   };
 
   return (
