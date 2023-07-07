@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AddFriends, Home, SignIn, SignUp, Welcome } from './screens';
+import { AddFriends, Home, Profile, SignIn, SignUp, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
@@ -28,6 +28,7 @@ const App: React.FC = () => {
         {session ? (
           <>
             <Stack.Screen name='Home' component={Home} />
+            <Stack.Screen name='Profile' component={Profile} />
             <Stack.Screen name='AddFriends' component={AddFriends} />
           </>
         ) : (

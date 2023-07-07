@@ -46,8 +46,8 @@ const defaultStyles: Elements = {
   },
   textInput: {
     padding: 8,
-    width: 350,
     borderRadius: 5,
+    minWidth: 350,
   },
   inputWrapper: {
     gap: 5,

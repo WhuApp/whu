@@ -6,8 +6,11 @@ import {
   Text,
   useColorScheme,
   ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
-import { InsetView, Button } from '../components';
+import { InsetView, Button, Icon } from '../components';
 import { getStyles, Elements } from '../styles';
 import { useAuth } from '../components/AuthContext';
 
@@ -19,24 +22,22 @@ type PendingRequests = {
 const AddFriends: React.FC = () => {
   const { sendFriendRequest, getFriendRequests } = useAuth();
   const [input, setInput] = useState<string>('');
-  const [requests, setRequests] = useState<PendingRequests | undefined>(null);
+  const [requests, setRequests] = useState<PendingRequests | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>(null);
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   useEffect(() => {
     setLoading(false);
+
     getFriendRequests().then(
       (requests) => {
         setRequests(requests);
-        setError(undefined);
         setLoading(false);
       },
       (reason) => {
         console.log(reason);
-        setError(reason);
         setLoading(false);
       },
     );
@@ -47,74 +48,94 @@ const AddFriends: React.FC = () => {
 
     const reason = await sendFriendRequest(input);
 
-    setError(reason);
+    if (reason) Alert.alert('Error', reason);
     setLoading(false);
   };
 
   return (
     <View style={[styles('page'), { padding: 15 }]}>
-      <InsetView>
+      <InsetView style={{ gap: 10 }}>
         <Text style={styles('title')}>Add Friends</Text>
-        <Text style={styles('label')}>Pending</Text>
-        {requests ? (
-          <OutgoingRequests requests={requests.outgoing ?? []} />
-        ) : (
-          <ActivityIndicator />
-        )}
-        <Text style={styles('label')}>Added Me</Text>
-        {requests ? (
-          <IncomingRequests requests={requests.incoming ?? []} />
-        ) : (
-          <ActivityIndicator />
-        )}
+        <View style={{ gap: 5 }}>
+          <Text style={styles('label')}>Pending</Text>
+          {requests ? (
+            <OutgoingRequests requests={requests.outgoing} />
+          ) : (
+            <ActivityIndicator />
+          )}
+        </View>
+        <View style={{ gap: 5 }}>
+          <Text style={styles('label')}>Added Me</Text>
+          {requests ? (
+            <IncomingRequests requests={requests.incoming} />
+          ) : (
+            <ActivityIndicator />
+          )}
+        </View>
         <View style={styles('inputWrapper')}>
-          <Text style={styles('label')}>Friend ID</Text>
-          <TextInput style={styles('textInput')} onChangeText={setInput} />
+          <Text style={styles('label')}>Search</Text>
+          <TextInput 
+            style={styles('textInput')} 
+            placeholder='Friend ID..' 
+            onChangeText={setInput} 
+          />
         </View>
         <Button
           loading={loading}
           text='Add Friend'
           onPress={handleAdd}
         />
-        {error && (
-          <Text style={[styles('error'), { alignSelf: 'center' }]}>
-            {error}
-          </Text>
-        )}
       </InsetView>
       <StatusBar style='auto' />
     </View>
   );
 };
 
+const itemStyle: ViewStyle = { 
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  backgroundColor: 'white',
+  padding: 8,
+  borderBottomColor: '#dcdfe3',
+  borderBottomWidth: 1,
+  alignItems: 'center',
+};
+
+const containerStyle: ViewStyle = {
+  borderRadius: 10,
+  overflow: 'hidden',
+};
+
 const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const { sendFriendRequest, declineFriendRequest } = useAuth();
-  const [users, setUsers] = useState<string[]>(requests);
 
-  const handleAccept = (id: string) => {
-    sendFriendRequest(id).then(
-      () => setUsers(users.filter((user) => user !== id)),
-      (reason) => console.log(reason),
-    );
+  const handleAccept = (id: string) =>
+    sendFriendRequest(id).then((reason) => console.log(reason));
+
+  const handleDecline = (id: string) =>
+    declineFriendRequest(id).catch((reason) => console.log(reason));
+
+  const buttonStyle: ViewStyle = {
+    flexDirection: 'row',
+    padding: 4,
+    backgroundColor: '#dcdfe3',
+    borderRadius: 100,
   };
 
-  const handleDecline = (id: string) => {
-    declineFriendRequest(id).then(
-      () => setUsers(users.filter((user) => user !== id)),
-      (reason) => console.log(reason),
-    );
-  };
-
-  if (!users.length) return <Text>No incoming requests!</Text>;
+  if (!requests.length) return <Text>No incoming requests!</Text>;
 
   return (
-    <View>
-      {users.map((user) => (
-        <View key={user}>
+    <View style={containerStyle}>
+      {requests.map((user) => (
+        <View style={itemStyle} key={user}>
           <Text>{user}</Text>
-          <View>
-            <Button text='Accept' onPress={() => handleAccept(user)} />
-            <Button text='Decline' onPress={() => handleDecline(user)} />
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity style={buttonStyle} onPress={() => handleAccept(user)}>
+              <Icon name='user-check' size={20} />
+            </TouchableOpacity>
+            <TouchableOpacity style={buttonStyle} onPress={() => handleDecline(user)}>
+              <Icon name='x' size={20} />
+            </TouchableOpacity>
           </View>
         </View>
       ))}
@@ -124,23 +145,20 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 
 const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const { cancelFriendRequest } = useAuth();
-  const [users, setUsers] = useState<string[]>(requests);
 
-  const handleCancel = (id: string) => {
-    cancelFriendRequest(id).then(
-      () => setUsers(users.filter((user) => user !== id)),
-      (reason) => console.log(reason),
-    );
-  };
+  const handleCancel = (id: string) =>
+    cancelFriendRequest(id).catch((reason) => console.log(reason));
 
-  if (!users.length) return <Text>No outgoing requests!</Text>;
+  if (!requests.length) return <Text>No outgoing requests!</Text>;
 
   return (
-    <View>
-      {users.map((user) => (
-        <View key={user}>
+    <View style={containerStyle}>
+      {requests.map((user) => (
+        <View style={itemStyle} key={user}>
           <Text>{user}</Text>
-          <Button text='Cancel' onPress={() => handleCancel(user)} />
+          <TouchableOpacity onPress={() => handleCancel(user)}>
+            <Icon name='x' size={20} />
+          </TouchableOpacity>
         </View>
       ))}
     </View>
