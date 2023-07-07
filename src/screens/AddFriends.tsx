@@ -11,7 +11,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { InsetView, Button, Icon } from '../components';
-import { getStyles, Elements } from '../styles';
+import { getStyles, Elements, colors } from '../styles';
 import { useAuth } from '../components/AuthContext';
 
 type PendingRequests = {
@@ -77,6 +77,7 @@ const AddFriends: React.FC = () => {
           <TextInput 
             style={styles('textInput')} 
             placeholder='Friend ID..' 
+            placeholderTextColor={colorScheme == 'light' ? colors.lightTextTertiary : colors.darkTextTertiary}
             onChangeText={setInput} 
           />
         </View>

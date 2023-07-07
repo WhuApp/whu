@@ -9,6 +9,9 @@ const FriendList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [friends, setFriends] = useState([]);
 
+  const colorScheme = useColorScheme();
+  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+
   useEffect(() => {
     getFriends().then((friendIds) => {
       setFriends(friendIds);
@@ -17,7 +20,7 @@ const FriendList: React.FC = () => {
   }, []);
 
   if (loading) return <Text>Loading..</Text>;
-  if (!friends.length) return <Text>You dont have any friends</Text>;
+  if (!friends.length) return <Text style={styles('text')}>You dont have any friends</Text>;
 
   return (
       <>

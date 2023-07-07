@@ -18,19 +18,23 @@ export interface Elements {
   error?: Style;
   text?: Style;
   title?: Style;
+  secondaryButton?: Style;
+  primaryButton?: Style;
 }
 
 export const colors = {
-  lightBackground: '#f2f2f2',
-  lighterBackground: '#ffffff',
-  darkBackground: '#313338',
-  darkerBackground: '#1e1f22',
+  lightBackgroundPrimary: '#ffffff',
+  lightBackgroundSecondary: '#f7f8fa',
+  lightBackgroundTertiary: '#ebecee',
+  darkBackgroundPrimary: '#313338',
+  darkBackgroundSecondary: '#2b2d31',
+  darkBackgroundTertiary: '#1e1f22',
   lightTextPrimary: '#000000',
-  lightTextSecondary: '#222222',
-  lightTextTertiary: '#141414',
+  lightTextSecondary: '#141414',
+  lightTextTertiary: '#BBBBBB',
   darkTextPrimary: '#ffffff',
   darkTextSecondary: '#D3D3D3',
-  darkTextTertiary: '#b5bac1',
+  darkTextTertiary: '#888888',
   linkColor: '#4082E3',
   errorColor: '#FF3040',
 };
@@ -63,43 +67,68 @@ const defaultStyles: Elements = {
   error: {
     color: colors.errorColor,
   },
+  primaryButton: {
+    flexDirection: 'row',
+    width: 200,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderRadius: 20,
+  },
+  secondaryButton: {
+    borderRadius: 100,
+    padding: 6,
+  },
 };
 
 const lightStyles: Elements = {
   page: {
-    backgroundColor: colors.lightBackground,
+    backgroundColor: colors.lightBackgroundPrimary,
   },
   title: {
     color: colors.lightTextPrimary,
+  },
+  label: {
+    color: colors.lightTextSecondary,
   },
   text: {
     color: colors.lightTextSecondary,
   },
   textInput: {
-    backgroundColor: colors.lighterBackground,
+    backgroundColor: colors.lightBackgroundTertiary,
     color: colors.lightTextPrimary,
   },
-  label: {
-    color: colors.lightTextTertiary,
+  primaryButton: {
+    backgroundColor: '#7791fc',
+  },
+  secondaryButton: {
+    backgroundColor: colors.lightBackgroundTertiary,
   },
 };
 
 const darkStyles: Elements = {
   page: {
-    backgroundColor: colors.darkBackground,
+    backgroundColor: colors.darkBackgroundPrimary,
   },
   title: {
     color: colors.darkTextPrimary,
+  },
+  label: {
+    color: colors.darkTextSecondary,
   },
   text: {
     color: colors.darkTextSecondary,
   },
   textInput: {
-    backgroundColor: colors.darkerBackground,
+    backgroundColor: colors.darkBackgroundTertiary,
     color: colors.darkTextPrimary,
   },
-  label: {
-    color: colors.darkTextTertiary,
+  primaryButton: {
+    backgroundColor: '#364cad',
+  },
+  secondaryButton: {
+    backgroundColor: colors.darkBackgroundTertiary,
   },
 };
 

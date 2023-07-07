@@ -13,8 +13,6 @@ import { GeoPoint } from '../location';
 
 const Home: React.FC = () => {
   const { session, getLocation } = useAuth();
-
-  const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<GeoPoint>();
   const [name, setName] = useState<string>('Loading..');
 
