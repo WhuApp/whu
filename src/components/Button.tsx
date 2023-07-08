@@ -3,10 +3,11 @@ import {
   Pressable,
   View,
   Text,
-  StyleSheet,
+  useColorScheme,
   ViewProps,
   ActivityIndicator,
 } from 'react-native';
+import { getStyles, Elements } from '../styles';
 
 interface ButtonProps {
   text: string;
@@ -20,31 +21,17 @@ const Button: React.FC<ButtonProps & ViewProps> = ({
   loading = false,
   ...props
 }) => {
+  const colorScheme = useColorScheme();
+  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+
   return (
     <View {...props}>
-      <Pressable onPress={onPress} style={styles.button}>
+      <Pressable onPress={onPress} style={styles('primaryButton')}>
         {loading && <ActivityIndicator size={'small'} color={'#FAFAFA'} />}
-        <Text style={styles.text}>{text}</Text>
+        <Text style={styles('text')}>{text}</Text>
       </Pressable>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: 'row',
-    width: 200,
-    backgroundColor: '#3C44F6',
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    borderRadius: 20,
-  },
-  text: {
-    fontSize: 20,
-    color: '#FAFAFA',
-  },
-});
 
 export default Button;

@@ -18,19 +18,24 @@ export interface Elements {
   error?: Style;
   text?: Style;
   title?: Style;
+  secondaryButton?: Style;
+  primaryButton?: Style;
+  listItem?: Style;
 }
 
 export const colors = {
-  lightBackground: '#f2f2f2',
-  lighterBackground: '#ffffff',
-  darkBackground: '#313338',
-  darkerBackground: '#1e1f22',
+  lightBackgroundPrimary: '#ffffff',
+  lightBackgroundSecondary: '#f7f8fa',
+  lightBackgroundTertiary: '#ebecee',
+  darkBackgroundPrimary: '#313338',
+  darkBackgroundSecondary: '#2b2d31',
+  darkBackgroundTertiary: '#1e1f22',
   lightTextPrimary: '#000000',
-  lightTextSecondary: '#222222',
-  lightTextTertiary: '#141414',
+  lightTextSecondary: '#141414',
+  lightTextTertiary: '#BBBBBB',
   darkTextPrimary: '#ffffff',
   darkTextSecondary: '#D3D3D3',
-  darkTextTertiary: '#b5bac1',
+  darkTextTertiary: '#888888',
   linkColor: '#4082E3',
   errorColor: '#FF3040',
 };
@@ -46,8 +51,8 @@ const defaultStyles: Elements = {
   },
   textInput: {
     padding: 8,
-    width: 350,
     borderRadius: 5,
+    minWidth: 350,
   },
   inputWrapper: {
     gap: 5,
@@ -63,43 +68,79 @@ const defaultStyles: Elements = {
   error: {
     color: colors.errorColor,
   },
+  primaryButton: {
+    backgroundColor: '#3C44F6',
+    flexDirection: 'row',
+    width: 200,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderRadius: 20,
+  },
+  secondaryButton: {
+    borderRadius: 100,
+    padding: 6,
+  },
+  listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: 8,
+    borderBottomWidth: 1,
+    alignItems: 'center',
+  },
 };
 
 const lightStyles: Elements = {
   page: {
-    backgroundColor: colors.lightBackground,
+    backgroundColor: colors.lightBackgroundPrimary,
   },
   title: {
     color: colors.lightTextPrimary,
   },
-  text: {
+  label: {
     color: colors.lightTextSecondary,
   },
-  textInput: {
-    backgroundColor: colors.lighterBackground,
+  text: {
     color: colors.lightTextPrimary,
   },
-  label: {
-    color: colors.lightTextTertiary,
+  textInput: {
+    backgroundColor: colors.lightBackgroundTertiary,
+    color: colors.lightTextPrimary,
+  },
+  secondaryButton: {
+    backgroundColor: colors.lightBackgroundTertiary,
+  },
+  listItem: {
+    backgroundColor: colors.lightBackgroundSecondary,
+    borderBottomColor: colors.lightBackgroundTertiary,
   },
 };
 
 const darkStyles: Elements = {
   page: {
-    backgroundColor: colors.darkBackground,
+    backgroundColor: colors.darkBackgroundPrimary,
   },
   title: {
     color: colors.darkTextPrimary,
   },
-  text: {
+  label: {
     color: colors.darkTextSecondary,
   },
-  textInput: {
-    backgroundColor: colors.darkerBackground,
+  text: {
     color: colors.darkTextPrimary,
   },
-  label: {
-    color: colors.darkTextTertiary,
+  textInput: {
+    backgroundColor: colors.darkBackgroundTertiary,
+    color: colors.darkTextPrimary,
+  },
+  secondaryButton: {
+    backgroundColor: colors.darkBackgroundTertiary,
+  },
+  listItem: {
+    backgroundColor: colors.darkBackgroundSecondary,
+    borderBottomColor: colors.darkBackgroundTertiary,
   },
 };
 

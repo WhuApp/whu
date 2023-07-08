@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Text } from 'react-native';
+import { Text, useColorScheme } from 'react-native';
 import { useAuth } from './AuthContext';
-
-type Friend = {
-  name: string;
-  lastSeen?: string;
-};
+import { getStyles, Elements } from '../styles';
 
 const FriendList: React.FC = () => {
   const { getFriends } = useAuth();
@@ -13,31 +9,37 @@ const FriendList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [friends, setFriends] = useState([]);
 
+  const colorScheme = useColorScheme();
+  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+
   useEffect(() => {
-    getFriends().then((document) => {
-      setFriends(document.friends.map((x) => ({ name: x })));
+    getFriends().then((friendIds) => {
+      setFriends(friendIds);
       setLoading(false);
     });
   }, []);
 
   if (loading) return <Text>Loading..</Text>;
-  if (!friends.length) return <Text>You dont have any friends</Text>;
+  if (!friends.length) return <Text style={styles('text')}>You dont have any friends</Text>;
 
   return (
-    <>
-      {friends.map((friend, index) => (
-        <FriendListItem key={index} friend={friend} />
-      ))}
-    </>
+      <>
+        {friends.map((friend, index) => (
+          <FriendListItem key={index} friend={friend} />
+        ))}
+      </>
   );
 };
 
 interface FriendListItemProps {
-  friend: Friend;
+  friend: string;
 }
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
-  return <Text>{friend.name}</Text>;
+  const colorScheme = useColorScheme();
+  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+
+  return <Text style={styles('text')}>{friend}</Text>;
 };
 
 export default FriendList;

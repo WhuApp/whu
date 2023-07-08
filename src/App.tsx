@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Home, SignIn, SignUp, Welcome } from './screens';
+import { AddFriends, Home, Profile, SignIn, SignUp, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
@@ -8,7 +8,7 @@ import * as Location from 'expo-location';
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  const { loggedIn } = useAuth();
+  const { session } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -25,8 +25,12 @@ const App: React.FC = () => {
       <Stack.Navigator
         screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
       >
-        {loggedIn ? (
-          <Stack.Screen name='Home' component={Home} />
+        {session ? (
+          <>
+            <Stack.Screen name='Home' component={Home} />
+            <Stack.Screen name='Profile' component={Profile} />
+            <Stack.Screen name='AddFriends' component={AddFriends} />
+          </>
         ) : (
           <>
             <Stack.Screen name='Welcome' component={Welcome} />

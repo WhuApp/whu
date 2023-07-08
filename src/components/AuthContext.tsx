@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Account, Client, Databases, ID, Permission, Role } from 'appwrite';
-import { normalizeCoordinates, denormalizeCoordiantes } from '../Location';
+import {
+  Account,
+  Client,
+  Databases,
+  ID,
+  Models,
+  Permission,
+  Role,
+} from 'appwrite';
+import {
+  normalizeCoordinates,
+  denormalizeCoordiantes,
+} from '../location';
 import * as Location from 'expo-location';
 
 const ENDPOINT = 'https://cloud.appwrite.io/v1';
@@ -9,119 +20,209 @@ const DATABASE_ID = '6488df9565380dad0d54';
 const COLLECTION_FRIENDS_ID = '649df56d2fc10d735314';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
 
-const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
+const client = new Client()
+  .setEndpoint(ENDPOINT)
+  .setProject(PROJECT_ID);
 const account = new Account(client);
 const databases = new Databases(client);
 
 const AuthContext = React.createContext(null);
 
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [session, setSession] = useState<Models.Session | undefined>();
 
   useEffect(() => {
-    account.get().then(
-      () => setLoggedIn(true),
-      () => setLoggedIn(false),
+    account.getSession('current').then(
+      (current) => setSession(current),
+      () => setSession(null),
     );
   }, []);
 
-  const signIn = (mail: string, password: string) => {
-    return account.createEmailSession(mail, password).then((result) => {
-      setLoggedIn(true);
-      return result;
-    });
+  const signIn = async (mail: string, password: string) => {
+    setSession(await account.createEmailSession(mail, password));
   };
 
-  const signOut = () => {
-    return account.deleteSession('current').then((result) => {
-      setLoggedIn(false);
-      return result;
-    });
+  const signOut = async () => {
+    await account.deleteSession('current');
+    setSession(null);
   };
 
-  const signUp = (name: string, mail: string, password: string) => {
-    return account.create(ID.unique(), mail, password, name).then((user) => {
-      return account.createEmailSession(mail, password).then(() => {
-        return createStartDocuments(user.$id).then(() => setLoggedIn(true));
-      });
-    });
+  const signUp = async (name: string, mail: string, password: string) => {
+    const user = await account.create(ID.unique(), mail, password, name);
+    const session = await account.createEmailSession(mail, password);
+
+    await setupNewUser(user.$id);
+    setSession(session);
   };
 
-  const createStartDocuments = (id: string) => {
+  const setupNewUser = async (id: string) => {
     const permissions = [
       Permission.read(Role.user(id)),
       Permission.update(Role.user(id)),
       Permission.delete(Role.user(id)),
       Permission.write(Role.user(id)),
     ];
-
-    return Location.getCurrentPositionAsync({
+    const location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Lowest,
       mayShowUserSettingsDialog: true,
-    }).then((location) => {
-      return Promise.all([
-        databases.createDocument(
-          DATABASE_ID,
-          COLLECTION_FRIENDS_ID,
-          id,
-          { friends: ['649d9184e0627ccff6a2'] },
-          permissions,
-        ),
-        databases.createDocument(
-          DATABASE_ID,
-          COLLECTION_LOCATION_ID,
-          id,
-          {
-            time_stamp: new Date().toISOString(),
-            ...normalizeCoordinates({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              altitude: location.coords.altitude,
-            }),
-          },
-          permissions,
-        ),
-      ]).catch(() => {
-        databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-        databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
-      });
+    });
+
+    await Promise.all([
+      databases.createDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, { friends: [] }, permissions),
+      databases.createDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id, {
+        time_stamp: new Date().toISOString(),
+        ...normalizeCoordinates({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          altitude: location.coords.altitude,
+        }),
+      }, permissions)
+    ]).catch((reason) => {
+      databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+      databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
+
+      throw new Error(`Failed to setup ${id} because ${reason}`);
     });
   };
 
-  const getSession = () => account.get();
-
-  const getFriends = () => {
-    return getSession().then((user) => {
-      return databases.getDocument(
-        DATABASE_ID,
-        COLLECTION_FRIENDS_ID,
-        user.$id,
-      );
-    });
+  const getFriends = async () => {
+    const document = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+    return document.friends;
   };
 
   const getLocation = async () => {
-    const user = await getSession();
-    const doc = await databases.getDocument(
-      DATABASE_ID,
-      COLLECTION_LOCATION_ID,
-      user.$id,
-    );
+    const document = await databases.getDocument(DATABASE_ID, COLLECTION_LOCATION_ID, session.userId);
+
     return denormalizeCoordiantes({
-      longitude: doc.longitude,
-      latitude: doc.latitude,
-      altitude: doc.altitude,
+      longitude: document.longitude,
+      latitude: document.latitude,
+      altitude: document.altitude,
+    });
+  };
+
+  const sendFriendRequest = async (id: string): Promise<never | string> => {
+    if (id === '' || id === session.userId) return 'Invalid id';
+    
+    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id).catch(() => { return undefined });
+    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+    const result = [];
+
+    if(!other) return 'Not found';
+    if (self.friends.includes(id)) return 'Already friends';
+    if (self.out.includes(id)) return 'Already requested';
+
+    if (self.in.includes(id)) {
+      result.push(
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
+          in: self.in.filter((x: string) => x !== id),
+          friends: [id, ...self.friends],
+        }),
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
+          out: self.out.filter((x: string) => x !== session.userId),
+          friends: [session.userId, ...other.friends],
+        }),
+      );
+    } else {
+      result.push(
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
+          out: [id, ...self.out],
+        }),
+        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
+          in: [session.userId, ...other.in],
+        }),
+      );
+    }
+
+    await Promise.all(result).catch((reason) => {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
+
+      throw new Error(`Sending request to ${id} failed because ${reason}`);
+    });
+  };
+
+  const getFriendRequests = async () => {
+    const document = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+
+    return { 
+      incoming: document.in ?? [], 
+      outgoing: document.out ?? []
+    };
+  };
+
+  const cancelFriendRequest = async (id: string) => {
+    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+
+    await Promise.all([
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
+        out: self.out.filter((x: string) => x !== id),
+      }),
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
+        in: other.in.filter((x: string) => x !== session.userId),
+      }),
+    ]).catch((reason) => {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
+
+      throw new Error(`Cancel friend request to ${id} failed because ${reason}`);
+    });
+  };
+
+  const declineFriendRequest = async (id: string) => {
+    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+
+    if (!self.in.includes(id)) throw new Error(`No request from user ${id}`);
+
+    await Promise.all([
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
+        in: self.in.filter((x: string) => x !== id)
+      }),
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
+        out: other.out.filter((x: string) => x !== session.userId)
+      })
+    ]).catch((reason) => {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
+
+      throw new Error(`Decline failed because ${reason}`);
+    });
+  };
+
+  const removeFriend = async (id: string) => {
+    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
+    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+
+    if (self.friends.includes(id)) throw new Error(`Not friends with ${id}`);
+
+    return Promise.all([
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
+        friends: self.friends.filter((x: string) => x !== id),
+      }),
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
+        friends: self.friends.filter((x: string) => x !== session.userId),
+      }),
+    ]).catch((reason) => {
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
+      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
+
+      throw new Error(`Removing friend ${id} failed beacuse ${reason}`);
     });
   };
 
   const auth = {
+    session,
     signIn,
     signOut,
     signUp,
-    getSession,
     getFriends,
     getLocation,
-    loggedIn,
+    sendFriendRequest,
+    getFriendRequests,
+    cancelFriendRequest,
+    declineFriendRequest,
+    removeFriend,
   };
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
