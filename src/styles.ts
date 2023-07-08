@@ -20,6 +20,7 @@ export interface Elements {
   title?: Style;
   secondaryButton?: Style;
   primaryButton?: Style;
+  listItem?: Style;
 }
 
 export const colors = {
@@ -68,6 +69,7 @@ const defaultStyles: Elements = {
     color: colors.errorColor,
   },
   primaryButton: {
+    backgroundColor: '#3C44F6',
     flexDirection: 'row',
     width: 200,
     padding: 10,
@@ -79,6 +81,14 @@ const defaultStyles: Elements = {
   secondaryButton: {
     borderRadius: 100,
     padding: 6,
+  },
+  listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: 8,
+    borderBottomWidth: 1,
+    alignItems: 'center',
   },
 };
 
@@ -93,17 +103,18 @@ const lightStyles: Elements = {
     color: colors.lightTextSecondary,
   },
   text: {
-    color: colors.lightTextSecondary,
+    color: colors.lightTextPrimary,
   },
   textInput: {
     backgroundColor: colors.lightBackgroundTertiary,
     color: colors.lightTextPrimary,
   },
-  primaryButton: {
-    backgroundColor: '#7791fc',
-  },
   secondaryButton: {
     backgroundColor: colors.lightBackgroundTertiary,
+  },
+  listItem: {
+    backgroundColor: colors.lightBackgroundSecondary,
+    borderBottomColor: colors.lightBackgroundTertiary,
   },
 };
 
@@ -118,17 +129,18 @@ const darkStyles: Elements = {
     color: colors.darkTextSecondary,
   },
   text: {
-    color: colors.darkTextSecondary,
+    color: colors.darkTextPrimary,
   },
   textInput: {
     backgroundColor: colors.darkBackgroundTertiary,
     color: colors.darkTextPrimary,
   },
-  primaryButton: {
-    backgroundColor: '#364cad',
-  },
   secondaryButton: {
     backgroundColor: colors.darkBackgroundTertiary,
+  },
+  listItem: {
+    backgroundColor: colors.darkBackgroundSecondary,
+    borderBottomColor: colors.darkBackgroundTertiary,
   },
 };
 
