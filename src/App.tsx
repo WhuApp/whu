@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AddFriends, Home, Profile, SignIn, SignUp, Welcome } from './screens';
+import { AddFriends, Home, Profile, Settings, SignIn, SignUp, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
@@ -20,6 +20,8 @@ const App: React.FC = () => {
     })();
   }, []);
 
+  // TODO: Change animation depending on current screen stack
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -27,15 +29,16 @@ const App: React.FC = () => {
       >
         {session ? (
           <>
-            <Stack.Screen name='Home' component={Home} />
-            <Stack.Screen name='Profile' component={Profile} />
+            <Stack.Screen name='Home'       component={Home} />
+            <Stack.Screen name='Profile'    component={Profile} />
+            <Stack.Screen name='Settings'   component={Settings} />
             <Stack.Screen name='AddFriends' component={AddFriends} />
           </>
         ) : (
           <>
-            <Stack.Screen name='Welcome' component={Welcome} />
-            <Stack.Screen name='SignIn' component={SignIn} />
-            <Stack.Screen name='SignUp' component={SignUp} />
+            <Stack.Screen name='Welcome'    component={Welcome} />
+            <Stack.Screen name='SignIn'     component={SignIn} />
+            <Stack.Screen name='SignUp'     component={SignUp} />
           </>
         )}
       </Stack.Navigator>

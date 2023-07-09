@@ -7,7 +7,7 @@ import {
   ViewProps,
   ActivityIndicator,
 } from 'react-native';
-import { getStyles, Elements } from '../styles';
+import { getStyles, Elements, colors } from '../styles';
 
 interface ButtonProps {
   text: string;
@@ -27,8 +27,8 @@ const Button: React.FC<ButtonProps & ViewProps> = ({
   return (
     <View {...props}>
       <Pressable onPress={onPress} style={styles('primaryButton')}>
-        {loading && <ActivityIndicator size={'small'} color={'#FAFAFA'} />}
-        <Text style={styles('text')}>{text}</Text>
+        {loading && <ActivityIndicator size={'small'} color={colors.darkTextPrimary} />}
+        <Text style={{ color: colors.darkTextPrimary }}>{text}</Text>
       </Pressable>
     </View>
   );

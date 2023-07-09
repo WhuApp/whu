@@ -32,10 +32,7 @@ const AddFriends: React.FC = () => {
 
     getFriendRequests().then(
       (requests) => {
-        setRequests({
-          incoming: ['Test1', 'Test2', 'Test3'],
-          outgoing: ['Test1', 'Test2', 'Test3'],
-        });
+        setRequests(requests);
         setLoading(false);
       },
       (reason) => {
@@ -106,7 +103,7 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const handleDecline = (id: string) =>
     declineFriendRequest(id).catch((reason) => console.log(reason));
 
-  if (!requests.length) return <Text>No incoming requests!</Text>;
+  if (!requests.length) return <Text style={styles('text')}>No incoming requests!</Text>;
 
   return (
     <View style={{ borderRadius: 10, overflow: 'hidden' }}>
@@ -142,7 +139,7 @@ const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const handleCancel = (id: string) =>
     cancelFriendRequest(id).catch((reason) => console.log(reason));
 
-  if (!requests.length) return <Text>No outgoing requests!</Text>;
+  if (!requests.length) return <Text style={styles('text')}>No outgoing requests!</Text>;
 
   return (
     <View style={{ borderRadius: 10, overflow: 'hidden' }}>
