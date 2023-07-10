@@ -7,4 +7,5 @@ export type RootStackParamList = {
   Home: undefined;
   AddFriends: undefined;
   Profile: undefined;
+  Settings: undefined;
 };
