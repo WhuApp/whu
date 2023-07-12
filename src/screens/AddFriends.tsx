@@ -92,7 +92,7 @@ const AddFriends: React.FC = () => {
 };
 
 const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const { sendFriendRequest, declineFriendRequest } = useAuth();
+  const { sendFriendRequest, deleteFriendRequest } = useAuth();
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
@@ -101,7 +101,7 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
     sendFriendRequest(id).then((reason) => console.log(reason));
 
   const handleDecline = (id: string) =>
-    declineFriendRequest(id).catch((reason) => console.log(reason));
+    deleteFriendRequest(id).catch((reason) => console.log(reason));
 
   if (!requests.length) return <Text style={styles('text')}>No incoming requests!</Text>;
 
@@ -131,13 +131,13 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 };
 
 const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const { cancelFriendRequest } = useAuth();
+  const { deleteFriendRequest } = useAuth();
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const handleCancel = (id: string) =>
-    cancelFriendRequest(id).catch((reason) => console.log(reason));
+    deleteFriendRequest(id).catch((reason) => console.log(reason));
 
   if (!requests.length) return <Text style={styles('text')}>No outgoing requests!</Text>;
 

@@ -7,6 +7,7 @@ import {
   Models,
   Permission,
   Role,
+  Functions,
 } from 'appwrite';
 import {
   normalizeCoordinates,
@@ -17,14 +18,16 @@ import * as Location from 'expo-location';
 const ENDPOINT = 'https://cloud.appwrite.io/v1';
 const PROJECT_ID = '648644a80adadf63b7d4';
 const DATABASE_ID = '6488df9565380dad0d54';
-const COLLECTION_FRIENDS_ID = '649df56d2fc10d735314';
+const COLLECTION_FRIENDS_ID = '64aaf2fb45c7f576e38b';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
+const FUNCTION_ADD_FRIEND_ID = '64aef40f8bc33879bb25';
 
 const client = new Client()
   .setEndpoint(ENDPOINT)
   .setProject(PROJECT_ID);
 const account = new Account(client);
 const databases = new Databases(client);
+const functions = new Functions(client);
 
 const AuthContext = React.createContext(null);
 
@@ -68,7 +71,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
 
     await Promise.all([
-      databases.createDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, { friends: [] }, permissions),
       databases.createDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id, {
         time_stamp: new Date().toISOString(),
         ...normalizeCoordinates({
@@ -86,8 +88,14 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const getFriends = async () => {
-    const document = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
-    return document.friends;
+    const friends: string[] = [];
+    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
+    documents.documents.filter((friendship) => friendship.accepted)
+      .forEach((friendship) => friends.push(
+        friendship.sender === session.userId ? friendship.receiver : friendship.sender
+      )
+    );
+    return friends;
   };
 
   const getLocation = async () => {
@@ -100,115 +108,31 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
   };
 
-  const sendFriendRequest = async (id: string): Promise<never | string> => {
-    if (id === '' || id === session.userId) return 'Invalid id';
-    
-    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id).catch(() => { return undefined });
-    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
-    const result = [];
-
-    if(!other) return 'Not found';
-    if (self.friends.includes(id)) return 'Already friends';
-    if (self.out.includes(id)) return 'Already requested';
-
-    if (self.in.includes(id)) {
-      result.push(
-        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
-          in: self.in.filter((x: string) => x !== id),
-          friends: [id, ...self.friends],
-        }),
-        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
-          out: self.out.filter((x: string) => x !== session.userId),
-          friends: [session.userId, ...other.friends],
-        }),
-      );
-    } else {
-      result.push(
-        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
-          out: [id, ...self.out],
-        }),
-        databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
-          in: [session.userId, ...other.in],
-        }),
-      );
-    }
-
-    await Promise.all(result).catch((reason) => {
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
-
-      throw new Error(`Sending request to ${id} failed because ${reason}`);
-    });
+  const sendFriendRequest = async (id: string) => {
+    const execution = await functions.createExecution(FUNCTION_ADD_FRIEND_ID, `{\"receiver\": \"${id}\"}`);
+    const response = JSON.parse(execution.response);
+    if (!response.success) return response.error;
   };
 
   const getFriendRequests = async () => {
-    const document = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
+    const outgoing: string[] = [];
+    const incoming: string[] = [];
+    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
+    documents.documents.filter((friendship) => !friendship.accepted).forEach((friendship) => {
+      if (friendship.sender === session.userId) outgoing.push(friendship.receiver);
+      if (friendship.receiver === session.userId) incoming.push(friendship.sender);
+    });
 
     return { 
-      incoming: document.in ?? [], 
-      outgoing: document.out ?? []
+      incoming: incoming, 
+      outgoing: outgoing
     };
   };
 
-  const cancelFriendRequest = async (id: string) => {
-    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
-
-    await Promise.all([
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
-        out: self.out.filter((x: string) => x !== id),
-      }),
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
-        in: other.in.filter((x: string) => x !== session.userId),
-      }),
-    ]).catch((reason) => {
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
-
-      throw new Error(`Cancel friend request to ${id} failed because ${reason}`);
-    });
-  };
-
-  const declineFriendRequest = async (id: string) => {
-    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
-
-    if (!self.in.includes(id)) throw new Error(`No request from user ${id}`);
-
-    await Promise.all([
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
-        in: self.in.filter((x: string) => x !== id)
-      }),
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
-        out: other.out.filter((x: string) => x !== session.userId)
-      })
-    ]).catch((reason) => {
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
-
-      throw new Error(`Decline failed because ${reason}`);
-    });
-  };
-
-  const removeFriend = async (id: string) => {
-    const other = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-    const self = await databases.getDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId);
-
-    if (self.friends.includes(id)) throw new Error(`Not friends with ${id}`);
-
-    return Promise.all([
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, {
-        friends: self.friends.filter((x: string) => x !== id),
-      }),
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, {
-        friends: self.friends.filter((x: string) => x !== session.userId),
-      }),
-    ]).catch((reason) => {
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, session.userId, self);
-      databases.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id, other);
-
-      throw new Error(`Removing friend ${id} failed beacuse ${reason}`);
-    });
+  const deleteFriendRequest = async (id: string) => {
+    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
+    const doc = documents.documents.filter((friendship) => friendship.sender === id || friendship.receiver === id)[0];
+    databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, doc.$id);
   };
 
   const auth = {
@@ -220,9 +144,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     getLocation,
     sendFriendRequest,
     getFriendRequests,
-    cancelFriendRequest,
-    declineFriendRequest,
-    removeFriend,
+    deleteFriendRequest
   };
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
