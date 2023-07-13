@@ -109,9 +109,9 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const sendFriendRequest = async (id: string) => {
-    const execution = await functions.createExecution(FUNCTION_ADD_FRIEND_ID, `{\"receiver\": \"${id}\"}`);
+    const execution = await functions.createExecution(FUNCTION_ADD_FRIEND_ID, JSON.stringify({ receiver: id }));
     const response = JSON.parse(execution.response);
-    if (!response.success) return response.error;
+    if (!response.success) return response.message;
   };
 
   const getFriendRequests = async () => {

@@ -1,114 +1,110 @@
-const sdk = require('node-appwrite');
+const {
+  Client,
+  Databases,
+  Users,
+  Query,
+  ID,
+  Permission,
+  Role,
+} = require('node-appwrite');
 
-/*
-  'req' variable has:
-    'headers' - object with request headers
-    'payload' - request body data as a string
-    'variables' - object with function variables
+const addFriend = async (request, response) => {
+  /**
+   * TODO: Maybe check if DATABASE_ID, COLLECTION_FRIENDS_ID, APPWRITE_FUNCTION_ENDPOINT, 
+   *       APPWRITE_FUNCTION_PROJECT_ID and APPWRITE_FUNCTION_API_KEY are not undefined.
+   */
 
-  'res' variable has:
-    'send(text, status)' - function to return text response. Status code defaults to 200
-    'json(obj, status)' - function to return JSON response. Status code defaults to 200
+  const database = request.variables['DATABASE_ID'];
+  const friendsCollection = request.variables['COLLECTION_FRIENDS_ID']; 
+  const payload = JSON.parse(request.payload);
+  const client = new Client();
+  const databases = new Databases(client);
+  const users = new Users(client);
 
-  If an error is thrown, a response with code 500 will be returned.
-*/
+  client
+    .setEndpoint(request.variables['APPWRITE_FUNCTION_ENDPOINT'])
+    .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
+    .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
 
-module.exports = async function (req, res) {
-  const client = new sdk.Client();
+  // Validate sender & receiver
+  if (!payload.receiver) {
+    return response.json({ success: false, message: 'No receiver provided' });
+  };
 
-  
-  // You can remove services you don't use
-  const account = new sdk.Account(client);
-  const avatars = new sdk.Avatars(client);
-  const database = new sdk.Databases(client);
-  const functions = new sdk.Functions(client);
-  const health = new sdk.Health(client);
-  const locale = new sdk.Locale(client);
-  const storage = new sdk.Storage(client);
-  const teams = new sdk.Teams(client);
-  const users = new sdk.Users(client);
-
-  if (
-    !req.variables['APPWRITE_FUNCTION_ENDPOINT'] ||
-    !req.variables['APPWRITE_FUNCTION_API_KEY']
-  ) {
-    console.warn('Environment variables are not set. Function cannot use Appwrite SDK.');
-  } else {
-    client
-      .setEndpoint(req.variables['APPWRITE_FUNCTION_ENDPOINT'])
-      .setProject(req.variables['APPWRITE_FUNCTION_PROJECT_ID'])
-      .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'])
-      .setSelfSigned(true);
-  }
-
-  const payload = JSON.parse(req.payload);
-  const DATABASE_ID = req.variables['DATABASE_ID'];
-  const COLLECTION_FRIENDS_ID = req.variables['COLLECTION_FRIENDS_ID'];
-  let senderId = req.variables['APPWRITE_FUNCTION_USER_ID'];
-  const receiverId = payload.receiver;
-
-  await users.get(senderId).catch(() => { 
-    console.log('using payload instead of sender');
-    senderId = payload.sender;
-    users.get(senderId).catch(() => res.json({ success: false, error: 'Sender not found' }));
+  const receiver = await users.get(payload.receiver).catch(() => {
+    return response.json({ success: false, message: 'Receiver not found' });
   });
-  
-  await users.get(receiverId).catch(() => res.json({ success: false, error: 'Receiver not found' }));
+  const sender = await users.get(request.variables['APPWRITE_FUNCTION_USER_ID']).catch(async () => {
+    console.log('Sender not found! Trying to use payload sender..');
+    
+    if (!payload.sender) {
+      return response.json({ success: false, message: 'No sender provided' });
+    }
 
-  if (senderId === receiverId) res.json({ success: false, error: 'Can not be friends with yourself' });
+    return await users.get(payload.sender).catch(() => {
+      return response.json({ success: false, message: 'Sender not found' });
+    })
+  });
+
+  if (sender.$id === receiver.$id) {
+    return response.json({ success: false, message: 'Sender can not be same as receiver' });
+  };
   
-  const other = await database.listDocuments(
-    DATABASE_ID, 
-    COLLECTION_FRIENDS_ID,
+  // Check if a request exists
+  const requests = await databases.listDocuments(
+    database,
+    friendsCollection,
     [
-      sdk.Query.equal('sender', [senderId, receiverId]),
-      sdk.Query.equal('receiver', [senderId, receiverId]),
-    ],
-  ).catch(() => { return undefined });
+      Query.equal('sender', [sender.$id, receiver.$id]),
+      Query.equal('receiver', [sender.$id, receiver.$id])
+    ]
+  );
 
-  //assert other.size <= 1
-
-  if (!other) {
-    const id = sdk.ID.unique();
-    await database.createDocument(
-      DATABASE_ID, 
-      COLLECTION_FRIENDS_ID, 
-      id, 
-      {
-        sender: senderId,
-        receiver: receiverId,
-        accepted: false,
-      },
+  // Create request
+  if (requests.total === 0) {
+    await databases.createDocument(
+      database,
+      friendsCollection,
+      ID.unique(),
+      { sender: sender.$id, receiver: receiver.$id, accepted: false },
       [
-        sdk.Permission.read(sdk.Role.user(senderId)),
-        sdk.Permission.read(sdk.Role.user(receiverId)),
-        sdk.Permission.delete(sdk.Role.user(senderId)),
-        sdk.Permission.delete(sdk.Role.user(receiverId)),    
+        Permission.read(Role.user(sender.$id)),
+        Permission.read(Role.user(receiver.$id)),
+        Permission.delete(Role.user(sender.$id)),
+        Permission.delete(Role.user(receiver.$id))
       ]
-    ).then(
-      () => res.json({ success: true, error: undefined }),
-      (reason) => {
-        database.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-        res.json({ success: false, error: `Failed to setup ${id} because ${reason}`});
-      }
     );
-  }
 
-  if (other[0].sender === senderId) res.json({ success: false, error: 'Already requested' });
+    console.log('Sent request to', receiver.$id);
+    return response.json({ success: true });
+  } else {
+    if (requests.total > 1) {
+      throw new Error('Something is completly wrong here!');
+    };
 
-  if (other[0].sender === receiverId) {
-    //assert other[0].receiver === senderId
-    await database.updateDocument(
-      DATABASE_ID,
-      COLLECTION_FRIENDS_ID,
-      other[0].$id,
-      { accepted: true },
-    ).then(
-      () => res.json({ success: true, error: undefined}),
-      (reason) => {
-        database.updateDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, other[0].$id, other[0]);
-        res.json({ success: false, error: `Failed to setup ${id} because ${reason}`});
-      }
-    );
-  }
+    const friendRequest = requests.documents[0];
+
+    if (friendRequest.accepted) {
+      return response.json({ success: false, message: 'Already friends' });
+    };
+
+    // Accept request
+    if (friendRequest.sender === receiver.$id) {
+      await databases.updateDocument(
+        database,
+        friendsCollection,
+        friendRequest.$id,
+        { accepted: true }
+      );
+
+      console.log('Accepted request of', receiver.$id);
+      return response.json({ success: true });
+    };
+
+    if (friendRequest.sender === sender.$id) {
+      return response.json({ success: false, message: 'Already requested' });
+    };
+  };
 };
+
+module.exports = addFriend;

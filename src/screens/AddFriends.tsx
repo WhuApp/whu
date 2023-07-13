@@ -98,7 +98,7 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const handleAccept = (id: string) =>
-    sendFriendRequest(id).then((reason) => console.log(reason));
+    sendFriendRequest(id).catch((reason) => console.log(reason));
 
   const handleDecline = (id: string) =>
     deleteFriendRequest(id).catch((reason) => console.log(reason));
