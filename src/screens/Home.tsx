@@ -12,15 +12,12 @@ import FriendList from '../components/FriendList';
 import { GeoPoint } from '../location';
 
 const Home: React.FC = () => {
-  const { session, getLocation } = useAuth();
-  const [location, setLocation] = useState<GeoPoint>();
+  const { session } = useAuth();
   const [name, setName] = useState<string>('Loading..');
 
   useEffect(() => {
     const fetchUser = async () => {
       setName(session.userId);
-
-      setLocation(await getLocation());
     };
 
     fetchUser();
@@ -34,11 +31,6 @@ const Home: React.FC = () => {
       <InsetView>
         <Header title={name} />
         <View style={[styles('container')]}>
-          <Text style={styles('text')}>
-            Latitude: {location?.latitude + "\n"} 
-            Longitude: {location?.longitude + "\n"} 
-            Altitude: {location?.altitude + "\n"} 
-          </Text>
           <FriendList />
         </View>
       </InsetView>

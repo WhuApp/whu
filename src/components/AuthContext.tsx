@@ -8,12 +8,14 @@ import {
   Permission,
   Role,
   Functions,
+  Query,
 } from 'appwrite';
 import {
   normalizeCoordinates,
   denormalizeCoordiantes,
 } from '../location';
 import * as Location from 'expo-location';
+import { Friend } from '../types';
 
 const ENDPOINT = 'https://cloud.appwrite.io/v1';
 const PROJECT_ID = '648644a80adadf63b7d4';
@@ -21,6 +23,7 @@ const DATABASE_ID = '6488df9565380dad0d54';
 const COLLECTION_FRIENDS_ID = '64aaf2fb45c7f576e38b';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
 const FUNCTION_ADD_FRIEND_ID = '64aef40f8bc33879bb25';
+const FUNCTION_GET_FRIENDS_ID = '64afee76ae420de6cc3d';
 
 const client = new Client()
   .setEndpoint(ENDPOINT)
@@ -59,53 +62,51 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const setupNewUser = async (id: string) => {
-    const permissions = [
-      Permission.read(Role.user(id)),
-      Permission.update(Role.user(id)),
-      Permission.delete(Role.user(id)),
-      Permission.write(Role.user(id)),
-    ];
     const location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Lowest,
       mayShowUserSettingsDialog: true,
     });
 
-    await Promise.all([
-      databases.createDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id, {
-        time_stamp: new Date().toISOString(),
+    await databases.createDocument(
+      DATABASE_ID, 
+      COLLECTION_LOCATION_ID, 
+      id, 
+      {
+        timestamp: new Date().getTime(),
         ...normalizeCoordinates({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           altitude: location.coords.altitude,
         }),
-      }, permissions)
-    ]).catch((reason) => {
-      databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, id);
-      databases.deleteDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id);
-
-      throw new Error(`Failed to setup ${id} because ${reason}`);
-    });
-  };
-
-  const getFriends = async () => {
-    const friends: string[] = [];
-    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
-    documents.documents.filter((friendship) => friendship.accepted)
-      .forEach((friendship) => friends.push(
-        friendship.sender === session.userId ? friendship.receiver : friendship.sender
-      )
+      }, 
+      [
+        Permission.read(Role.user(id)),
+        Permission.update(Role.user(id)),
+        Permission.delete(Role.user(id)),
+        Permission.write(Role.user(id)),
+      ]
     );
-    return friends;
   };
 
-  const getLocation = async () => {
-    const document = await databases.getDocument(DATABASE_ID, COLLECTION_LOCATION_ID, session.userId);
-
-    return denormalizeCoordiantes({
-      longitude: document.longitude,
-      latitude: document.latitude,
-      altitude: document.altitude,
-    });
+  const getFriends = async (): Promise<Friend[]> => {
+    const execution = await functions.createExecution(FUNCTION_GET_FRIENDS_ID);
+    const response = JSON.parse(execution.response);
+    console.log(execution);
+    if (execution.statusCode === 200){
+      return response.map((friend) => {
+        return {
+          name: friend.name,
+          location: {
+            timestamp: new Date(friend.location.timestamp),
+            ...denormalizeCoordiantes({
+              longitude: friend.location.longitude,
+              latitude: friend.location.latitude,
+              altitude: friend.location.altitude,
+            }),
+          },
+        };
+      });
+    };
   };
 
   const sendFriendRequest = async (id: string) => {
@@ -117,8 +118,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const getFriendRequests = async () => {
     const outgoing: string[] = [];
     const incoming: string[] = [];
-    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
-    documents.documents.filter((friendship) => !friendship.accepted).forEach((friendship) => {
+    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [Query.equal('accepted', false)]);
+    documents.documents.forEach((friendship) => {
       if (friendship.sender === session.userId) outgoing.push(friendship.receiver);
       if (friendship.receiver === session.userId) incoming.push(friendship.sender);
     });
@@ -141,7 +142,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     signOut,
     signUp,
     getFriends,
-    getLocation,
     sendFriendRequest,
     getFriendRequests,
     deleteFriendRequest

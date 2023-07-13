@@ -1,5 +1,3 @@
-// TODO global types???
-
 export type RootStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
@@ -9,3 +7,13 @@ export type RootStackParamList = {
   Profile: undefined;
   Settings: undefined;
 };
+
+export type Friend = {
+  name: string,
+  location: {
+    timestamp: Date,
+    longitude: number,
+    latitude: number,
+    altitude: number,
+  }
+}
