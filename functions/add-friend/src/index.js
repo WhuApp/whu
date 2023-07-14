@@ -9,10 +9,16 @@ const {
 } = require('node-appwrite');
 
 const addFriend = async (request, response) => {
-  /**
-   * TODO: Maybe check if DATABASE_ID, COLLECTION_FRIENDS_ID, APPWRITE_FUNCTION_ENDPOINT, 
-   *       APPWRITE_FUNCTION_PROJECT_ID and APPWRITE_FUNCTION_API_KEY are not undefined.
-   */
+  // Check if everything is set up correctly
+  if ([
+    'DATABASE_ID',
+    'COLLECTION_FRIENDS_ID',
+    'APPWRITE_FUNCTION_ENDPOINT',
+    'APPWRITE_FUNCTION_PROJECT_ID',
+    'APPWRITE_FUNCTION_API_KEY'
+  ].some((x) => !request.variables[x])) {
+    throw new Error('Some variables are missing');
+  };
 
   const database = request.variables['DATABASE_ID'];
   const friendsCollection = request.variables['COLLECTION_FRIENDS_ID']; 
