@@ -6,6 +6,17 @@ const {
 } = require('node-appwrite');
 
 module.exports = async function (request, response) {
+  // Check if everything is set up correctly
+  if ([
+    'DATABASE_ID',
+    'COLLECTION_FRIENDS_ID',
+    'COLLECTION_LOCATIONS_ID',
+    'APPWRITE_FUNCTION_ENDPOINT',
+    'APPWRITE_FUNCTION_PROJECT_ID',
+    'APPWRITE_FUNCTION_API_KEY'
+  ].some((x) => !request.variables[x])) {
+    throw new Error('Some variables are missing');
+  };
 
   const database = request.variables['DATABASE_ID'];
   const friendsCollection = request.variables['COLLECTION_FRIENDS_ID']; 
@@ -19,54 +30,54 @@ module.exports = async function (request, response) {
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
 
+  // Validate sender
   const sender = await users.get(request.variables['APPWRITE_FUNCTION_USER_ID']).catch(async () => {
     console.log('Sender not found! Trying to use payload sender..');
 
     if (!request.payload) {
-      return response.json({ success: false, message: 'No payload provided' })
-    }
+      throw new Error('No payload provided');
+    };
+
     const payload = JSON.parse(request.payload);
 
     if (!payload.sender) {
-      return response.json({ success: false, message: 'No sender provided' });
-    }
+      throw new Error('No sender provided');
+    };
 
     return await users.get(payload.sender).catch(() => {
-      return response.json({ success: false, message: 'Sender not found' });
-    })
+      throw new Error('Sender not found');
+    });
   });
 
-  const outgoingFrienships = (await databases.listDocuments(
+  // Find friends
+  const outgoing = await databases.listDocuments(
     database, 
     friendsCollection,
     [
       Query.equal('sender', sender.$id),
       Query.equal('accepted', true)
     ]
-  ));
-  
-  const incomingFrienships = (await databases.listDocuments(
+  );
+  const incoming = await databases.listDocuments(
     database, 
     friendsCollection,
     [
       Query.equal('receiver', sender.$id),
       Query.equal('accepted', true)
     ]
-  ));
+  );
+  const ids = [
+    ...outgoing.documents.map((x) => x.receiver), 
+    ...incoming.documents.map((x) => x.sender)
+  ];
 
-  const friendiDs = [];
-  outgoingFrienships.documents.forEach((friendship) => friendiDs.push(friendship.receiver));
-  incomingFrienships.documents.forEach((friendship) => friendiDs.push(friendship.sender));
-  
-  const result = [];
-  console.log(friendiDs);
-  for (const friendId of friendiDs) {
-    console.log(friendId);
-    const friend = await users.get(friendId);
-    const location = await databases.getDocument(database, locationsCollection, friendId);
+  // Transform to friend objects
+  const friends = await Promise.all(
+    ids.map(async (id) => {
+      const friend = await users.get(id);
+      const location = await databases.getDocument(database, locationsCollection, id);
 
-    result.push(
-      {
+      return ({
         name: friend.name,
         location: {
           timestamp: location.timestamp,
@@ -74,9 +85,9 @@ module.exports = async function (request, response) {
           latitude: location.latitude,
           altitude: location.altitude,
         },
-      }
-    );
-  }
+      });
+    }),
+  );
 
-  response.json(result);
+  response.json(friends ?? []);
 };
