@@ -21,7 +21,7 @@ function normalizeCoordinates(raw: GeoPoint): GeoPoint {
   return {
     longitude: longitude / 90,
     latitude: latitude / 180,
-    altitude: raw.altitude / 100000,
+    altitude: raw.altitude / 100000,  //max height 100 000 meters
   };
 }
 

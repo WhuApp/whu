@@ -1,0 +1,36 @@
+{
+    "projectId": "648644a80adadf63b7d4",
+    "projectName": "WhuApp",
+    "functions": [
+        {
+            "$id": "64aef40f8bc33879bb25",
+            "name": "add-friend",
+            "runtime": "node-16.0",
+            "path": "functions/add-friend",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "$id": "64afee76ae420de6cc3d",
+            "name": "get-friends",
+            "runtime": "node-16.0",
+            "path": "functions/get-friends",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}

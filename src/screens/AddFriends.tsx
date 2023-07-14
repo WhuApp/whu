@@ -12,6 +12,7 @@ import {
 import { InsetView, Button, Icon } from '../components';
 import { getStyles, Elements, colors } from '../styles';
 import { useAuth } from '../components/AuthContext';
+import { addFriend } from '../services/friends';
 
 type PendingRequests = {
   outgoing: string[];
@@ -19,7 +20,7 @@ type PendingRequests = {
 };
 
 const AddFriends: React.FC = () => {
-  const { sendFriendRequest, getFriendRequests } = useAuth();
+  const { getFriendRequests } = useAuth();
   const [input, setInput] = useState<string>('');
   const [requests, setRequests] = useState<PendingRequests | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,7 +46,7 @@ const AddFriends: React.FC = () => {
   const handleAdd = async () => {
     setLoading(true);
 
-    const reason = await sendFriendRequest(input);
+    const reason = await addFriend(input);
 
     if (reason) Alert.alert('Error', reason);
     setLoading(false);
@@ -92,16 +93,16 @@ const AddFriends: React.FC = () => {
 };
 
 const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const { sendFriendRequest, declineFriendRequest } = useAuth();
+  const { deleteFriendRequest } = useAuth();
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const handleAccept = (id: string) =>
-    sendFriendRequest(id).then((reason) => console.log(reason));
+    addFriend(id).catch((reason) => console.log(reason));
 
   const handleDecline = (id: string) =>
-    declineFriendRequest(id).catch((reason) => console.log(reason));
+    deleteFriendRequest(id).catch((reason) => console.log(reason));
 
   if (!requests.length) return <Text style={styles('text')}>No incoming requests!</Text>;
 
@@ -131,13 +132,13 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 };
 
 const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const { cancelFriendRequest } = useAuth();
+  const { deleteFriendRequest } = useAuth();
 
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
   const handleCancel = (id: string) =>
-    cancelFriendRequest(id).catch((reason) => console.log(reason));
+    deleteFriendRequest(id).catch((reason) => console.log(reason));
 
   if (!requests.length) return <Text style={styles('text')}>No outgoing requests!</Text>;
 
