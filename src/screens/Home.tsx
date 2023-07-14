@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   View,
-  Text,
   useColorScheme,
 } from 'react-native';
 import { InsetView, Header } from '../components';
 import { getStyles, Elements } from '../styles';
 import { useAuth } from '../components/AuthContext';
 import FriendList from '../components/FriendList';
-import { GeoPoint } from '../location';
 
 const Home: React.FC = () => {
   const { session } = useAuth();
@@ -30,7 +28,7 @@ const Home: React.FC = () => {
     <View style={styles('page')}>
       <InsetView>
         <Header title={name} />
-        <View style={[styles('container')]}>
+        <View style={{ padding: 15 }}>
           <FriendList />
         </View>
       </InsetView>

@@ -1,36 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import {
   Account,
-  Client,
   Databases,
   ID,
   Models,
   Permission,
   Role,
-  Functions,
   Query,
 } from 'appwrite';
 import {
   normalizeCoordinates,
-  denormalizeCoordiantes,
 } from '../location';
 import * as Location from 'expo-location';
-import { Friend } from '../types';
+import { client } from '../appwrite';
 
-const ENDPOINT = 'https://cloud.appwrite.io/v1';
-const PROJECT_ID = '648644a80adadf63b7d4';
 const DATABASE_ID = '6488df9565380dad0d54';
 const COLLECTION_FRIENDS_ID = '64aaf2fb45c7f576e38b';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
-const FUNCTION_ADD_FRIEND_ID = '64aef40f8bc33879bb25';
-const FUNCTION_GET_FRIENDS_ID = '64afee76ae420de6cc3d';
 
-const client = new Client()
-  .setEndpoint(ENDPOINT)
-  .setProject(PROJECT_ID);
 const account = new Account(client);
 const databases = new Databases(client);
-const functions = new Functions(client);
 
 const AuthContext = React.createContext(null);
 
@@ -88,33 +77,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     );
   };
 
-  const getFriends = async (): Promise<Friend[]> => {
-    const execution = await functions.createExecution(FUNCTION_GET_FRIENDS_ID);
-    const response = JSON.parse(execution.response);
-    console.log(execution);
-    if (execution.statusCode === 200){
-      return response.map((friend) => {
-        return {
-          name: friend.name,
-          location: {
-            timestamp: new Date(friend.location.timestamp),
-            ...denormalizeCoordiantes({
-              longitude: friend.location.longitude,
-              latitude: friend.location.latitude,
-              altitude: friend.location.altitude,
-            }),
-          },
-        };
-      });
-    };
-  };
-
-  const sendFriendRequest = async (id: string) => {
-    const execution = await functions.createExecution(FUNCTION_ADD_FRIEND_ID, JSON.stringify({ receiver: id }));
-    const response = JSON.parse(execution.response);
-    if (!response.success) return response.message;
-  };
-
   const getFriendRequests = async () => {
     const outgoing: string[] = [];
     const incoming: string[] = [];
@@ -141,8 +103,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     signIn,
     signOut,
     signUp,
-    getFriends,
-    sendFriendRequest,
     getFriendRequests,
     deleteFriendRequest
   };

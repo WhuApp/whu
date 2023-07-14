@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, useColorScheme } from 'react-native';
-import { useAuth } from './AuthContext';
 import { getStyles, Elements } from '../styles';
-import { Friend } from '../types';
+import type { Friend } from '../types';
+import { getFriends } from '../services/friends';
 
 const FriendList: React.FC = () => {
-  const { getFriends } = useAuth();
-
   const [loading, setLoading] = useState<boolean>(true);
   const [friends, setFriends] = useState<Friend[]>([]);
 
@@ -24,11 +22,12 @@ const FriendList: React.FC = () => {
   if (!friends.length) return <Text style={styles('text')}>You dont have any friends</Text>;
 
   return (
-    <>
+    <View>
+      <Text style={styles('title')}>Friends</Text>
       {friends.map((friend, index) => (
         <FriendListItem key={index} friend={friend} />
       ))}
-    </>
+    </View>
   );
 };
 
@@ -40,13 +39,15 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
+  const format = (num: number) => num.toLocaleString(undefined, { minimumFractionDigits: 6 });
+
   return (
-    <View>
+    <View style={[styles('listItem'), { width: '100%' }]}>
       <Text style={styles('text')}>{friend.name}</Text>
-      <Text style={styles('text')}>longitude: {friend.location.longitude.toLocaleString(undefined, {minimumFractionDigits: 6},)}</Text>
-      <Text style={styles('text')}>latitude: {friend.location.latitude.toLocaleString(undefined, {minimumFractionDigits: 6},)}</Text>
-      <Text style={styles('text')}>altitude: {friend.location.altitude.toLocaleString(undefined, {minimumFractionDigits: 6},)}</Text>
-      <Text style={styles('text')}>{friend.location.timestamp.toString()}</Text>
+      <Text style={styles('text')}>{format(friend.location.longitude)}</Text>
+      <Text style={styles('text')}>{format(friend.location.latitude)}</Text>
+      <Text style={styles('text')}>{format(friend.location.altitude)}</Text>
+      <Text style={styles('text')}>{friend.location.timestamp.toTimeString().split(' ')[0].slice(0, -3)}</Text>
     </View>
   )
 };
