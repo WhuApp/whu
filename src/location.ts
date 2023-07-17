@@ -1,3 +1,5 @@
+import type { Location } from './types';
+
 type GeoPoint = {
   longitude: number;
   latitude: number;
@@ -35,7 +37,7 @@ function denormalizeCoordiantes(normalized: GeoPoint): GeoPoint {
 }
 
 //https://www.movable-type.co.uk/scripts/latlong.html
-function calculateDistance(from: GeoPoint, to: GeoPoint) {
+function calculateDistance(from: Location, to: Location) {
   const R = 6371.0710e3; // metres
   const φ1 = from.latitude * Math.PI / 180; // φ, λ in radians
   const φ2 = to.latitude * Math.PI / 180;
@@ -51,8 +53,7 @@ function calculateDistance(from: GeoPoint, to: GeoPoint) {
   return d;
 }
 
-//https://www.movable-type.co.uk/scripts/latlong.html
-function calculateBearing(from: GeoPoint, to: GeoPoint) {
+function calculateBearing(from: Location, to: Location) {
   const φ1 = from.latitude * Math.PI / 180; // φ, λ in radians
   const φ2 = to.latitude * Math.PI / 180;
   const λ1 = from.longitude * Math.PI / 180; // φ, λ in radians
@@ -67,4 +68,10 @@ function calculateBearing(from: GeoPoint, to: GeoPoint) {
   return brng;
 }
 
-export { normalizeCoordinates, denormalizeCoordiantes, GeoPoint };
+export {
+  normalizeCoordinates,
+  denormalizeCoordiantes,
+  GeoPoint,
+  calculateBearing,
+  calculateDistance,
+};
