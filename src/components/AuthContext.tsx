@@ -45,6 +45,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     setSession(session);
   };
 
+  // TODO: Create a appwrite function for signup proccess
   const createUserDocument = async (id: string) => {
     const data = await currentTimedLocationAsync();
     const permissions = [

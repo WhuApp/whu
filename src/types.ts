@@ -22,3 +22,8 @@ export type Location = {
 export type TimedLocation = Location & { 
   timestamp: Date | number;
 };
+
+export type PendingRequests = {
+  outgoing: string[];
+  incoming: string[];
+};

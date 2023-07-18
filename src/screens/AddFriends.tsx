@@ -11,13 +11,9 @@ import {
 } from 'react-native';
 import { InsetView, Button, Icon } from '../components';
 import { getStyles, Elements, colors } from '../styles';
-import { deleteFriendRequest, getFriendRequests } from '../services/friends';
+import { removeFriend, getFriendRequests } from '../services/friends';
 import { addFriend } from '../services/friends';
-
-type PendingRequests = {
-  outgoing: string[];
-  incoming: string[];
-};
+import type { PendingRequests } from '../types';
 
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
@@ -98,8 +94,11 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const handleAccept = (id: string) =>
     addFriend(id).catch((reason) => console.log(reason));
 
-  const handleDecline = (id: string) =>
-    deleteFriendRequest(id).catch((reason) => console.log(reason));
+  const handleDecline = async (id: string) => {
+    const reason = await removeFriend(id);
+
+    if (reason) Alert.alert('Error', reason);
+  };
 
   if (!requests.length) return <Text style={styles('text')}>No incoming requests!</Text>;
 
@@ -132,8 +131,11 @@ const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const handleCancel = (id: string) =>
-    deleteFriendRequest(id).catch((reason) => console.log(reason));
+  const handleCancel = async (id: string) => {
+    const reason = await removeFriend(id);
+
+    if (reason) Alert.alert('Error', reason);
+  };
 
   if (!requests.length) return <Text style={styles('text')}>No outgoing requests!</Text>;
 
