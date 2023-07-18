@@ -1,15 +1,31 @@
-import type { Location } from './types';
+import type { Location, TimedLocation } from './types';
+import { getCurrentPositionAsync, Accuracy } from 'expo-location';
 
-type GeoPoint = {
-  longitude: number;
-  latitude: number;
-  altitude: number;
+/*
+Functions calculateDistance & calculateBearing were taken from
+https://www.movable-type.co.uk/scripts/latlong.html
+*/
+
+export const currentTimedLocationAsync = async (): Promise<TimedLocation> => {
+  const location = await getCurrentPositionAsync({
+    accuracy: Accuracy.Lowest,
+    mayShowUserSettingsDialog: true,
+  });
+
+  return {
+    timestamp: new Date().getTime(),
+    ...normalize({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      altitude: location.coords.altitude,
+    }),
+  };
 };
 
 //optimizable (while loops)
-function normalizeCoordinates(raw: GeoPoint): GeoPoint {
-  let longitude = raw.longitude;
-  let latitude = raw.latitude;
+const normalize = (location: Location): Location => {
+  let longitude = location.longitude;
+  let latitude = location.latitude;
 
   while (longitude > 90 || longitude < -90) {
     if (longitude > 90) longitude = 180 - longitude;
@@ -24,20 +40,18 @@ function normalizeCoordinates(raw: GeoPoint): GeoPoint {
   return {
     longitude: longitude / 90,
     latitude: latitude / 180,
-    altitude: raw.altitude / 100000,  //max height 100 000 meters
+    altitude: location.altitude / 100000,  // max height 100 000 meters
   };
-}
+};
 
-function denormalizeCoordiantes(normalized: GeoPoint): GeoPoint {
-  return {
-    longitude: normalized.longitude * 90,
-    latitude: normalized.latitude * 180,
-    altitude: normalized.altitude * 100000,
-  };
-}
+export const denormalize = (location: TimedLocation): TimedLocation => ({
+  timestamp: new Date(location.timestamp),
+  longitude: location.longitude * 90,
+  latitude: location.latitude * 180,
+  altitude: location.altitude * 100000,
+});
 
-//https://www.movable-type.co.uk/scripts/latlong.html
-function calculateDistance(from: Location, to: Location) {
+export const calculateDistance = (from: Location, to: Location) => {
   const R = 6371.0710e3; // metres
   const φ1 = from.latitude * Math.PI / 180; // φ, λ in radians
   const φ2 = to.latitude * Math.PI / 180;
@@ -51,9 +65,9 @@ function calculateDistance(from: Location, to: Location) {
   const d = R * c; // in metres 
 
   return d;
-}
+};
 
-function calculateBearing(from: Location, to: Location) {
+export const calculateBearing = (from: Location, to: Location) => {
   const φ1 = from.latitude * Math.PI / 180; // φ, λ in radians
   const φ2 = to.latitude * Math.PI / 180;
   const λ1 = from.longitude * Math.PI / 180; // φ, λ in radians
@@ -66,12 +80,4 @@ function calculateBearing(from: Location, to: Location) {
   const brng = (θ * 180 / Math.PI + 360) % 360; // in degrees
 
   return brng;
-}
-
-export {
-  normalizeCoordinates,
-  denormalizeCoordiantes,
-  GeoPoint,
-  calculateBearing,
-  calculateDistance,
 };

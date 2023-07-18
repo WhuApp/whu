@@ -10,12 +10,15 @@ export type RootStackParamList = {
 
 export type Friend = {
   name: string,
-  location: Location;
+  location: TimedLocation;
 }
 
 export type Location = {
-  timestamp: Date,
   longitude: number,
   latitude: number,
   altitude: number,
+};
+
+export type TimedLocation = Location & { 
+  timestamp: Date | number;
 };

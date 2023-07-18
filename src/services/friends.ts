@@ -1,7 +1,7 @@
 import { client } from '../appwrite';
 import { Functions } from 'appwrite';
 import type { Friend } from '../types';
-import { denormalizeCoordiantes } from '../location';
+import { denormalize } from '../location';
 
 const FUNCTION_GET_FRIENDS_ID = '64afee76ae420de6cc3d';
 const FUNCTION_ADD_FRIEND_ID = '64aef40f8bc33879bb25';
@@ -17,14 +17,7 @@ export const getFriends = async (): Promise<Friend[]> => {
 
   return data.map((friend) => ({
     name: friend.name,
-    location: {
-      timestamp: new Date(friend.location.timestamp),
-      ...denormalizeCoordiantes({
-        longitude: friend.location.longitude,
-        latitude: friend.location.latitude,
-        altitude: friend.location.altitude,
-      }),
-    },
+    location: denormalize(friend.location),
   }));
 };
 

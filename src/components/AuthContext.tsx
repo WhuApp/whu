@@ -8,10 +8,7 @@ import {
   Role,
   Query,
 } from 'appwrite';
-import {
-  normalizeCoordinates,
-} from '../location';
-import * as Location from 'expo-location';
+import { currentTimedLocationAsync } from '../location';
 import { client } from '../appwrite';
 
 const DATABASE_ID = '6488df9565380dad0d54';
@@ -51,30 +48,16 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const setupNewUser = async (id: string) => {
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Lowest,
-      mayShowUserSettingsDialog: true,
-    });
+    const data = await currentTimedLocationAsync();
+    const permissions = [
+      Permission.read(Role.user(id)),
+      Permission.update(Role.user(id)),
+      Permission.delete(Role.user(id)),
+      Permission.write(Role.user(id)),
+    ];
+    const document = await databases.createDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id, data, permissions);
 
-    await databases.createDocument(
-      DATABASE_ID, 
-      COLLECTION_LOCATION_ID, 
-      id, 
-      {
-        timestamp: new Date().getTime(),
-        ...normalizeCoordinates({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          altitude: location.coords.altitude,
-        }),
-      }, 
-      [
-        Permission.read(Role.user(id)),
-        Permission.update(Role.user(id)),
-        Permission.delete(Role.user(id)),
-        Permission.write(Role.user(id)),
-      ]
-    );
+    return document;
   };
 
   const getFriendRequests = async () => {

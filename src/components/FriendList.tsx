@@ -49,13 +49,15 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
   
   const calcHeading = () => (Math.floor(calculateBearing(location, friend.location) - heading) + 360) % 360;
 
+  const time = () => (friend.location.timestamp as Date).toTimeString().split(' ')[0].slice(0, -3);
+
   return (
     <View style={[styles('listItem'), { width: '100%' }]}>
       <Text style={styles('text')}>{friend.name}</Text>
       {location && <Text style={styles('text')}>{calcDistance()}m</Text>}
       {heading && location && <Text style={styles('text')}>{calcHeading()}°</Text>}
       {heading && location && <Compass direction={calcHeading()} />}
-      <Text style={styles('text')}>{friend.location.timestamp.toTimeString().split(' ')[0].slice(0, -3)}</Text>
+      <Text style={styles('text')}>{time()}</Text>
     </View>
   )
 };
