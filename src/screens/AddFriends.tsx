@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { InsetView, Button, Icon } from '../components';
 import { getStyles, Elements, colors } from '../styles';
-import { useAuth } from '../components/AuthContext';
+import { deleteFriendRequest, getFriendRequests } from '../services/friends';
 import { addFriend } from '../services/friends';
 
 type PendingRequests = {
@@ -20,7 +20,6 @@ type PendingRequests = {
 };
 
 const AddFriends: React.FC = () => {
-  const { getFriendRequests } = useAuth();
   const [input, setInput] = useState<string>('');
   const [requests, setRequests] = useState<PendingRequests | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -93,8 +92,6 @@ const AddFriends: React.FC = () => {
 };
 
 const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const { deleteFriendRequest } = useAuth();
-
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
@@ -132,8 +129,6 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
 };
 
 const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const { deleteFriendRequest } = useAuth();
-
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 

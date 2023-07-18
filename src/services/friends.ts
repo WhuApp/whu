@@ -1,12 +1,17 @@
 import { client } from '../appwrite';
-import { Functions } from 'appwrite';
+import { Databases, Functions } from 'appwrite';
 import type { Friend } from '../types';
 import { denormalize } from '../location';
 
+const DATABASE_ID = '6488df9565380dad0d54';
+const COLLECTION_FRIENDS_ID = '64aaf2fb45c7f576e38b';
+
 const FUNCTION_GET_FRIENDS_ID = '64afee76ae420de6cc3d';
 const FUNCTION_ADD_FRIEND_ID = '64aef40f8bc33879bb25';
+const FUNCTION_GET_FRIEND_REQUESTS_ID = '64b645dbb12660ad9258';
 
 const functions = new Functions(client);
+const databases = new Databases(client);
 
 /**
  * TODO: Implement caching
@@ -27,4 +32,17 @@ export const addFriend = async (id: string): Promise<string | undefined> => {
   const data = JSON.parse(execution.response);
   
   if (!data.success) return data.message;
+};
+
+export const getFriendRequests = async () => {
+  const execution = await functions.createExecution(FUNCTION_GET_FRIEND_REQUESTS_ID);
+  const data = JSON.parse(execution.response);
+
+  return data;
+};
+
+export const deleteFriendRequest = async (id: string) => {
+  const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
+  const doc = documents.documents.filter((friendship) => friendship.sender === id || friendship.receiver === id)[0];
+  databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, doc.$id);
 };

@@ -6,13 +6,11 @@ import {
   Models,
   Permission,
   Role,
-  Query,
 } from 'appwrite';
 import { currentTimedLocationAsync } from '../location';
 import { client } from '../appwrite';
 
 const DATABASE_ID = '6488df9565380dad0d54';
-const COLLECTION_FRIENDS_ID = '64aaf2fb45c7f576e38b';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
 
 const account = new Account(client);
@@ -43,11 +41,11 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const user = await account.create(ID.unique(), mail, password, name);
     const session = await account.createEmailSession(mail, password);
 
-    await setupNewUser(user.$id);
+    await createUserDocument(user.$id);
     setSession(session);
   };
 
-  const setupNewUser = async (id: string) => {
+  const createUserDocument = async (id: string) => {
     const data = await currentTimedLocationAsync();
     const permissions = [
       Permission.read(Role.user(id)),
@@ -60,34 +58,11 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     return document;
   };
 
-  const getFriendRequests = async () => {
-    const outgoing: string[] = [];
-    const incoming: string[] = [];
-    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [Query.equal('accepted', false)]);
-    documents.documents.forEach((friendship) => {
-      if (friendship.sender === session.userId) outgoing.push(friendship.receiver);
-      if (friendship.receiver === session.userId) incoming.push(friendship.sender);
-    });
-
-    return { 
-      incoming: incoming, 
-      outgoing: outgoing
-    };
-  };
-
-  const deleteFriendRequest = async (id: string) => {
-    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
-    const doc = documents.documents.filter((friendship) => friendship.sender === id || friendship.receiver === id)[0];
-    databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, doc.$id);
-  };
-
   const auth = {
     session,
     signIn,
     signOut,
     signUp,
-    getFriendRequests,
-    deleteFriendRequest
   };
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
