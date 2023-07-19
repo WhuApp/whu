@@ -7,7 +7,7 @@ const useLiveHeading = () => {
   const [heading, setHeading] = useState<number>();
 
   const onHeadingUpdate = (data: LocationHeadingObject) => {
-    setHeading(data.magHeading);
+    setHeading(data.trueHeading);
   };
 
   useEffect(() => {
