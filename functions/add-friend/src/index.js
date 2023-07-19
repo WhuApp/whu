@@ -4,8 +4,6 @@ const {
   Users,
   Query,
   ID,
-  Permission,
-  Role,
 } = require('node-appwrite');
 
 const addFriend = async (request, response) => {
@@ -72,13 +70,7 @@ const addFriend = async (request, response) => {
       database,
       friendsCollection,
       ID.unique(),
-      { sender: sender.$id, receiver: receiver.$id, accepted: false },
-      [
-        Permission.read(Role.user(sender.$id)),
-        Permission.read(Role.user(receiver.$id)),
-        Permission.delete(Role.user(sender.$id)),
-        Permission.delete(Role.user(receiver.$id))
-      ]
+      { sender: sender.$id, receiver: receiver.$id, accepted: false }
     );
 
     console.log('Sent request to', receiver.$id);
