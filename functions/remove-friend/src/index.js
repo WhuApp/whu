@@ -71,7 +71,7 @@ const addFriend = async (request, response) => {
     throw new Error('Something is completly wrong here!');
   };
 
-  await databases.deleteDocument(database, friendsCollection, friendships[0].$id);
+  await databases.deleteDocument(database, friendsCollection, friendships.documents[0].$id);
   response.json({ success: true });
 };
 
