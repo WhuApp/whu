@@ -46,6 +46,10 @@ const setupUser = async function (request, response) {
     });
   });
 
+  if (await databases.getDocument(database, locationsCollection, sender.$id)) {
+    throw new Error('Location document already exists');
+  }
+
   if (!payload.data) {
     throw new Error('No data provided');
   }

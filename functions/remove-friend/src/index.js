@@ -41,17 +41,13 @@ const addFriend = async (request, response) => {
     console.log('Sender not found! Trying to use payload sender..');
     
     if (!payload.sender) {
-      return response.json({ success: false, message: 'No sender provided' });
+      throw new Error('No sender provided');
     }
 
     return await users.get(payload.sender).catch(() => {
-      return response.json({ success: false, message: 'Sender not found' });
+      throw new Error('Sender not found');
     })
   });
-
-  if (sender.$id === receiver.$id) {
-    return response.json({ success: false, message: 'Sender can not be same as receiver' });
-  };
   
   // Check if a request or friendship exists
   const friendships = await databases.listDocuments(

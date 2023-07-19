@@ -32,26 +32,27 @@ const addFriend = async (request, response) => {
 
   // Validate sender & receiver
   if (!payload.receiver) {
-    return response.json({ success: false, message: 'No receiver provided' });
+    throw new Error('No receiver provided');
   };
 
   const receiver = await users.get(payload.receiver).catch(() => {
-    return response.json({ success: false, message: 'Receiver not found' });
+    throw new Error('Receiver not found');
   });
+  
   const sender = await users.get(request.variables['APPWRITE_FUNCTION_USER_ID']).catch(async () => {
     console.log('Sender not found! Trying to use payload sender..');
     
     if (!payload.sender) {
-      return response.json({ success: false, message: 'No sender provided' });
+      throw new Error('No sender provided');
     }
 
     return await users.get(payload.sender).catch(() => {
-      return response.json({ success: false, message: 'Sender not found' });
+      throw new Error('Sender not found');
     })
   });
 
   if (sender.$id === receiver.$id) {
-    return response.json({ success: false, message: 'Sender can not be same as receiver' });
+    throw new Error('Sender can not be same as receiver');
   };
   
   // Check if a request exists
