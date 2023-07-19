@@ -40,10 +40,12 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const payload = JSON.stringify({ data: await currentTimedLocationAsync() });
     const execution = await functions.createExecution(FUNCTION_SETUP_USER_ID, payload);
     const data = JSON.parse(execution.response);
-  
-    if (!data.success) return data.message;
     
-    setSession(session);
+    if (data.success) {
+      setSession(session);
+    } else {
+      return data.message;
+    }
   };
 
   const auth = {

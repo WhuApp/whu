@@ -8,7 +8,6 @@ const setupUser = async function (request, response) {
   // Check if everything is set up correctly
   if ([
     'DATABASE_ID',
-    'COLLECTION_FRIENDS_ID',
     'COLLECTION_LOCATIONS_ID',
     'APPWRITE_FUNCTION_ENDPOINT',
     'APPWRITE_FUNCTION_PROJECT_ID',
