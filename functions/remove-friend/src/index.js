@@ -3,7 +3,6 @@ const {
   Databases,
   Users,
   Query,
-  ID,
 } = require('node-appwrite');
 
 const addFriend = async (request, response) => {
@@ -32,7 +31,7 @@ const addFriend = async (request, response) => {
 
   // Validate sender & receiver
   if (!payload.receiver) {
-    return response.json({ success: false, message: 'No receiver provided' });
+    throw new Error('No receiver provided');
   };
 
   const receiver = await users.get(payload.receiver).catch(() => {
@@ -54,8 +53,8 @@ const addFriend = async (request, response) => {
     return response.json({ success: false, message: 'Sender can not be same as receiver' });
   };
   
-  // Check if a request exists
-  const requests = await databases.listDocuments(
+  // Check if a request or friendship exists
+  const friendships = await databases.listDocuments(
     database,
     friendsCollection,
     [
@@ -64,45 +63,16 @@ const addFriend = async (request, response) => {
     ]
   );
 
-  // Create request
-  if (requests.total === 0) {
-    await databases.createDocument(
-      database,
-      friendsCollection,
-      ID.unique(),
-      { sender: sender.$id, receiver: receiver.$id, accepted: false }
-    );
-
-    console.log('Sent request to', receiver.$id);
-    return response.json({ success: true });
-  } else {
-    if (requests.total > 1) {
-      throw new Error('Something is completly wrong here!');
-    };
-
-    const friendRequest = requests.documents[0];
-
-    if (friendRequest.accepted) {
-      return response.json({ success: false, message: 'Already friends' });
-    };
-
-    // Accept request
-    if (friendRequest.sender === receiver.$id) {
-      await databases.updateDocument(
-        database,
-        friendsCollection,
-        friendRequest.$id,
-        { accepted: true }
-      );
-
-      console.log('Accepted request of', receiver.$id);
-      return response.json({ success: true });
-    };
-
-    if (friendRequest.sender === sender.$id) {
-      return response.json({ success: false, message: 'Already requested' });
-    };
+  if (friendships.total === 0) {
+    return response.json({ success: false, message: 'No friendship or request for that user' });
   };
+
+  if (friendships.total > 1) {
+    throw new Error('Something is completly wrong here!');
+  };
+
+  await databases.deleteDocument(database, friendsCollection, friendships.documents[0].$id);
+  response.json({ success: true });
 };
 
 module.exports = addFriend;

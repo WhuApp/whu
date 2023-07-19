@@ -6,16 +6,11 @@ import {
   Models,
   Permission,
   Role,
-  Query,
 } from 'appwrite';
-import {
-  normalizeCoordinates,
-} from '../location';
-import * as Location from 'expo-location';
+import { currentTimedLocationAsync } from '../location';
 import { client } from '../appwrite';
 
 const DATABASE_ID = '6488df9565380dad0d54';
-const COLLECTION_FRIENDS_ID = '64aaf2fb45c7f576e38b';
 const COLLECTION_LOCATION_ID = '649df6a988dfc4a3026e';
 
 const account = new Account(client);
@@ -46,56 +41,22 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const user = await account.create(ID.unique(), mail, password, name);
     const session = await account.createEmailSession(mail, password);
 
-    await setupNewUser(user.$id);
+    await createUserDocument(user.$id);
     setSession(session);
   };
 
-  const setupNewUser = async (id: string) => {
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Lowest,
-      mayShowUserSettingsDialog: true,
-    });
+  // TODO: Create a appwrite function for signup proccess
+  const createUserDocument = async (id: string) => {
+    const data = await currentTimedLocationAsync();
+    const permissions = [
+      Permission.read(Role.user(id)),
+      Permission.update(Role.user(id)),
+      Permission.delete(Role.user(id)),
+      Permission.write(Role.user(id)),
+    ];
+    const document = await databases.createDocument(DATABASE_ID, COLLECTION_LOCATION_ID, id, data, permissions);
 
-    await databases.createDocument(
-      DATABASE_ID, 
-      COLLECTION_LOCATION_ID, 
-      id, 
-      {
-        timestamp: new Date().getTime(),
-        ...normalizeCoordinates({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          altitude: location.coords.altitude,
-        }),
-      }, 
-      [
-        Permission.read(Role.user(id)),
-        Permission.update(Role.user(id)),
-        Permission.delete(Role.user(id)),
-        Permission.write(Role.user(id)),
-      ]
-    );
-  };
-
-  const getFriendRequests = async () => {
-    const outgoing: string[] = [];
-    const incoming: string[] = [];
-    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [Query.equal('accepted', false)]);
-    documents.documents.forEach((friendship) => {
-      if (friendship.sender === session.userId) outgoing.push(friendship.receiver);
-      if (friendship.receiver === session.userId) incoming.push(friendship.sender);
-    });
-
-    return { 
-      incoming: incoming, 
-      outgoing: outgoing
-    };
-  };
-
-  const deleteFriendRequest = async (id: string) => {
-    const documents = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID);
-    const doc = documents.documents.filter((friendship) => friendship.sender === id || friendship.receiver === id)[0];
-    databases.deleteDocument(DATABASE_ID, COLLECTION_FRIENDS_ID, doc.$id);
+    return document;
   };
 
   const auth = {
@@ -103,8 +64,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     signIn,
     signOut,
     signUp,
-    getFriendRequests,
-    deleteFriendRequest
   };
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
