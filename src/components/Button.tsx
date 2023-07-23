@@ -33,7 +33,11 @@ const Button: React.FC<ButtonProps> = ({
   });
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.button}>
+    <TouchableOpacity
+      style={styles.button}
+      disabled={loading}
+      onPress={onPress}
+    >
       {loading && (
         <ActivityIndicator
           size={'small'}
