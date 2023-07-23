@@ -4,11 +4,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
 import * as Location from 'expo-location';
+import { useColors } from './utils';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   const { session } = useAuth();
+  const colors = useColors();
 
   // TODO: no?
   useEffect(() => {
@@ -24,7 +26,11 @@ const App: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+          navigationBarColor: colors('backgroundPrimary')
+        }}
       >
         {session ? (
           <>
@@ -50,6 +56,7 @@ const App: React.FC = () => {
             <Stack.Screen
               name='Welcome'
               component={Welcome}
+              options={{ navigationBarColor: '#0F0F31' }}
             />
             <Stack.Screen
               name='SignIn'
