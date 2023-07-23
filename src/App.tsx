@@ -49,6 +49,7 @@ const App: React.FC = () => {
             <Stack.Screen
               name='AddFriends'
               component={AddFriends}
+              options={{ animation: 'slide_from_bottom' }}
             />
           </>
         ) : (

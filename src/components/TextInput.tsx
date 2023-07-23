@@ -53,13 +53,14 @@ const TextInput: React.FC<TextInputProps> = ({
   };
   const inputWrapperStyle: ViewStyle = {
     padding: 8,
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     borderRadius: 10,
     backgroundColor: colors('backgroundTertiary'),
   };
   const inputStyle: TextStyle = {
-    width: '100%',
+    flexGrow: 1,
     color: colors('textPrimary'),
   };
 
