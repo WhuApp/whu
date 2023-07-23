@@ -10,6 +10,7 @@ const Stack = createNativeStackNavigator();
 const App: React.FC = () => {
   const { session } = useAuth();
 
+  // TODO: no?
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -20,8 +21,6 @@ const App: React.FC = () => {
     })();
   }, []);
 
-  // TODO: Change animation depending on current screen stack
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -29,16 +28,39 @@ const App: React.FC = () => {
       >
         {session ? (
           <>
-            <Stack.Screen name='Home'       component={Home} />
-            <Stack.Screen name='Profile'    component={Profile} />
-            <Stack.Screen name='Settings'   component={Settings} />
-            <Stack.Screen name='AddFriends' component={AddFriends} />
+            <Stack.Screen
+              name='Home'
+              component={Home}
+            />
+            <Stack.Screen
+              name='Profile'
+              component={Profile}
+            />
+            <Stack.Screen
+              name='Settings'
+              component={Settings}
+            />
+            <Stack.Screen
+              name='AddFriends'
+              component={AddFriends}
+            />
           </>
         ) : (
           <>
-            <Stack.Screen name='Welcome'    component={Welcome} />
-            <Stack.Screen name='SignIn'     component={SignIn} />
-            <Stack.Screen name='SignUp'     component={SignUp} />
+            <Stack.Screen
+              name='Welcome'
+              component={Welcome}
+            />
+            <Stack.Screen
+              name='SignIn'
+              component={SignIn}
+              options={{ animation: 'slide_from_bottom' }}
+            />
+            <Stack.Screen
+              name='SignUp'
+              component={SignUp}
+              options={{ animation: 'slide_from_bottom' }}
+            />
           </>
         )}
       </Stack.Navigator>
