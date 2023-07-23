@@ -22,22 +22,22 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
   return (
     <View style={[styles('container'), { flexDirection: 'row', padding: 8 }]}>
-      <TouchableOpacity 
-        style={styles('secondaryButton')} 
+      <TouchableOpacity
+        style={styles('secondaryButton')}
         onPress={() => navigation.navigate('Profile')}
       >
         <Icon name='user' />
       </TouchableOpacity>
       <Text style={styles('text')}>{title}</Text>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <TouchableOpacity 
-          style={styles('secondaryButton')} 
+        <TouchableOpacity
+          style={styles('secondaryButton')}
           onPress={() => navigation.navigate('AddFriends')}
         >
           <Icon name='user-plus' />
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles('secondaryButton')} 
+        <TouchableOpacity
+          style={styles('secondaryButton')}
           onPress={() => navigation.navigate('Settings')}
         >
           <Icon name='settings' />

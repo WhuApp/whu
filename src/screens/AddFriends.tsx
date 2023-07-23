@@ -69,16 +69,16 @@ const AddFriends: React.FC = () => {
         </View>
         <View style={styles('inputWrapper')}>
           <Text style={styles('label')}>Search</Text>
-          <TextInput 
-            style={styles('textInput')} 
-            placeholder='Friend ID..' 
+          <TextInput
+            style={styles('textInput')}
+            placeholder='Friend ID..'
             placeholderTextColor={colorScheme == 'light' ? colors.lightTextTertiary : colors.darkTextTertiary}
-            onChangeText={setInput} 
+            onChangeText={setInput}
           />
         </View>
         <Button
           loading={loading}
-          text='Add Friend'
+          title='Add Friend'
           onPress={handleAdd}
         />
       </InsetView>

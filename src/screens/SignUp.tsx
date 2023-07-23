@@ -62,7 +62,7 @@ const SignUp: React.FC = () => {
         onChangeText={setRepeatPassword}
       />
       <Button
-        text='Sign Up'
+        title='Sign Up'
         loading={loading}
         onPress={handleSignUp}
       />

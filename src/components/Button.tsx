@@ -1,36 +1,49 @@
 import React from 'react';
-import {
-  Pressable,
-  View,
-  Text,
-  useColorScheme,
-  ViewProps,
-  ActivityIndicator,
-} from 'react-native';
-import { getStyles, Elements, colors } from '../styles';
+import { Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { useColors } from '../utils';
 
 interface ButtonProps {
-  text: string;
+  title: string;
   loading?: boolean;
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps & ViewProps> = ({
+const Button: React.FC<ButtonProps> = ({
   onPress,
-  text,
-  loading = false,
-  ...props
+  title,
+  loading,
 }) => {
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+  const colors = useColors();
+
+  const styles = StyleSheet.create({
+    button: {
+      minWidth: 180,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      gap: 10,
+      backgroundColor: colors('accent'),
+    },
+    text: {
+      color: colors('textPrimary'),
+    },
+  });
 
   return (
-    <View {...props}>
-      <Pressable onPress={onPress} style={styles('primaryButton')}>
-        {loading && <ActivityIndicator size={'small'} color={colors.darkTextPrimary} />}
-        <Text style={{ color: colors.darkTextPrimary }}>{text}</Text>
-      </Pressable>
-    </View>
+    <TouchableOpacity onPress={onPress} style={styles.button}>
+      {loading && (
+        <ActivityIndicator
+          size={'small'}
+          color={colors('textPrimary')}
+        />
+      )}
+      <Text style={styles.text}>
+        {title}
+      </Text>
+    </TouchableOpacity>
   );
 };
 

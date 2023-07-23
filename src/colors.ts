@@ -4,6 +4,8 @@ type Color = {
 };
 
 export interface ColorEntries {
+  accent: Color;
+
   backgroundPrimary: Color;
   backgroundSecondary: Color;
   backgroundTertiary: Color;
@@ -17,6 +19,10 @@ export interface ColorEntries {
 }
 
 export const colors: ColorEntries = {
+  accent: {
+    light: '#3C44F6',
+    dark: '#3C44F6',
+  },
   backgroundPrimary: {
     light: '#ffffff',
     dark: '#313338',

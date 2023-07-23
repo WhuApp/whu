@@ -40,7 +40,7 @@ const SignIn: React.FC = () => {
         onChangeText={setPassword}
       />
       <Button
-        text='Sign In'
+        title='Sign In'
         loading={loading}
         onPress={handleSignIn}
       />

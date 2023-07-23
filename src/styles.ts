@@ -1,10 +1,4 @@
-import {
-  ColorSchemeName,
-  ImageStyle,
-  StyleSheet,
-  TextStyle,
-  ViewStyle,
-} from 'react-native';
+import { ColorSchemeName, ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 
 type Style = TextStyle | ViewStyle | ImageStyle;
 
@@ -147,6 +141,6 @@ const darkStyles: Elements = {
 export const getStyles = (element: keyof Elements, theme: ColorSchemeName) => {
   return StyleSheet.compose(
     defaultStyles[element] ?? {},
-    (theme === 'dark' ? darkStyles[element] : lightStyles[element]) ?? {},
+    (theme === 'dark' ? darkStyles[element] : lightStyles[element]) ?? {}
   );
 };
