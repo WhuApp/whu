@@ -41,7 +41,7 @@ const Button: React.FC<ButtonProps> = ({
       {loading && (
         <ActivityIndicator
           size={'small'}
-          color={colors('textPrimary')}
+          color={colors('textPrimary', 'dark')}
         />
       )}
       <Text style={styles.text}>
