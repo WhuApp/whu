@@ -1,25 +1,21 @@
 import React from 'react';
-import {
-  Text,
-  View,
-  useColorScheme,
-} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { getStyles, Elements } from '../styles';
-import { InsetView } from '../components';
+import { Text, useColorScheme } from 'react-native';
+import ModalLayout from '../layouts/ModalLayout';
+import { useColors } from '../utils';
 
 const Settings: React.FC = () => {
   const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+  const colors = useColors();
 
   return (
-    <View style={[styles('page'), { padding: 15 }]}>
-      <InsetView>
-        <Text style={styles('title')}>Settings</Text>
-        <Text style={styles('text')}>Current color scheme: {colorScheme}</Text>
-      </InsetView>
-      <StatusBar style='auto' />
-    </View>
+    <ModalLayout
+      title='Settings'
+      onPressMore={() => { }}
+    >
+      <Text style={{ color: colors('textPrimary') }}>
+        Color scheme: {colorScheme}
+      </Text>
+    </ModalLayout>
   );
 };
 

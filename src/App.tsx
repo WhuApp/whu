@@ -23,28 +23,26 @@ const App: React.FC = () => {
     })();
   }, []);
 
+  // TODO: somehow pass screen options from component
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-          navigationBarColor: colors('backgroundPrimary')
-        }}
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false, navigationBarColor: colors('backgroundPrimary') }}>
         {session ? (
           <>
             <Stack.Screen
               name='Home'
               component={Home}
+              options={{ animation: 'simple_push' }}
             />
             <Stack.Screen
               name='Profile'
               component={Profile}
+              options={{ animation: 'slide_from_bottom' }}
             />
             <Stack.Screen
               name='Settings'
               component={Settings}
+              options={{ animation: 'slide_from_bottom' }}
             />
             <Stack.Screen
               name='AddFriends'
@@ -57,7 +55,7 @@ const App: React.FC = () => {
             <Stack.Screen
               name='Welcome'
               component={Welcome}
-              options={{ navigationBarColor: '#0F0F31' }}
+              options={{ animation: 'simple_push', navigationBarColor: '#0F0F31' }}
             />
             <Stack.Screen
               name='SignIn'
