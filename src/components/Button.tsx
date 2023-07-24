@@ -28,7 +28,7 @@ const Button: React.FC<ButtonProps> = ({
       backgroundColor: colors('accent'),
     },
     text: {
-      color: colors('textPrimary'),
+      color: colors('textPrimary', 'dark'),
     },
   });
 

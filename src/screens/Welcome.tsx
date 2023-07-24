@@ -20,7 +20,7 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
       alignItems: 'center',
     },
     title: {
-      color: colors('textPrimary'),
+      color: colors('textPrimary', 'dark'),
       fontSize: 40,
       fontWeight: 'bold',
     },
@@ -37,7 +37,7 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
       gap: 4,
     },
     text: {
-      color: colors('textSecondary'),
+      color: colors('textSecondary', 'dark'),
     },
     link: {
       color: colors('linkText'),
