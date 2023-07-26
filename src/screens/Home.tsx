@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import {
-  View,
-  useColorScheme,
-} from 'react-native';
-import { InsetView, Header } from '../components';
-import { getStyles, Elements } from '../styles';
+import { Text } from 'react-native';
 import { useAuth } from '../components/AuthContext';
 import FriendList from '../components/FriendList';
+import { useColors } from '../utils';
 
 const Home: React.FC = () => {
   const { session } = useAuth();
   const [name, setName] = useState<string>('Loading..');
+  const colors = useColors();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,19 +17,13 @@ const Home: React.FC = () => {
     fetchUser();
   }, []);
 
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
-
   return (
-    <View style={styles('page')}>
-      <InsetView>
-        <Header title={name} />
-        <View style={{ padding: 15 }}>
-          <FriendList />
-        </View>
-      </InsetView>
-      <StatusBar style='auto' />
-    </View>
+    <>
+      <Text style={{ color: colors('textPrimary') }}>
+        {name}
+      </Text>
+      <FriendList />
+    </>
   );
 }
 

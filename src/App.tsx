@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
-import { AddFriends, Home, Profile, Settings, SignIn, SignUp, Welcome } from './screens';
+import { AddFriends, Home, Profile, Settings, SignIn, SignUp, Test, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from './components/AuthContext';
 import * as Location from 'expo-location';
 import { useColors } from './utils';
+import { MainLayout } from './layouts';
 
 const Stack = createNativeStackNavigator();
+const Tab = createNativeStackNavigator();
 
 const App: React.FC = () => {
   const { session } = useAuth();
@@ -23,6 +25,7 @@ const App: React.FC = () => {
     })();
   }, []);
 
+  // TODO: What is SafeAreaView
   // TODO: somehow pass screen options from component
   return (
     <NavigationContainer>
@@ -30,8 +33,8 @@ const App: React.FC = () => {
         {session ? (
           <>
             <Stack.Screen
-              name='Home'
-              component={Home}
+              name='MainView'
+              component={MainView}
               options={{ animation: 'simple_push' }}
             />
             <Stack.Screen
@@ -72,6 +75,17 @@ const App: React.FC = () => {
       </Stack.Navigator>
     </NavigationContainer>
   );
+};
+
+const MainView: React.FC = () => {
+  return (
+    <MainLayout>
+      <Tab.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+        <Tab.Screen name='Home' component={Home} />
+        <Tab.Screen name='Test' component={Test} options={{ animation: 'slide_from_left' }} />
+      </Tab.Navigator>
+    </MainLayout>
+  )
 };
 
 export default App;

@@ -9,17 +9,17 @@ export type RootStackParamList = {
 };
 
 export type Friend = {
-  name: string,
+  name: string;
   location: TimedLocation;
-}
-
-export type Location = {
-  longitude: number,
-  latitude: number,
-  altitude: number,
 };
 
-export type TimedLocation = Location & { 
+export type Location = {
+  longitude: number;
+  latitude: number;
+  altitude: number;
+};
+
+export type TimedLocation = Location & {
   timestamp: Date | number;
 };
 
