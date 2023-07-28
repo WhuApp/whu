@@ -41,7 +41,7 @@ const userExists = async function (request, response) {
     console.log('user not found');
     return response.json({});
   } else if (machingUsers.length > 1) {
-    console.error('More than one user share unique values', user);
+    console.log('More than one user share unique values', user);
   }
   console.log('user(s) found:', [...machingUsers]);
   return response.json({ user: machingUsers[0] });
