@@ -51,25 +51,25 @@
       "timeout": 15
     },
     {
-      "$id": "64b820cd88e01612a887",
-      "name": "setup-user",
-      "runtime": "node-16.0",
-      "path": "functions/setup-user",
-      "entrypoint": "src/index.js",
-      "ignore": ["node_modules", ".npm"],
-      "execute": [],
-      "events": [],
-      "schedule": "",
-      "timeout": 15
-    },
-    {
       "$id": "64c3b745e7e1fa7c9445",
       "name": "user-exists",
       "runtime": "node-16.0",
       "path": "functions/user-exists",
       "entrypoint": "src/index.js",
       "ignore": ["node_modules", ".npm"],
-      "execute": ["any"],
+      "execute": ["guests"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    },
+    {
+      "$id": "64c4123000a5be24fa29",
+      "name": "register",
+      "runtime": "node-16.0",
+      "path": "functions/register",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["guests"],
       "events": [],
       "schedule": "",
       "timeout": 15

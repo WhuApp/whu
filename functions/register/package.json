@@ -1,5 +1,5 @@
 {
-  "name": "function-setup-user",
+  "name": "appwrite-function",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
