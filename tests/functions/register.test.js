@@ -4,9 +4,9 @@ import { ENDPOINT, PROJECT_ID } from '../../src/appwrite';
 const REGISTER_ID = '64c4123000a5be24fa29';
 const user = {
   id: '64c3d3253309cb3dfadf',
-  email: 'userExists01@test.com',
-  password: 'userExists01.Password',
-  name: 'userExists01',
+  email: 'userRegister1@test.com',
+  password: 'userRegister01.Password',
+  name: 'userRegister01',
 };
 const client = new Client().setEndpoint(ENDPOINT).setProject(PROJECT_ID);
 const functions = new Functions(client);
