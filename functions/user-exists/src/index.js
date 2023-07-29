@@ -20,31 +20,33 @@ const userExists = async function (request, response) {
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
 
-  if (!request.payload) {
-    throw new Error('No payload provided');
-  }
-
+  //receiver
+  if (!request.payload) throw new Error('No payload provided');
   const payload = JSON.parse(request.payload);
 
-  if (!payload.data) {
-    throw new Error('No data provided');
+  const emailOrName = payload.emailOrName;
+  if (!emailOrName) throw new Error('No email or name provided');
+
+  const matchingName = await users.list([Query.equal('name', [emailOrName])]);
+  const matchingMail = await users.list([Query.equal('email', [emailOrName])]);
+  const matchingUsers = [].concat(matchingName.users).concat(matchingMail.users);
+
+  if (matchingUsers.length === 0) {
+    return response.json({
+      data: {
+        exists: false,
+      },
+    });
+  } else if (matchingUsers.length > 1) {
+    console.log('More than one user share unique values', matchingUsers);
   }
+  console.log('user(s) found:', [...matchingUsers]);
 
-  const user = payload.data;
-  console.log('user provided: ', user);
-
-  const machingName = await users.list([Query.equal('name', [user.name])]);
-  const machingMail = await users.list([Query.equal('email', [user.email])]);
-  const machingUsers = [].concat(machingName.users).concat(machingMail.users);
-
-  if (machingUsers.length === 0) {
-    console.log('user not found');
-    return response.json({});
-  } else if (machingUsers.length > 1) {
-    console.log('More than one user share unique values', user);
-  }
-  console.log('user(s) found:', [...machingUsers]);
-  return response.json({ user: machingUsers[0] });
+  return response.json({
+    data: {
+      exists: true,
+    },
+  });
 };
 
 module.exports = userExists;

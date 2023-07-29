@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Account,
-  ID,
-  Models,
-  Functions,
-} from 'appwrite';
-import { currentTimedLocationAsync } from '../location';
+import { Account, ID, Models, Functions } from 'appwrite';
 import { client } from '../appwrite';
-
-const FUNCTION_SETUP_USER_ID = '64b820cd88e01612a887';
+import { register } from '../api/functions';
 
 const functions = new Functions(client);
 const account = new Account(client);
@@ -24,8 +17,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     );
   }, []);
 
-  const signIn = async (mail: string, password: string) => {
-    setSession(await account.createEmailSession(mail, password));
+  const signIn = async (email: string, password: string) => {
+    setSession(await account.createEmailSession(email, password));
   };
 
   const signOut = async () => {
@@ -33,19 +26,12 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     setSession(null);
   };
 
-  const signUp = async (name: string, mail: string, password: string) => {
-    await account.create(ID.unique(), mail, password, name);
-    const session = await account.createEmailSession(mail, password);
+  const signUp = async (name: string, email: string, password: string): Promise<string | never> => {
+    const response = await register({ name, email, password });
 
-    const payload = JSON.stringify({ data: await currentTimedLocationAsync() });
-    const execution = await functions.createExecution(FUNCTION_SETUP_USER_ID, payload);
-    const data = JSON.parse(execution.response);
-    
-    if (data.success) {
-      setSession(session);
-    } else {
-      return data.message;
-    }
+    if (!response.success) return response.error;
+
+    await signIn(email, password);
   };
 
   const auth = {
