@@ -36,10 +36,7 @@ const register = async function (request, response) {
   const userData = JSON.parse(request.payload);
   
   //check user data is correct
-  const reg = request.variables['NAME_REGEX'];
-  console.log(reg)
-  const nameRegEx = new RegExp(reg);
-  console.log(nameRegEx);
+  const nameRegEx = new RegExp(request.variables['NAME_REGEX']);
   if (!nameRegEx.test(userData.name)) {
     console.log('name:', userData.name);
     return response.json({ message: 'Invalid username' });
@@ -49,6 +46,12 @@ const register = async function (request, response) {
   if (!passwordRegEx.test(userData.password)) {
     console.log('password:', userData.password);
     return response.json({ message: 'Invalid password' });
+  }
+
+  const emailRegEx = new RegExp(request.variables['EMAIL_REGEX']);
+  if (!emailRegEx.test(userData.email)) {
+    console.log('email:', userData.email);
+    return response.json({ message: 'Invalid email' });
   }
 
   if ((await users.list([Query.equal('name', [userData.name])])).total > 0) {
