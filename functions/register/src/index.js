@@ -52,11 +52,11 @@ const register = async function (request, response) {
   }
 
   if ((await users.list([Query.equal('name', [userData.name])])).total > 0) {
-    return response.json({ message: 'Name already taken' });
+    return response.json({ message: 'Name is unavailable' });
   }
 
   if ((await users.list([Query.equal('email', [userData.email])])).total > 0) {
-    return response.json({ message: 'Email already taken' });
+    return response.json({ message: 'Email already registered' });
   }
 
   //for the unlikely case that an id is already used
