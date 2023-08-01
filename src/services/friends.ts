@@ -34,10 +34,9 @@ export const removeFriend = async (emailOrName: string): Promise<string | never>
   if (!response.success) return response.error;
 };
 
-export const getFriendRequests = async (): Promise<PendingRequests | string> => {
+export const getFriendRequests = async (): Promise<PendingRequests> => {
   const response = await getFriendRequestsApi();
 
-  if (!response.success) return response.error;
-
-  return response.data;
+  if (!response.success) return Promise.reject(response.error);
+  return Promise.resolve(response.data);
 };
