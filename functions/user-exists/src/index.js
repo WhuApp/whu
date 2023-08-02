@@ -25,7 +25,7 @@ const userExists = async function (request, response) {
   const payload = JSON.parse(request.payload);
 
   const emailOrName = payload.emailOrName;
-  if (!emailOrName) throw new Error('No email or name provided');
+  if (!emailOrName) return response.json({ message: 'Missing email or name' });
 
   const matchingName = await users.list([Query.equal('name', [emailOrName])]);
   const matchingMail = await users.list([Query.equal('email', [emailOrName])]);
