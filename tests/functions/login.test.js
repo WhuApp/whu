@@ -1,11 +1,7 @@
 import { login } from '../../src/api/functions';
+import data from './data.json';
 
-const credentials = {
-  id: '64c997a6bea13a0a1fcf',
-  username: 'userLogin01',
-  email: 'userlogin01@test.com',
-  password: 'userLogin01.Password',
-};
+const credentials = data.existent;
 
 test('Login with valid email and valid password', async () => {
   const response = await login({
@@ -38,7 +34,7 @@ test('Login with valid username and valid password', async () => {
 test('Login with valid email and invalid password', async () => {
   const response = await login({
     emailOrName: credentials.email,
-    password: 'invalid',
+    password: 'x',
   });
 
   expect(response.success).toBeFalsy();
@@ -49,7 +45,7 @@ test('Login with valid email and invalid password', async () => {
 test('Login with valid username and invalid password', async () => {
   const response = await login({
     emailOrName: credentials.username,
-    password: 'invalid',
+    password: 'x',
   });
 
   expect(response.success).toBeFalsy();
@@ -59,7 +55,7 @@ test('Login with valid username and invalid password', async () => {
 
 test('Login with invalid email', async () => {
   const response = await login({
-    emailOrName: 'invalid@test.com',
+    emailOrName: 'x@test.com',
     password: credentials.password,
   });
 
@@ -70,7 +66,7 @@ test('Login with invalid email', async () => {
 
 test('Login with invalid username', async () => {
   const response = await login({
-    emailOrName: 'invalid',
+    emailOrName: 'x',
     password: credentials.password,
   });
 

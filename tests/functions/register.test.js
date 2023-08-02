@@ -1,18 +1,8 @@
 import { register } from '../../src/api/functions';
+import data from './data.json';
 
-const nonExistentCredentials = {
-  id: '64c445ccb399021ee62f',
-  email: 'userRegister01@test.com',
-  password: 'userRegister01.Password',
-  username: 'userRegister01',
-};
-
-const existentCredentials = {
-  id: '64c997a6bea13a0a1fcf',
-  username: 'userLogin01',
-  email: 'userlogin01@test.com',
-  password: 'userLogin01.Password',
-};
+const existentCredentials = data.existent;
+const nonExistentCredentials = data.nonExistent;
 
 test('Register with non existent valid credentials', async () => {
   // TODO implement
