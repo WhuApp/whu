@@ -25,26 +25,19 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     setLoading(true);
 
     if (password != repeatPassword) {
       setErrorMessage('Passwords do not match');
       setLoading(false);
-
       return;
     }
 
-    signUp(name, mail, password).then(
-      () => {
-        setErrorMessage(null);
-        setLoading(false);
-      },
-      (reason) => {
-        setErrorMessage(reason.toString());
-        setLoading(false);
-      },
-    );
+    const reason = await signUp(name, mail, password);
+
+    setErrorMessage(reason);
+    setLoading(false);
   };
 
   return (

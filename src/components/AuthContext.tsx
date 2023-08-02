@@ -19,7 +19,10 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const signIn = async (emailOrName: string, password: string): Promise<string | never> => {
     const response = await login({ emailOrName, password });
 
-    if (!response.success) return response.error;
+    if (!response.success) {
+      return response.error ?? 'Unknown Error';
+    }
+
     setSession(response.data.session);
   };
 
@@ -31,8 +34,11 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const signUp = async (name: string, email: string, password: string): Promise<string | never> => {
     const response = await register({ name, email, password });
 
-    if (!response.success) return response.error;
-    await signIn(email, password);
+    if (!response.success) {
+      return response.error ?? 'Unknown Error';
+    }
+
+    return await signIn(email, password);
   };
 
   const auth = {

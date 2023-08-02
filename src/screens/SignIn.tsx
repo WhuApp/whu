@@ -27,19 +27,11 @@ const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const styles = (element: keyof Elements) => getStyles(element, colorScheme);
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     setLoading(true);
-
-    signIn(mail, password).then(
-      () => {
-        setError(null);
-        setLoading(false);
-      },
-      (reason) => {
-        setError(reason.toString());
-        setLoading(false);
-      },
-    );
+    const reason = await signIn(mail, password);
+    setError(reason);
+    setLoading(false);
   };
 
   return (
