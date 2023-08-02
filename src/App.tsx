@@ -24,21 +24,19 @@ const App: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
         {session ? (
           <>
-            <Stack.Screen name='Home'       component={Home} />
-            <Stack.Screen name='Profile'    component={Profile} />
-            <Stack.Screen name='Settings'   component={Settings} />
+            <Stack.Screen name='Home' component={Home} />
+            <Stack.Screen name='Profile' component={Profile} />
+            <Stack.Screen name='Settings' component={Settings} />
             <Stack.Screen name='AddFriends' component={AddFriends} />
           </>
         ) : (
           <>
-            <Stack.Screen name='Welcome'    component={Welcome} />
-            <Stack.Screen name='SignIn'     component={SignIn} />
-            <Stack.Screen name='SignUp'     component={SignUp} />
+            <Stack.Screen name='Welcome' component={Welcome} />
+            <Stack.Screen name='SignIn' component={SignIn} />
+            <Stack.Screen name='SignUp' component={SignUp} />
           </>
         )}
       </Stack.Navigator>
