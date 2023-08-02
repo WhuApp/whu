@@ -34,8 +34,12 @@ const register = async function (request, response) {
 
   if (!request.payload) throw new Error('No payload provided');
   const userData = JSON.parse(request.payload);
-  
+
   //check user data is correct
+  if (!userData.name) return response.json({ message: 'Missing username' });
+  if (!userData.email) return response.json({ message: 'Missing email' });
+  if (!userData.password) return response.json({ message: 'Missing password' });
+
   const nameRegEx = new RegExp(request.variables['NAME_REGEX']);
   if (!nameRegEx.test(userData.name)) {
     console.log('name:', userData.name);
