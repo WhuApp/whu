@@ -1,4 +1,4 @@
-const { Client, Account, Users, Query } = require('node-appwrite');
+const { Client, Users, Query } = require('node-appwrite');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const login = async function (request, response) {
@@ -25,12 +25,14 @@ const login = async function (request, response) {
   if (!request.payload) throw new Error('No payload provided');
   const credentials = JSON.parse(request.payload);
 
+  if (!credentials.emailOrName) return response.json({ message: 'Missing email or username' });
+
   const matchingName = await users.list([Query.equal('name', [credentials.emailOrName])]);
   const matchingMail = await users.list([Query.equal('email', [credentials.emailOrName])]);
   const matchingUsers = [].concat(matchingName.users).concat(matchingMail.users);
 
   if (matchingUsers.length === 0) {
-    return response.json({ message: 'No user with this name found' });
+    return response.json({ message: 'Invalid email or username' });
   } else if (matchingUsers.length > 1) {
     console.log('More than one user share unique values', matchingUsers);
   }
@@ -53,7 +55,12 @@ const login = async function (request, response) {
   };
 
   const session = await (await fetch(url, options)).json();
-  return response.json({ data: { session } });
+
+  if (session.message) {
+    response.json({ message: session.message });
+  } else {
+    response.json({ data: { session } });
+  }
 };
 
 module.exports = login;
