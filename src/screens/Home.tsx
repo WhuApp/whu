@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { useAuth } from '../components/AuthContext';
 import FriendList from '../components/FriendList';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 
 const Home: React.FC = () => {
   const { session } = useAuth();

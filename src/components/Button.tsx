@@ -1,11 +1,11 @@
 import React from 'react';
 import { Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 
 interface ButtonProps {
   title: string;
   loading?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const Button: React.FC<ButtonProps> = ({

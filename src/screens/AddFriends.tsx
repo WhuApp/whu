@@ -4,7 +4,7 @@ import { TextInput, Icon } from '../components';
 import { removeFriend, getFriendRequests } from '../services/friends';
 import { addFriend } from '../services/friends';
 import type { PendingRequests } from '../types';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 import ModalLayout from '../layouts/ModalLayout';
 
 interface RequestsProps {

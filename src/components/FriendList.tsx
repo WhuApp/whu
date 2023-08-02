@@ -3,7 +3,7 @@ import { Text, View, useColorScheme } from 'react-native';
 import { getStyles, Elements } from '../styles';
 import type { Friend } from '../types';
 import { getFriends } from '../services/friends';
-import { useLiveHeading, useLiveLocation } from '../utils';
+import { useLiveHeading, useLiveLocation } from '../hooks';
 import { calculateBearing, calculateDistance } from '../location';
 import Compass from './Compass';
 
@@ -46,7 +46,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
   const heading = useLiveHeading();
 
   const calcDistance = () => Math.floor(calculateDistance(location, friend.location));
-  
+
   const calcHeading = () => (Math.floor(calculateBearing(location, friend.location) - heading) + 360) % 360;
 
   const time = () => (friend.location.timestamp as Date).toTimeString().split(' ')[0].slice(0, -3);

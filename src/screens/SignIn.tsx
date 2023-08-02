@@ -1,49 +1,25 @@
 import React, { useState } from 'react';
-import { Button, TextInput } from '../components';
-import { useAuth } from '../components/AuthContext';
-import { AppwriteException } from 'appwrite';
+import { EmailInput, PasswordInput, Button } from '../components';
 import ModalLayout from '../layouts/ModalLayout';
 
 const SignIn: React.FC = () => {
-  const { signIn } = useAuth();
-  const [mail, setMail] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>(null);
-
-  const handleSignIn = async () => {
-    setLoading(true);
-
-    try {
-      await signIn(mail, password);
-    } catch (reason: unknown) {
-      setError((reason as AppwriteException).message);
-    }
-
-    setLoading(false);
-  };
 
   return (
     <ModalLayout
       title='Sign In'
       onPressMore={() => { }}
     >
-      <TextInput
+      <EmailInput
         label='E-Mail'
-        error={error}
-        onChangeText={setMail}
+        onChangeText={setEmail}
       />
-      <TextInput
+      <PasswordInput
         label='Password'
-        error={error}
-        secureTextEntry
         onChangeText={setPassword}
       />
-      <Button
-        title='Sign In'
-        loading={loading}
-        onPress={handleSignIn}
-      />
+      <Button title='Sign In' />
     </ModalLayout>
   );
 };

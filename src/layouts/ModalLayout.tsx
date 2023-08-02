@@ -8,7 +8,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { Icon, InsetView } from '../components';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 import { RootStackParamList } from '../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 
