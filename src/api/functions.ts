@@ -58,7 +58,7 @@ export const getFriends = async (): Promise<FunctionResponse<GetFriendsResponse>
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
     data: response.data,
   };
 };
@@ -70,7 +70,7 @@ export const addFriend = async (input: AddFriendRequest): Promise<FunctionRespon
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
   };
 };
 
@@ -83,7 +83,7 @@ export const removeFriend = async (
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
   };
 };
 
@@ -93,7 +93,7 @@ export const getFriendRequests = async (): Promise<FunctionResponse<GetFriendReq
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
     data: response.data,
   };
 };
@@ -105,7 +105,7 @@ export const register = async (input: RegisterRequest): Promise<FunctionResponse
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
   };
 };
 
@@ -118,7 +118,7 @@ export const userExists = async (
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
     data: response.data,
   };
 };
@@ -130,7 +130,7 @@ export const login = async (input: LoginRequest): Promise<FunctionResponse<Login
 
   return {
     success: execution.statusCode === 200 && !response.message,
-    error: response.message ?? 'Unknown Error',
+    error: response.message,
     data: response.data,
   };
 };
