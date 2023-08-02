@@ -8,4 +8,5 @@ export const FUNCTION_IDS = {
   getFriendRequests: '64b645dbb12660ad9258',
   register: '64c4123000a5be24fa29',
   userExists: '64c3b745e7e1fa7c9445',
+  login: '64c9894b1ec13aa4db59',
 };

@@ -57,7 +57,7 @@
       "path": "functions/user-exists",
       "entrypoint": "src/index.js",
       "ignore": ["node_modules", ".npm"],
-      "execute": ["guests"],
+      "execute": ["any"],
       "events": [],
       "schedule": "",
       "timeout": 15
@@ -69,7 +69,19 @@
       "path": "functions/register",
       "entrypoint": "src/index.js",
       "ignore": ["node_modules", ".npm"],
-      "execute": ["guests"],
+      "execute": ["any"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    },
+    {
+      "$id": "64c9894b1ec13aa4db59",
+      "name": "login",
+      "runtime": "node-16.0",
+      "path": "functions/login",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["any"],
       "events": [],
       "schedule": "",
       "timeout": 15

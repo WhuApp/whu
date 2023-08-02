@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Account, ID, Models, Functions } from 'appwrite';
+import { Account, Models } from 'appwrite';
 import { client } from '../appwrite';
-import { register } from '../api/functions';
+import { register, login } from '../api/functions';
 
-const functions = new Functions(client);
 const account = new Account(client);
 const AuthContext = React.createContext(null);
 
@@ -17,8 +16,11 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     );
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    setSession(await account.createEmailSession(email, password));
+  const signIn = async (emailOrName: string, password: string): Promise<string | never> => {
+    const response = await login({ emailOrName, password });
+
+    if (!response.success) return response.error;
+    setSession(response.data.session);
   };
 
   const signOut = async () => {
@@ -30,7 +32,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const response = await register({ name, email, password });
 
     if (!response.success) return response.error;
-
     await signIn(email, password);
   };
 

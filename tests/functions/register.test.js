@@ -1,4 +1,4 @@
-import { register, userExists } from '../../src/api/functions';
+import { register } from '../../src/api/functions';
 
 const validUser = {
   id: '64c445ccb399021ee62f',
@@ -11,7 +11,7 @@ const invalidUser = {
   email: 'a',
   password: 'a',
   name: 'a',
-}
+};
 
 test('valid user (maybe already existent)', async () => {
   const response = await register({
