@@ -13,7 +13,9 @@ import {
 export const getFriends = async (): Promise<Friend[] | string> => {
   const response = await getFriendsApi();
 
-  if (!response.success) return response.error;
+  if (!response.success) {
+    return response.error ?? 'Unknown Error';
+  }
 
   return response.data.map((friend) => ({
     name: friend.name,
@@ -25,18 +27,25 @@ export const getFriends = async (): Promise<Friend[] | string> => {
 export const addFriend = async (emailOrName: string): Promise<string | never> => {
   const response = await addFriendApi({ emailOrName });
 
-  if (!response.success) return response.error;
+  if (!response.success) {
+    return response.error ?? 'Unknown Error';
+  }
 };
 
 export const removeFriend = async (emailOrName: string): Promise<string | never> => {
   const response = await removeFriendApi({ emailOrName });
 
-  if (!response.success) return response.error;
+  if (!response.success) {
+    return response.error ?? 'Unknown Error';
+  }
 };
 
 export const getFriendRequests = async (): Promise<PendingRequests> => {
   const response = await getFriendRequestsApi();
 
-  if (!response.success) return Promise.reject(response.error);
-  return Promise.resolve(response.data);
+  if (!response.success) {
+    throw new Error(response.error ?? 'Unknown Error');
+  }
+
+  return response.data;
 };
