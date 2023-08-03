@@ -1,5 +1,5 @@
 import { client } from '../appwrite';
-import { Functions, Models } from 'appwrite';
+import { Functions } from 'appwrite';
 import { PendingRequests, Location } from '../types';
 import { FUNCTION_IDS } from '../constants';
 
@@ -41,15 +41,6 @@ type UserExistsRequest = {
 
 type UserExistsResponse = {
   exists: boolean;
-};
-
-type LoginRequest = {
-  emailOrName: string;
-  password: string;
-};
-
-type LoginResponse = {
-  session: Models.Session;
 };
 
 export const getFriends = async (): Promise<FunctionResponse<GetFriendsResponse>> => {
@@ -114,18 +105,6 @@ export const userExists = async (
 ): Promise<FunctionResponse<UserExistsResponse>> => {
   const payload = JSON.stringify(input);
   const execution = await functions.createExecution(FUNCTION_IDS.userExists, payload);
-  const response = JSON.parse(execution.response);
-
-  return {
-    success: execution.statusCode === 200 && !response.message,
-    error: response.message,
-    data: response.data,
-  };
-};
-
-export const login = async (input: LoginRequest): Promise<FunctionResponse<LoginResponse>> => {
-  const payload = JSON.stringify(input);
-  const execution = await functions.createExecution(FUNCTION_IDS.login, payload);
   const response = JSON.parse(execution.response);
 
   return {
