@@ -1,7 +1,6 @@
 const { Client, Users, Query } = require('node-appwrite');
 
-const userExists = async function (request, response) {
-  // Check if everything is set up correctly
+module.exports = async (request, response) => {
   if (
     [
       'APPWRITE_FUNCTION_ENDPOINT',
@@ -12,41 +11,27 @@ const userExists = async function (request, response) {
     throw new Error('Some variables are missing');
   }
 
-  const client = new Client();
-  const users = new Users(client);
-
-  client
+  const client = new Client()
     .setEndpoint(request.variables['APPWRITE_FUNCTION_ENDPOINT'])
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
+  const users = new Users(client);
 
-  //receiver
-  if (!request.payload) throw new Error('No payload provided');
-  const payload = JSON.parse(request.payload);
-
-  const emailOrName = payload.emailOrName;
-  if (!emailOrName) return response.json({ message: 'Missing email or name' });
-
-  const matchingName = await users.list([Query.equal('name', [emailOrName])]);
-  const matchingMail = await users.list([Query.equal('email', [emailOrName])]);
-  const matchingUsers = [].concat(matchingName.users).concat(matchingMail.users);
-
-  if (matchingUsers.length === 0) {
-    return response.json({
-      data: {
-        exists: false,
-      },
-    });
-  } else if (matchingUsers.length > 1) {
-    console.log('More than one user share unique values', matchingUsers);
+  if (!request.payload || !JSON.parse(request.payload).email) {
+    return response.json({ message: 'Missing email' });
   }
-  console.log('user(s) found:', [...matchingUsers]);
 
-  return response.json({
-    data: {
-      exists: true,
-    },
-  });
+  const email = JSON.parse(request.payload).email;
+  const matching = await users.list([Query.equal('email', [email])]);
+
+  console.log(matching.users);
+
+  switch (matching.total) {
+    case 0:
+      return response.json({ data: { exists: false } });
+    case 1:
+      return response.json({ data: { exists: true } });
+    default:
+      throw new Error('Multiple users share the same email');
+  }
 };
-
-module.exports = userExists;
