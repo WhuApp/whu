@@ -36,7 +36,7 @@ type RegisterRequest = {
 };
 
 type UserExistsRequest = {
-  emailOrName: string;
+  email: string;
 };
 
 type UserExistsResponse = {
