@@ -31,25 +31,25 @@ test('Login with valid username and valid password', async () => {
   expect(response.data.session.userId).toBe(credentials.id);
 });
 
-test('Login with valid email and invalid password', async () => {
+test('Login with valid email and too short password', async () => {
   const response = await login({
     emailOrName: credentials.email,
     password: 'x',
   });
 
   expect(response.success).toBeFalsy();
-  expect(response.error).toBe('ToDo'); // TODO fix
+  expect(response.error).toBe('Invalid password: Password must be at least 8 characters');
   expect(response.data).toBeUndefined();
 });
 
-test('Login with valid username and invalid password', async () => {
+test('Login with valid username and too short password', async () => {
   const response = await login({
     emailOrName: credentials.username,
     password: 'x',
   });
 
   expect(response.success).toBeFalsy();
-  expect(response.error).toBe('ToDo'); // TODO fix
+  expect(response.error).toBe('Invalid password: Password must be at least 8 characters');
   expect(response.data).toBeUndefined();
 });
 
