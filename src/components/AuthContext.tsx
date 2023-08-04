@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Account, ID, Models } from 'appwrite';
-import { client } from '../appwrite';
+import { client } from '../api/appwrite';
 import { userExists } from '../api/functions';
 
 const account = new Account(client);

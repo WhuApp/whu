@@ -1,4 +1,4 @@
-import { client } from '../appwrite';
+import { client } from './appwrite';
 import { Functions } from 'appwrite';
 import { PendingRequests, Location } from '../types';
 import { FUNCTION_IDS } from '../constants';
