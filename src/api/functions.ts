@@ -29,14 +29,8 @@ type RemoveFriendRequest = {
 
 type GetFriendRequestsResponse = PendingRequests;
 
-type RegisterRequest = {
-  name: string;
-  email: string;
-  password: string;
-};
-
 type UserExistsRequest = {
-  email: string;
+  name: string;
 };
 
 type UserExistsResponse = {
@@ -86,17 +80,6 @@ export const getFriendRequests = async (): Promise<FunctionResponse<GetFriendReq
     success: execution.statusCode === 200 && !response.message,
     error: response.message,
     data: response.data,
-  };
-};
-
-export const register = async (input: RegisterRequest): Promise<FunctionResponse<never>> => {
-  const payload = JSON.stringify(input);
-  const execution = await functions.createExecution(FUNCTION_IDS.register, payload);
-  const response = JSON.parse(execution.response);
-
-  return {
-    success: execution.statusCode === 200 && !response.message,
-    error: response.message,
   };
 };
 

@@ -61,18 +61,6 @@
       "events": [],
       "schedule": "",
       "timeout": 15
-    },
-    {
-      "$id": "64c4123000a5be24fa29",
-      "name": "register",
-      "runtime": "node-16.0",
-      "path": "functions/register",
-      "entrypoint": "src/index.js",
-      "ignore": ["node_modules", ".npm"],
-      "execute": ["any"],
-      "events": [],
-      "schedule": "",
-      "timeout": 15
     }
   ]
 }

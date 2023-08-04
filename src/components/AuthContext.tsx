@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Account, Models } from 'appwrite';
+import { Account, ID, Models } from 'appwrite';
 import { client } from '../appwrite';
-import { register } from '../api/functions';
+import { userExists } from '../api/functions';
 
 const account = new Account(client);
 const AuthContext = React.createContext(null);
@@ -30,13 +30,17 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   const signUp = async (name: string, email: string, password: string): Promise<string | never> => {
-    const response = await register({ name, email, password });
+    try {
+      if ((await userExists({ name })).data.exists) {
+        return 'Name unavailable';
+      }
 
-    if (!response.success) {
-      return response.error ?? 'Unknown Error';
+      await account.create(ID.unique(), email, password, name);
+      return await signIn(email, password);
+      // TODO: Create location document
+    } catch (reason) {
+      return reason.toString();
     }
-
-    return await signIn(email, password);
   };
 
   const auth = {
