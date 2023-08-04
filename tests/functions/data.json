@@ -1,12 +1,12 @@
 {
   "existent": {
     "id": "64ca57b575a0665cea69",
-    "username": "ExistentUser",
+    "name": "ExistentUser",
     "email": "existent@whu.app",
     "password": "BadPassword123!"
   },
   "nonExistent": {
-    "username": "NonExistentUser",
+    "name": "NonExistentUser",
     "email": "nonExistent@whu.app",
     "password": "BadPassword123!"
   }

@@ -4,26 +4,26 @@ import data from './data.json';
 const existentCredentials = data.existent;
 const nonExistentCredentials = data.nonExistent;
 
-test('Check existent email', async () => {
-  const response = await userExists({ email: existentCredentials.email });
+test('Check existent name', async () => {
+  const response = await userExists({ name: existentCredentials.name });
 
   expect(response.success).toBeTruthy();
   expect(response.error).toBeUndefined();
   expect(response.data.exists).toBeTruthy();
 });
 
-test('Check non existent email', async () => {
-  const response = await userExists({ email: nonExistentCredentials.email });
+test('Check non existent name', async () => {
+  const response = await userExists({ name: nonExistentCredentials.name });
 
   expect(response.success).toBeTruthy();
   expect(response.error).toBeUndefined();
   expect(response.data.exists).toBeFalsy();
 });
 
-test('Check without email', async () => {
+test('Check without name', async () => {
   const response = await userExists({});
 
   expect(response.success).toBeFalsy();
-  expect(response.error).toBe('Missing email');
+  expect(response.error).toBe('Missing name');
   expect(response.data).toBeUndefined();
 });

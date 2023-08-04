@@ -17,12 +17,12 @@ module.exports = async (request, response) => {
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
   const users = new Users(client);
 
-  if (!request.payload || !JSON.parse(request.payload).email) {
-    return response.json({ message: 'Missing email' });
+  if (!request.payload || !JSON.parse(request.payload).name) {
+    return response.json({ message: 'Missing name' });
   }
 
-  const email = JSON.parse(request.payload).email;
-  const matching = await users.list([Query.equal('email', [email])]);
+  const name = JSON.parse(request.payload).name;
+  const matching = await users.list([Query.equal('name', [name])]);
 
   console.log(matching.users);
 
@@ -32,6 +32,6 @@ module.exports = async (request, response) => {
     case 1:
       return response.json({ data: { exists: true } });
     default:
-      throw new Error('Multiple users share the same email');
+      throw new Error('Multiple users share the same name');
   }
 };
