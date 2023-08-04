@@ -1,124 +1,139 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  useColorScheme,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import { InsetView, Button, Icon } from '../components';
-import { getStyles, Elements, colors } from '../styles';
+import { View, Text, Alert, TouchableOpacity, StyleSheet } from 'react-native';
+import { TextInput, Icon } from '../components';
 import { removeFriend, getFriendRequests } from '../services/friends';
 import { addFriend } from '../services/friends';
 import type { PendingRequests } from '../types';
+import { useColors } from '../utils';
+import ModalLayout from '../layouts/ModalLayout';
+
+interface RequestsProps {
+  requests: string[];
+}
 
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
-  const [requests, setRequests] = useState<PendingRequests | undefined>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [requests, setRequests] = useState<PendingRequests>({ incoming: [], outgoing: [] });
+  const colors = useColors();
 
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+  const styles = StyleSheet.create({
+    iconWrapper: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    label: {
+      color: colors('textSecondary'),
+    },
+  });
 
   useEffect(() => {
-    setLoading(false);
-
-    getFriendRequests().then(
-      (requests) => {
-        setRequests(requests);
-        setLoading(false);
-      },
-      (reason) => {
-        console.log(reason);
-        setLoading(false);
-      },
-    );
+    (async () => {
+      const data = await getFriendRequests();
+      console.log(data);
+      setRequests(data);
+    })();
   }, []);
 
   const handleAdd = async () => {
-    setLoading(true);
-
     const reason = await addFriend(input);
 
-    if (reason) Alert.alert('Error', reason);
-    setLoading(false);
+    if (reason) {
+      Alert.alert('Error', reason);
+    }
   };
 
   return (
-    <View style={[styles('page'), { padding: 15 }]}>
-      <InsetView style={{ gap: 10 }}>
-        <Text style={styles('title')}>Add Friends</Text>
-        <View style={{ gap: 5 }}>
-          <Text style={styles('label')}>Pending</Text>
-          {requests ? (
-            <OutgoingRequests requests={requests.outgoing} />
-          ) : (
-            <ActivityIndicator />
-          )}
-        </View>
-        <View style={{ gap: 5 }}>
-          <Text style={styles('label')}>Added Me</Text>
-          {requests ? (
-            <IncomingRequests requests={requests.incoming} />
-          ) : (
-            <ActivityIndicator />
-          )}
-        </View>
-        <View style={styles('inputWrapper')}>
-          <Text style={styles('label')}>Search</Text>
-          <TextInput 
-            style={styles('textInput')} 
-            placeholder='Friend ID..' 
-            placeholderTextColor={colorScheme == 'light' ? colors.lightTextTertiary : colors.darkTextTertiary}
-            onChangeText={setInput} 
-          />
-        </View>
-        <Button
-          loading={loading}
-          text='Add Friend'
-          onPress={handleAdd}
-        />
-      </InsetView>
-      <StatusBar style='auto' />
-    </View>
+    <ModalLayout title='Add Friends' onPressMore={() => {}}>
+      <TextInput
+        placeholder='Search..'
+        onChangeText={setInput}
+        contentLeft={<Icon name='search' />}
+        contentRight={
+          <View style={styles.iconWrapper}>
+            <TouchableOpacity onPress={handleAdd}>
+              <Icon name='arrow-right' />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Icon name='camera' />
+            </TouchableOpacity>
+          </View>
+        }
+      />
+      {requests.incoming.length > 0 && (
+        <>
+          <Text style={styles.label}>Added Me</Text>
+          <IncomingRequests requests={requests.incoming} />
+        </>
+      )}
+      {requests.outgoing.length > 0 && (
+        <>
+          <Text style={styles.label}>Pending</Text>
+          <OutgoingRequests requests={requests.outgoing} />
+        </>
+      )}
+    </ModalLayout>
   );
 };
 
-const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
+  const colors = useColors();
 
-  const handleAccept = (id: string) =>
-    addFriend(id).catch((reason) => console.log(reason));
+  const styles = StyleSheet.create({
+    container: {
+      borderRadius: 15,
+      overflow: 'hidden',
+      backgroundColor: colors('backgroundSecondary'),
+    },
+    icon: {
+      padding: 8,
+      backgroundColor: colors('backgroundTertiary'),
+      borderRadius: 10000,
+    },
+    item: {
+      flexDirection: 'row',
+      paddingHorizontal: 6,
+      paddingVertical: 3,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: colors('backgroundTertiary'),
+    },
+    text: {
+      color: colors('textPrimary'),
+    },
+    iconWrapper: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+  });
+
+  const handleAccept = async (id: string) => {
+    const reason = await addFriend(id);
+
+    if (reason) {
+      console.log(reason);
+    }
+  };
 
   const handleDecline = async (id: string) => {
     const reason = await removeFriend(id);
 
-    if (reason) Alert.alert('Error', reason);
+    if (reason) {
+      console.log(reason);
+    }
   };
 
-  if (!requests.length) return <Text style={styles('text')}>No incoming requests!</Text>;
-
   return (
-    <View style={{ borderRadius: 10, overflow: 'hidden' }}>
+    <View style={styles.container}>
       {requests.map((user) => (
-        <View style={styles('listItem')} key={user}>
-          <Text style={styles('text')}>{user}</Text>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <TouchableOpacity
-              style={styles('secondaryButton')}
-              onPress={() => handleAccept(user)}
-            >
-              <Icon name='user-check' size={20} />
+        <View style={styles.item} key={user}>
+          <Text style={styles.text}>{user}</Text>
+          <View style={styles.iconWrapper}>
+            <TouchableOpacity style={styles.icon} onPress={() => handleAccept(user)}>
+              <Icon name='user-check' />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles('secondaryButton')}
-              onPress={() => handleDecline(user)}
-            >
-              <Icon name='x' size={20} />
+            <TouchableOpacity style={styles.icon} onPress={() => handleDecline(user)}>
+              <Icon name='x' />
             </TouchableOpacity>
           </View>
         </View>
@@ -127,25 +142,49 @@ const IncomingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
   );
 };
 
-const OutgoingRequests: React.FC<{ requests: string[] }> = ({ requests }) => {
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
+  const colors = useColors();
+
+  const styles = StyleSheet.create({
+    container: {
+      borderRadius: 15,
+      overflow: 'hidden',
+      backgroundColor: colors('backgroundSecondary'),
+    },
+    icon: {
+      padding: 8,
+      backgroundColor: colors('backgroundTertiary'),
+      borderRadius: 10000,
+    },
+    item: {
+      flexDirection: 'row',
+      paddingHorizontal: 6,
+      paddingVertical: 3,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: colors('backgroundTertiary'),
+    },
+    text: {
+      color: colors('textPrimary'),
+    },
+  });
 
   const handleCancel = async (id: string) => {
     const reason = await removeFriend(id);
 
-    if (reason) Alert.alert('Error', reason);
+    if (reason) {
+      console.log(reason);
+    }
   };
 
-  if (!requests.length) return <Text style={styles('text')}>No outgoing requests!</Text>;
-
   return (
-    <View style={{ borderRadius: 10, overflow: 'hidden' }}>
+    <View style={styles.container}>
       {requests.map((user) => (
-        <View style={styles('listItem')} key={user}>
-          <Text style={styles('text')}>{user}</Text>
-          <TouchableOpacity onPress={() => handleCancel(user)}>
-            <Icon name='x' size={20} />
+        <View style={styles.item} key={user}>
+          <Text style={styles.text}>{user}</Text>
+          <TouchableOpacity style={styles.icon} onPress={() => handleCancel(user)}>
+            <Icon name='x' />
           </TouchableOpacity>
         </View>
       ))}

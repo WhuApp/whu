@@ -12,7 +12,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     account.getSession('current').then(
       (current) => setSession(current),
-      () => setSession(null),
+      () => setSession(null)
     );
   }, []);
 
