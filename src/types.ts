@@ -9,6 +9,7 @@ export type RootStackParamList = {
 };
 
 export type Friend = {
+  id: string;
   name: string;
   lastLocationUpdate: Date;
   location: Location;

@@ -1,7 +1,6 @@
 const { Client, Databases, Users, Query } = require('node-appwrite');
 
 module.exports = async function (request, response) {
-  // Check if everything is set up correctly
   if (
     [
       'DATABASE_ID',
@@ -15,32 +14,29 @@ module.exports = async function (request, response) {
     throw new Error('Some variables are missing');
   }
 
-  const database = request.variables['DATABASE_ID'];
-  const friendsCollection = request.variables['COLLECTION_FRIENDS_ID'];
-  const locationsCollection = request.variables['COLLECTION_LOCATIONS_ID'];
-  const client = new Client();
-  const databases = new Databases(client);
-  const users = new Users(client);
+  if (!request.variables['APPWRITE_FUNCTION_USER_ID']) {
+    throw new Error('This function can only be called as a user');
+  }
 
-  client
+  const DATABASE_ID = request.variables['DATABASE_ID'];
+  const COLLECTION_FRIENDS_ID = request.variables['COLLECTION_FRIENDS_ID'];
+  const COLLECTION_LOCATIONS_ID = request.variables['COLLECTION_LOCATIONS_ID'];
+
+  const client = new Client()
     .setEndpoint(request.variables['APPWRITE_FUNCTION_ENDPOINT'])
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
+  const users = new Users(client);
+  const databases = new Databases(client);
 
-  //sender
   const senderId = request.variables['APPWRITE_FUNCTION_USER_ID'];
-  const sender = await users.get(senderId).catch(() => {
-    console.log('sender:', senderId);
-    throw new Error('Sender not found');
-  });
 
-  // Find friends
-  const outgoing = await databases.listDocuments(database, friendsCollection, [
-    Query.equal('sender', sender.$id),
+  const outgoing = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [
+    Query.equal('sender', senderId),
     Query.equal('accepted', true),
   ]);
-  const incoming = await databases.listDocuments(database, friendsCollection, [
-    Query.equal('receiver', sender.$id),
+  const incoming = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [
+    Query.equal('receiver', senderId),
     Query.equal('accepted', true),
   ]);
   const ids = [
@@ -48,19 +44,21 @@ module.exports = async function (request, response) {
     ...incoming.documents.map((x) => x.sender),
   ];
 
-  // Transform to friend objects
+  console.log({ senderId });
+  console.log(ids);
+
   const friends = await Promise.all(
     ids.map(async (id) => {
       const friend = await users.get(id);
-      const location = await databases.getDocument(database, locationsCollection, id);
+      const location = await databases.getDocument(DATABASE_ID, COLLECTION_LOCATIONS_ID, id);
 
       return {
         name: friend.name,
         lastLocationUpdate: location.timestamp,
         location: location,
       };
-    }),
+    })
   );
 
-  response.json({ data: friends ?? [] });
+  response.json({ data: { friends: friends ?? [] } });
 };

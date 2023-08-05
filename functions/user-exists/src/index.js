@@ -11,19 +11,21 @@ module.exports = async (request, response) => {
     throw new Error('Some variables are missing');
   }
 
+  if (!request.payload || !JSON.parse(request.payload).name) {
+    return response.json({ message: 'Missing name' });
+  }
+
   const client = new Client()
     .setEndpoint(request.variables['APPWRITE_FUNCTION_ENDPOINT'])
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
   const users = new Users(client);
 
-  if (!request.payload || !JSON.parse(request.payload).name) {
-    return response.json({ message: 'Missing name' });
-  }
-
-  const name = JSON.parse(request.payload).name;
+  const payload = JSON.parse(request.payload);
+  const name = payload.name;
   const matching = await users.list([Query.equal('name', [name])]);
 
+  console.log(payload);
   console.log(matching.users);
 
   switch (matching.total) {

@@ -1,7 +1,6 @@
-const { Client, Databases, Users, Query } = require('node-appwrite');
+const { Client, Databases, Query } = require('node-appwrite');
 
 module.exports = async function (request, response) {
-  // Check if everything is set up correctly
   if (
     [
       'DATABASE_ID',
@@ -14,33 +13,32 @@ module.exports = async function (request, response) {
     throw new Error('Some variables are missing');
   }
 
-  const database = request.variables['DATABASE_ID'];
-  const friendsCollection = request.variables['COLLECTION_FRIENDS_ID'];
-  const client = new Client();
-  const databases = new Databases(client);
-  const users = new Users(client);
+  if (!request.variables['APPWRITE_FUNCTION_USER_ID']) {
+    throw new Error('This function can only be called as a user');
+  }
 
-  client
+  const DATABASE_ID = request.variables['DATABASE_ID'];
+  const COLLECTION_FRIENDS_ID = request.variables['COLLECTION_FRIENDS_ID'];
+
+  const client = new Client()
     .setEndpoint(request.variables['APPWRITE_FUNCTION_ENDPOINT'])
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
+  const databases = new Databases(client);
 
-  //sender
   const senderId = request.variables['APPWRITE_FUNCTION_USER_ID'];
-  const sender = await users.get(senderId).catch(() => {
-    console.log('sender:', senderId);
-    throw new Error('Sender not found');
-  });
 
-  // Find incoming & outgoing requests
-  const outgoing = await databases.listDocuments(database, friendsCollection, [
-    Query.equal('sender', sender.$id),
+  const outgoing = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [
+    Query.equal('sender', senderId),
     Query.equal('accepted', false),
   ]);
-  const incoming = await databases.listDocuments(database, friendsCollection, [
-    Query.equal('receiver', sender.$id),
+  const incoming = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [
+    Query.equal('receiver', senderId),
     Query.equal('accepted', false),
   ]);
+
+  console.log({ senderId });
+  console.log({ incoming, outgoing });
 
   response.json({
     data: {

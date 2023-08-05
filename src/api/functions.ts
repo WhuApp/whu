@@ -12,6 +12,7 @@ type FunctionResponse<T> = {
 };
 
 type UnparsedFriend = {
+  id: string;
   name: string;
   lastLocationUpdate: number;
   location: Location;
@@ -20,11 +21,19 @@ type UnparsedFriend = {
 type GetFriendsResponse = UnparsedFriend[];
 
 type AddFriendRequest = {
-  emailOrName: string;
+  target: string;
+};
+
+type AddFriendResponse = {
+  success: boolean;
 };
 
 type RemoveFriendRequest = {
-  emailOrName: string;
+  target: string;
+};
+
+type RemoveFriendResponse = {
+  success: boolean;
 };
 
 type GetFriendRequestsResponse = PendingRequests;
@@ -48,7 +57,9 @@ export const getFriends = async (): Promise<FunctionResponse<GetFriendsResponse>
   };
 };
 
-export const addFriend = async (input: AddFriendRequest): Promise<FunctionResponse<never>> => {
+export const addFriend = async (
+  input: AddFriendRequest
+): Promise<FunctionResponse<AddFriendResponse>> => {
   const payload = JSON.stringify(input);
   const execution = await functions.createExecution(FUNCTION_IDS.addFriend, payload);
   const response = JSON.parse(execution.response);
@@ -56,12 +67,13 @@ export const addFriend = async (input: AddFriendRequest): Promise<FunctionRespon
   return {
     success: execution.statusCode === 200 && !response.message,
     error: response.message,
+    data: response.data,
   };
 };
 
 export const removeFriend = async (
-  input: RemoveFriendRequest,
-): Promise<FunctionResponse<never>> => {
+  input: RemoveFriendRequest
+): Promise<FunctionResponse<RemoveFriendResponse>> => {
   const payload = JSON.stringify(input);
   const execution = await functions.createExecution(FUNCTION_IDS.removeFriend, payload);
   const response = JSON.parse(execution.response);
@@ -69,6 +81,7 @@ export const removeFriend = async (
   return {
     success: execution.statusCode === 200 && !response.message,
     error: response.message,
+    data: response.data,
   };
 };
 
@@ -84,7 +97,7 @@ export const getFriendRequests = async (): Promise<FunctionResponse<GetFriendReq
 };
 
 export const userExists = async (
-  input: UserExistsRequest,
+  input: UserExistsRequest
 ): Promise<FunctionResponse<UserExistsResponse>> => {
   const payload = JSON.stringify(input);
   const execution = await functions.createExecution(FUNCTION_IDS.userExists, payload);

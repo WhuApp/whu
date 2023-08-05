@@ -18,22 +18,23 @@ export const getFriends = async (): Promise<Friend[] | string> => {
   }
 
   return response.data.map((friend) => ({
+    id: friend.id,
     name: friend.name,
     lastLocationUpdate: new Date(friend.lastLocationUpdate),
     location: denormalize(friend.location),
   }));
 };
 
-export const addFriend = async (emailOrName: string): Promise<string | never> => {
-  const response = await addFriendApi({ emailOrName });
+export const addFriend = async (target: string): Promise<string | never> => {
+  const response = await addFriendApi({ target });
 
   if (!response.success) {
     return response.error ?? 'Unknown Error';
   }
 };
 
-export const removeFriend = async (emailOrName: string): Promise<string | never> => {
-  const response = await removeFriendApi({ emailOrName });
+export const removeFriend = async (target: string): Promise<string | never> => {
+  const response = await removeFriendApi({ target });
 
   if (!response.success) {
     return response.error ?? 'Unknown Error';
