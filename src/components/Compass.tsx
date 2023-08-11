@@ -1,18 +1,17 @@
 import React from 'react';
-import { Text, View, useColorScheme } from 'react-native';
-import { getStyles, Elements, colors } from '../styles';
+import { View } from 'react-native';
 import Icon from './Icon';
+import { useColors } from '../utils';
 
 interface CompassProps {
   direction: number;
-};
+}
 
 const Compass: React.FC<CompassProps> = ({ direction }) => {
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+  const colors = useColors();
 
   return (
-    <View style={{ borderRadius: 10000, backgroundColor: colorScheme === 'dark' ? colors.darkBackgroundTertiary : colors.lightBackgroundTertiary }}>
+    <View style={{ borderRadius: 10000, backgroundColor: colors('backgroundTertiary') }}>
       <View style={{ transform: [{ rotate: `${direction}deg` }] }}>
         <Icon name='arrow-up' />
       </View>

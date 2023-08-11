@@ -29,6 +29,7 @@ const AddFriends: React.FC = () => {
   useEffect(() => {
     (async () => {
       const data = await getFriendRequests();
+      console.log(data);
       setRequests(data);
     })();
   }, []);
@@ -42,16 +43,11 @@ const AddFriends: React.FC = () => {
   };
 
   return (
-    <ModalLayout
-      title='Add Friends'
-      onPressMore={() => { }}
-    >
+    <ModalLayout title='Add Friends' onPressMore={() => {}}>
       <TextInput
         placeholder='Search..'
         onChangeText={setInput}
-        contentLeft={
-          <Icon name='search' />
-        }
+        contentLeft={<Icon name='search' />}
         contentRight={
           <View style={styles.iconWrapper}>
             <TouchableOpacity onPress={handleAdd}>
@@ -65,22 +61,18 @@ const AddFriends: React.FC = () => {
       />
       {requests.incoming.length > 0 && (
         <>
-          <Text style={styles.label}>
-            Added Me
-          </Text>
+          <Text style={styles.label}>Added Me</Text>
           <IncomingRequests requests={requests.incoming} />
         </>
       )}
       {requests.outgoing.length > 0 && (
         <>
-          <Text style={styles.label}>
-            Pending
-          </Text>
+          <Text style={styles.label}>Pending</Text>
           <OutgoingRequests requests={requests.outgoing} />
         </>
       )}
     </ModalLayout>
-  )
+  );
 };
 
 const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
@@ -135,20 +127,12 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
     <View style={styles.container}>
       {requests.map((user) => (
         <View style={styles.item} key={user}>
-          <Text style={styles.text}>
-            {user}
-          </Text>
+          <Text style={styles.text}>{user}</Text>
           <View style={styles.iconWrapper}>
-            <TouchableOpacity
-              style={styles.icon}
-              onPress={() => handleAccept(user)}
-            >
+            <TouchableOpacity style={styles.icon} onPress={() => handleAccept(user)}>
               <Icon name='user-check' />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.icon}
-              onPress={() => handleDecline(user)}
-            >
+            <TouchableOpacity style={styles.icon} onPress={() => handleDecline(user)}>
               <Icon name='x' />
             </TouchableOpacity>
           </View>
@@ -198,13 +182,8 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
     <View style={styles.container}>
       {requests.map((user) => (
         <View style={styles.item} key={user}>
-          <Text style={styles.text}>
-            {user}
-          </Text>
-          <TouchableOpacity
-            style={styles.icon}
-            onPress={() => handleCancel(user)}
-          >
+          <Text style={styles.text}>{user}</Text>
+          <TouchableOpacity style={styles.icon} onPress={() => handleCancel(user)}>
             <Icon name='x' />
           </TouchableOpacity>
         </View>

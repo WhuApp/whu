@@ -1,78 +1,65 @@
-const {
-  Client,
-  Databases,
-  Users,
-  Query,
-} = require('node-appwrite');
+const { Client, Databases, Users, Query } = require('node-appwrite');
 
-const addFriend = async (request, response) => {
-  // Check if everything is set up correctly
-  if ([
-    'DATABASE_ID',
-    'COLLECTION_FRIENDS_ID',
-    'APPWRITE_FUNCTION_ENDPOINT',
-    'APPWRITE_FUNCTION_PROJECT_ID',
-    'APPWRITE_FUNCTION_API_KEY'
-  ].some((x) => !request.variables[x])) {
+module.exports = async (request, response) => {
+  if (
+    [
+      'DATABASE_ID',
+      'COLLECTION_FRIENDS_ID',
+      'APPWRITE_FUNCTION_ENDPOINT',
+      'APPWRITE_FUNCTION_PROJECT_ID',
+      'APPWRITE_FUNCTION_API_KEY',
+    ].some((x) => !request.variables[x])
+  ) {
     throw new Error('Some variables are missing');
-  };
+  }
 
-  const database = request.variables['DATABASE_ID'];
-  const friendsCollection = request.variables['COLLECTION_FRIENDS_ID']; 
-  const payload = JSON.parse(request.payload);
-  const client = new Client();
-  const databases = new Databases(client);
-  const users = new Users(client);
+  if (!request.variables['APPWRITE_FUNCTION_USER_ID']) {
+    throw new Error('This function can only be called as a user');
+  }
 
-  client
+  if (!request.payload || !JSON.parse(request.payload).target) {
+    return response.json({ message: 'Missing target' });
+  }
+
+  const DATABASE_ID = request.variables['DATABASE_ID'];
+  const COLLECTION_FRIENDS_ID = request.variables['COLLECTION_FRIENDS_ID'];
+
+  const client = new Client()
     .setEndpoint(request.variables['APPWRITE_FUNCTION_ENDPOINT'])
     .setProject(request.variables['APPWRITE_FUNCTION_PROJECT_ID'])
     .setKey(request.variables['APPWRITE_FUNCTION_API_KEY']);
+  const databases = new Databases(client);
+  const users = new Users(client);
 
-  // Validate sender & receiver
-  if (!payload.receiver) {
-    throw new Error('No receiver provided');
-  };
+  const payload = JSON.parse(request.payload);
+  const targetId = payload.target;
+  const senderId = request.variables['APPWRITE_FUNCTION_USER_ID'];
 
-  const receiver = await users.get(payload.receiver).catch(() => {
-    return response.json({ success: false, message: 'Receiver not found' });
-  });
-  const sender = await users.get(request.variables['APPWRITE_FUNCTION_USER_ID']).catch(async () => {
-    console.log('Sender not found! Trying to use payload sender..');
-    
-    if (!payload.sender) {
-      return response.json({ success: false, message: 'No sender provided' });
+  if ((await users.list([Query.equal('$id', targetId)])).users.length === 0) {
+    return response.json({ message: 'User not found' });
+  }
+
+  const friendships = await databases.listDocuments(DATABASE_ID, COLLECTION_FRIENDS_ID, [
+    Query.equal('sender', [senderId, targetId]),
+    Query.equal('receiver', [senderId, targetId]),
+  ]);
+
+  console.log(payload);
+  console.log({ senderId, targetId });
+  console.log(friendships);
+
+  switch (friendships.total) {
+    case 0:
+      throw new Error('No friendship or request found');
+    case 1: {
+      await databases.deleteDocument(
+        DATABASE_ID,
+        COLLECTION_FRIENDS_ID,
+        friendships.documents[0].$id
+      );
+      return response.json({ data: { success: true } });
     }
-
-    return await users.get(payload.sender).catch(() => {
-      return response.json({ success: false, message: 'Sender not found' });
-    })
-  });
-
-  if (sender.$id === receiver.$id) {
-    return response.json({ success: false, message: 'Sender can not be same as receiver' });
-  };
-  
-  // Check if a request or friendship exists
-  const friendships = await databases.listDocuments(
-    database,
-    friendsCollection,
-    [
-      Query.equal('sender', [sender.$id, receiver.$id]),
-      Query.equal('receiver', [sender.$id, receiver.$id])
-    ]
-  );
-
-  if (friendships.total === 0) {
-    return response.json({ success: false, message: 'No friendship or request for that user' });
-  };
-
-  if (friendships.total > 1) {
-    throw new Error('Something is completly wrong here!');
-  };
-
-  await databases.deleteDocument(database, friendsCollection, friendships.documents[0].$id);
-  response.json({ success: true });
+    default:
+      throw new Error('Something is completly wrong here');
+  }
 };
-
-module.exports = addFriend;

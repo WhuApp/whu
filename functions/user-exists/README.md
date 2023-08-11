@@ -1,14 +1,14 @@
-# add-friend
+# user-exists
 
 ## 🤖 Documentation
 
-This function is either used to send or to accept a friend request.
+This function is used to check if a username exists.
 
 _Input:_
 
 ```ts
 {
-  target: string; // ID
+  name: string;
 }
 ```
 
@@ -17,9 +17,9 @@ _Output:_
 ```ts
 {
   data: {
-    success: boolean,
+    exists: boolean,
   } | undefined,
-  message: string | undefined, // Error
+  message: string | undefined; // Error
 }
 ```
 
@@ -30,8 +30,6 @@ List of environment variables used by this cloud function:
 - **APPWRITE_FUNCTION_PROJECT_ID** - ID of Appwrite project
 - **APPWRITE_FUNCTION_ENDPOINT** - Endpoint of Appwrite project
 - **APPWRITE_FUNCTION_API_KEY** - Appwrite API Key
-- **DATABASE_ID** - ID of database
-- **COLLECTION_FRIENDS_ID** - ID of friends collection
 
 ## 🚀 Deployment
 

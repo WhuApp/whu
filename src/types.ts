@@ -9,18 +9,16 @@ export type RootStackParamList = {
 };
 
 export type Friend = {
+  id: string;
   name: string;
-  location: TimedLocation;
+  lastLocationUpdate: Date;
+  location: Location;
 };
 
 export type Location = {
   longitude: number;
   latitude: number;
   altitude: number;
-};
-
-export type TimedLocation = Location & {
-  timestamp: Date | number;
 };
 
 export type PendingRequests = {

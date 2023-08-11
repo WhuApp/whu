@@ -1,47 +1,52 @@
-import { client } from '../appwrite';
-import { Functions } from 'appwrite';
 import type { Friend, PendingRequests } from '../types';
 import { denormalize } from '../location';
-
-const FUNCTION_GET_FRIENDS_ID = '64afee76ae420de6cc3d';
-const FUNCTION_ADD_FRIEND_ID = '64aef40f8bc33879bb25';
-const FUNCTION_REMOVE_FRIEND_ID = '64b67d44e75c49e2110e';
-const FUNCTION_GET_FRIEND_REQUESTS_ID = '64b645dbb12660ad9258';
-
-const functions = new Functions(client);
+import {
+  getFriends as getFriendsApi,
+  addFriend as addFriendApi,
+  removeFriend as removeFriendApi,
+  getFriendRequests as getFriendRequestsApi,
+} from '../api/functions';
 
 /**
  * TODO: Implement caching
  */
-export const getFriends = async (): Promise<Friend[]> => {
-  const execution = await functions.createExecution(FUNCTION_GET_FRIENDS_ID);
-  const data = JSON.parse(execution.response);
+export const getFriends = async (): Promise<Friend[] | string> => {
+  const response = await getFriendsApi();
 
-  return data.map((friend) => ({
+  if (!response.success) {
+    return response.error ?? 'Unknown Error';
+  }
+
+  return response.data.map((friend) => ({
+    id: friend.id,
     name: friend.name,
+    lastLocationUpdate: new Date(friend.lastLocationUpdate),
     location: denormalize(friend.location),
   }));
 };
 
-export const addFriend = async (id: string): Promise<string | undefined> => {
-  const payload = JSON.stringify({ receiver: id });
-  const execution = await functions.createExecution(FUNCTION_ADD_FRIEND_ID, payload);
-  const data = JSON.parse(execution.response);
-  
-  if (!data.success) return data.message;
+export const addFriend = async (target: string): Promise<string | never> => {
+  const response = await addFriendApi({ target });
+
+  if (!response.success) {
+    return response.error ?? 'Unknown Error';
+  }
 };
 
-export const removeFriend = async (id: string): Promise<string | undefined> => {
-  const payload = JSON.stringify({ receiver: id });
-  const execution = await functions.createExecution(FUNCTION_REMOVE_FRIEND_ID, payload);
-  const data = JSON.parse(execution.response);
+export const removeFriend = async (target: string): Promise<string | never> => {
+  const response = await removeFriendApi({ target });
 
-  if (!data.success) return data.message;
+  if (!response.success) {
+    return response.error ?? 'Unknown Error';
+  }
 };
 
 export const getFriendRequests = async (): Promise<PendingRequests> => {
-  const execution = await functions.createExecution(FUNCTION_GET_FRIEND_REQUESTS_ID);
-  const data = JSON.parse(execution.response);
+  const response = await getFriendRequestsApi();
 
-  return data;
+  if (!response.success) {
+    throw new Error(response.error ?? 'Unknown Error');
+  }
+
+  return response.data;
 };

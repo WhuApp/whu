@@ -29,7 +29,9 @@ const App: React.FC = () => {
   // TODO: somehow pass screen options from component
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false, navigationBarColor: colors('backgroundPrimary') }}>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false, navigationBarColor: colors('backgroundPrimary') }}
+      >
         {session ? (
           <>
             <Stack.Screen
@@ -80,12 +82,14 @@ const App: React.FC = () => {
 const MainView: React.FC = () => {
   return (
     <MainLayout>
-      <Tab.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+      <Tab.Navigator
+        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}
+      >
         <Tab.Screen name='Home' component={Home} />
         <Tab.Screen name='Test' component={Test} options={{ animation: 'slide_from_left' }} />
       </Tab.Navigator>
     </MainLayout>
-  )
+  );
 };
 
 export default App;

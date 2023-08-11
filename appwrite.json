@@ -1,66 +1,66 @@
 {
-    "projectId": "648644a80adadf63b7d4",
-    "projectName": "WhuApp",
-    "functions": [
-        {
-            "$id": "64aef40f8bc33879bb25",
-            "name": "add-friend",
-            "runtime": "node-16.0",
-            "path": "functions/add-friend",
-            "entrypoint": "src/index.js",
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "execute": [],
-            "events": [],
-            "schedule": "",
-            "timeout": 15
-        },
-        {
-            "$id": "64afee76ae420de6cc3d",
-            "name": "get-friends",
-            "runtime": "node-16.0",
-            "path": "functions/get-friends",
-            "entrypoint": "src/index.js",
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "execute": [],
-            "events": [],
-            "schedule": "",
-            "timeout": 15
-        },
-        {
-            "$id": "64b645dbb12660ad9258",
-            "name": "get-friend-requests",
-            "runtime": "node-16.0",
-            "path": "functions/get-friend-requests",
-            "entrypoint": "src/index.js",
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "execute": [],
-            "events": [],
-            "schedule": "",
-            "timeout": 15
-        },
-        {
-            "$id": "64b67d44e75c49e2110e",
-            "name": "remove-friend",
-            "runtime": "node-16.0",
-            "path": "functions/remove-friend",
-            "entrypoint": "src/index.js",
-            "ignore": [
-                "node_modules",
-                ".npm"
-            ],
-            "execute": [],
-            "events": [],
-            "schedule": "",
-            "timeout": 15
-        }
-    ]
+  "projectId": "648644a80adadf63b7d4",
+  "projectName": "WhuApp",
+  "functions": [
+    {
+      "$id": "64aef40f8bc33879bb25",
+      "name": "add-friend",
+      "runtime": "node-16.0",
+      "path": "functions/add-friend",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["users"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    },
+    {
+      "$id": "64afee76ae420de6cc3d",
+      "name": "get-friends",
+      "runtime": "node-16.0",
+      "path": "functions/get-friends",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["users"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    },
+    {
+      "$id": "64b645dbb12660ad9258",
+      "name": "get-friend-requests",
+      "runtime": "node-16.0",
+      "path": "functions/get-friend-requests",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["users"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    },
+    {
+      "$id": "64b67d44e75c49e2110e",
+      "name": "remove-friend",
+      "runtime": "node-16.0",
+      "path": "functions/remove-friend",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["users"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    },
+    {
+      "$id": "64c3b745e7e1fa7c9445",
+      "name": "user-exists",
+      "runtime": "node-16.0",
+      "path": "functions/user-exists",
+      "entrypoint": "src/index.js",
+      "ignore": ["node_modules", ".npm"],
+      "execute": ["any"],
+      "events": [],
+      "schedule": "",
+      "timeout": 15
+    }
+  ]
 }
