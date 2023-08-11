@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -20,7 +22,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE"
+      ],
+      "package": "app.whu"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,7 +39,18 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
+      ],
+      [
+        "react-native-auth0",
+        {
+          "domain": "whuapp.eu.auth0.com"
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bd89e99a-8e18-4462-9ae3-e72be1486d54"
+      }
+    }
   }
 }
