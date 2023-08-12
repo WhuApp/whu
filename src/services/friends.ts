@@ -1,5 +1,4 @@
 import type { Friend, PendingRequests } from '../types';
-import { denormalize } from '../location';
 
 /**
  * TODO: Implement caching

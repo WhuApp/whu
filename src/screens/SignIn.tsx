@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Button, TextInput } from '../components';
+import { Button } from '../components';
 import { useAuth0 } from 'react-native-auth0';
+import { ModalLayout } from '../layouts';
+import { Text } from 'react-native';
 
 const SignIn: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -14,13 +16,18 @@ const SignIn: React.FC = () => {
     try {
       await authorize({}, {}); // TODO: understand this params
     } catch (e) {
-      setError(e);
+      setError(e.toString());
     }
 
     setLoading(false);
   };
 
-  return <Button title='Sign In' loading={loading} onPress={handleSignIn} />;
+  return (
+    <ModalLayout title='Sign In' onPressMore={() => {}}>
+      <Button title='Sign In' loading={loading} onPress={handleSignIn} />
+      {error && <Text>{error}</Text>}
+    </ModalLayout>
+  );
 };
 
 export default SignIn;

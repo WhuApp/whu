@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { watchPositionAsync, Accuracy } from 'expo-location';
 import type { LocationObject } from 'expo-location';
-import type { TimedLocation } from '../types';
+import type { Location } from '../types';
 
 // DANGER!!! This hook expects to already have permissions to get foreground location data
 const useLiveLocation = () => {
-  const [location, setLocation] = useState<TimedLocation>();
+  const [location, setLocation] = useState<Location>();
 
   const onLocationUpdate = (data: LocationObject) => {
     setLocation({
-      timestamp: new Date(data.timestamp),
       longitude: data.coords.longitude,
       latitude: data.coords.latitude,
       altitude: data.coords.altitude,

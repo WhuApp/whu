@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '../components';
 import ModalLayout from '../layouts/ModalLayout';
-import { useAuth0, Auth0Provider } from 'react-native-auth0';
+import { useAuth0 } from 'react-native-auth0';
 
 const Profile: React.FC = () => {
   const { clearSession } = useAuth0();

@@ -1,5 +1,4 @@
 import type { Location } from './types';
-import { getCurrentPositionAsync, Accuracy } from 'expo-location';
 
 /*
 Functions calculateDistance & calculateBearing were taken from
