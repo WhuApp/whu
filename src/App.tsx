@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
-import { AddFriends, Home, Profile, Settings, SignIn, SignUp, Test, Welcome } from './screens';
+import { AddFriends, Home, Profile, Settings, SignIn, Test, Welcome } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useAuth } from './components/AuthContext';
 import * as Location from 'expo-location';
 import { useColors } from './utils';
 import { MainLayout } from './layouts';
+import { useAuth0 } from 'react-native-auth0';
 
 const Stack = createNativeStackNavigator();
 const Tab = createNativeStackNavigator();
 
 const App: React.FC = () => {
-  const { session } = useAuth();
   const colors = useColors();
+  const { user } = useAuth0();
 
   // TODO: no?
   useEffect(() => {
@@ -32,7 +32,7 @@ const App: React.FC = () => {
       <Stack.Navigator
         screenOptions={{ headerShown: false, navigationBarColor: colors('backgroundPrimary') }}
       >
-        {session ? (
+        {user ? (
           <>
             <Stack.Screen
               name='MainView'
@@ -65,11 +65,6 @@ const App: React.FC = () => {
             <Stack.Screen
               name='SignIn'
               component={SignIn}
-              options={{ animation: 'slide_from_bottom' }}
-            />
-            <Stack.Screen
-              name='SignUp'
-              component={SignUp}
               options={{ animation: 'slide_from_bottom' }}
             />
           </>
