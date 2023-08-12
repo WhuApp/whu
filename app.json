@@ -44,6 +44,11 @@
           "domain": "whuapp.eu.auth0.com"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bd89e99a-8e18-4462-9ae3-e72be1486d54"
+      }
+    }
   }
 }
