@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "whu",
-    "slug": "whu",
+    "slug": "whuapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -49,6 +51,7 @@
       "eas": {
         "projectId": "82b3b86d-d875-4620-a1ee-881b83354117"
       }
-    }
+    },
+    "owner": "whuapp"
   }
 }
