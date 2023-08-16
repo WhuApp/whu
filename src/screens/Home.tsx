@@ -1,30 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Text } from 'react-native';
-import { useAuth } from '../components/AuthContext';
-import FriendList from '../components/FriendList';
-import { useColors } from '../utils';
+import { useAuth0 } from 'react-native-auth0';
 
 const Home: React.FC = () => {
-  const { session } = useAuth();
-  const [name, setName] = useState<string>('Loading..');
-  const colors = useColors();
+  const { user } = useAuth0();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setName(session.userId);
-    };
-
-    fetchUser();
-  }, []);
-
-  return (
-    <>
-      <Text style={{ color: colors('textPrimary') }}>
-        {name}
-      </Text>
-      <FriendList />
-    </>
-  );
-}
+  return <Text>Logged in as {user.name}</Text>;
+};
 
 export default Home;
