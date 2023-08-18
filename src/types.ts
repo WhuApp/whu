@@ -5,6 +5,7 @@ export type RootStackParamList = {
   AddFriends: undefined;
   Profile: undefined;
   Settings: undefined;
+  DevPage: undefined;
 };
 
 export type Friend = {
