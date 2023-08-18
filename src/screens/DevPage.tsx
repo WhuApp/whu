@@ -12,6 +12,7 @@ import { useAuth0 } from "react-native-auth0";
 import { useColors } from "../utils";
 import { ModalLayout } from "../layouts";
 import { useClipboard } from "@react-native-community/clipboard";
+import { TextInput } from "../components";
 
 const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   const c = children!.toString();
@@ -112,6 +113,12 @@ const DevPage: React.FC = () => {
           <Text style={styles.title}>Credentials</Text>
           <ObjectView obj={credentials}></ObjectView>
         </View>
+        <View
+          style={{
+            borderBottomColor: "black",
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
       </View>
     </ModalLayout>
   );
