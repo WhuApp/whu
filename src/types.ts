@@ -10,9 +10,7 @@ export type RootStackParamList = {
 
 export type Friend = {
   id: string;
-  name: string;
-  lastLocationUpdate: Date;
-  location: Location;
+  username: string;
 };
 
 export type Location = {
