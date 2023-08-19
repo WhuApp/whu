@@ -1,47 +1,47 @@
-import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { Button, InsetView } from "../components";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
-import { useColors } from "../utils";
+import React from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Button, InsetView } from '../components';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
+import { useColors } from '../utils';
 
-const earthImage = require("./../../assets/earth.jpg");
+const earthImage = require('./../../assets/earth.jpg');
 
-type WelcomeProps = NativeStackScreenProps<RootStackParamList, "Welcome">;
+type WelcomeProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
   const colors = useColors();
 
   const styles = StyleSheet.create({
     root: {
-      backgroundColor: "#0F0F31",
-      justifyContent: "space-around",
-      alignItems: "center",
+      backgroundColor: '#0F0F31',
+      justifyContent: 'space-around',
+      alignItems: 'center',
     },
     title: {
-      color: colors("textPrimary", "dark"),
+      color: colors('textPrimary', 'dark'),
       fontSize: 40,
-      fontWeight: "bold",
+      fontWeight: 'bold',
     },
     image: {
       width: 350,
       height: 350,
     },
     container: {
-      alignItems: "center",
+      alignItems: 'center',
       gap: 8,
     },
     wrapper: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 4,
     },
     text: {
-      color: colors("textSecondary", "dark"),
+      color: colors('textSecondary', 'dark'),
     },
     link: {
-      color: colors("linkText"),
-      fontWeight: "bold",
+      color: colors('linkText'),
+      fontWeight: 'bold',
     },
   });
 
@@ -51,19 +51,16 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
         <Text style={styles.title}>Whu</Text>
         <Image style={styles.image} source={earthImage} />
         <View style={styles.container}>
-          <Button
-            title="Sign In"
-            onPress={() => navigation.navigate("SignIn")}
-          />
+          <Button title='Sign In' onPress={() => navigation.navigate('SignIn')} />
           <View style={styles.wrapper}>
             <Text style={styles.text}>No account yet?</Text>
-            <Pressable onPress={() => navigation.navigate("SignIn")}>
+            <Pressable onPress={() => navigation.navigate('SignIn')}>
               <Text style={styles.link}>Sign Up</Text>
             </Pressable>
           </View>
         </View>
       </InsetView>
-      <StatusBar style="light" />
+      <StatusBar style='light' />
     </>
   );
 };

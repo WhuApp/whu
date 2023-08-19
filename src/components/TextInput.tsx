@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput as NativeTextInpt,
-  ViewStyle,
-  TextStyle
-} from 'react-native';
+import { View, Text, TextInput as NativeTextInpt, ViewStyle, TextStyle } from 'react-native';
 import { useColors } from '../utils';
 
 interface TextInputProps {
@@ -27,7 +21,7 @@ const TextInput: React.FC<TextInputProps> = ({
   secureTextEntry,
   contentLeft,
   contentRight,
-  onChangeText
+  onChangeText,
 }) => {
   const colors = useColors();
 
@@ -86,6 +80,6 @@ const TextInput: React.FC<TextInputProps> = ({
       </View>
     </View>
   );
-}
+};
 
 export default TextInput;

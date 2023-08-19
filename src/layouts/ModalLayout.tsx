@@ -1,10 +1,10 @@
-import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { Pressable, Text, TextStyle, View, ViewStyle } from "react-native";
-import { Icon, InsetView } from "../components";
-import { useColors } from "../utils";
-import { RootStackParamList } from "../types";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import React from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { Pressable, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { Icon, InsetView } from '../components';
+import { useColors } from '../utils';
+import { RootStackParamList } from '../types';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 interface ModalLayoutProps {
   title: string;
@@ -20,26 +20,26 @@ const ModalLayout: React.FC<React.PropsWithChildren & ModalLayoutProps> = ({
   const colors = useColors();
 
   const rootStyle: ViewStyle = {
-    backgroundColor: colors("backgroundSecondary"),
+    backgroundColor: colors('backgroundSecondary'),
   };
   const headerStyle: ViewStyle = {
-    width: "100%",
+    width: '100%',
     padding: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   };
   const titleStyle: TextStyle = {
-    color: colors("textPrimary"),
+    color: colors('textPrimary'),
     fontSize: 20,
-    fontWeight: "normal",
+    fontWeight: 'normal',
   };
   const contentStyle: ViewStyle = {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     padding: 15,
     gap: 10,
-    backgroundColor: colors("backgroundPrimary"),
+    backgroundColor: colors('backgroundPrimary'),
   };
 
   return (
@@ -47,18 +47,16 @@ const ModalLayout: React.FC<React.PropsWithChildren & ModalLayoutProps> = ({
       <InsetView style={rootStyle}>
         <View style={headerStyle}>
           <Pressable onPress={navigation.goBack}>
-            <Icon name="chevron-down" />
+            <Icon name='chevron-down' />
           </Pressable>
           <Text style={titleStyle}>{title}</Text>
           <Pressable onPress={onPressMore}>
-            <Icon name="more-horizontal" />
+            <Icon name='more-horizontal' />
           </Pressable>
         </View>
-        <View style={contentStyle}>
-          {children}
-        </View>
+        <View style={contentStyle}>{children}</View>
       </InsetView>
-      <StatusBar style="auto" />
+      <StatusBar style='auto' />
     </>
   );
 };

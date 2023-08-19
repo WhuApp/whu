@@ -1,6 +1,6 @@
-import React from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
-import { useColors } from "../utils";
+import React from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { useColors } from '../utils';
 
 interface ButtonProps {
   title: string;
@@ -8,11 +8,7 @@ interface ButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  onPress,
-  title,
-  loading,
-}) => {
+const Button: React.FC<ButtonProps> = ({ onPress, title, loading }) => {
   const colors = useColors();
 
   const styles = StyleSheet.create({
@@ -21,32 +17,21 @@ const Button: React.FC<ButtonProps> = ({
       paddingVertical: 12,
       paddingHorizontal: 12,
       borderRadius: 20,
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "row",
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
       gap: 10,
-      backgroundColor: colors("accent"),
+      backgroundColor: colors('accent'),
     },
     text: {
-      color: colors("textPrimary", "dark"),
+      color: colors('textPrimary', 'dark'),
     },
   });
 
   return (
-    <Pressable
-      style={styles.button}
-      disabled={loading}
-      onPress={onPress}
-    >
-      {loading && (
-        <ActivityIndicator
-          size={"small"}
-          color={colors("textPrimary", "dark")}
-        />
-      )}
-      <Text style={styles.text}>
-        {title}
-      </Text>
+    <Pressable style={styles.button} disabled={loading} onPress={onPress}>
+      {loading && <ActivityIndicator size={'small'} color={colors('textPrimary', 'dark')} />}
+      <Text style={styles.text}>{title}</Text>
     </Pressable>
   );
 };
