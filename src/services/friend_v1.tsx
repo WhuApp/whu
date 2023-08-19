@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
 import { responseWithJsonSafe } from '../utils/safe_json';
-import useAuth from '../auth';
+import useAuth from './auth';
 
 const BASE_URL = 'https://api.whu.app/friends/v1/';
 

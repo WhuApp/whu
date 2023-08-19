@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import { AddFriends, Home, Profile, Settings, SignIn, Test, Welcome } from './screens';
+import { AddFriends, Home, Profile, Settings, SignIn, Test, Welcome, DevPage } from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { useColors } from './utils';
 import { MainLayout } from './layouts';
 import { useAuth0 } from 'react-native-auth0';
-import DevPage from './screens/DevPage';
-import { AuthProvider } from './auth';
+import { AuthProvider } from './services/auth';
 import { FriendsV1Provider } from './services/friend_v1';
 import { UsersV1Provider } from './services/users_v1';
 
