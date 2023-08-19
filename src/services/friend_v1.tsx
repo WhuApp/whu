@@ -39,7 +39,7 @@ export class FriendV1 {
   }
 
   async getOutgoingFriendRequests(): Promise<string[]> {
-    return await this.innerFetch('request/out/list');
+    return await this.innerFetch('requests/out/list');
   }
 
   async getIncomingFriendRequests(): Promise<string[]> {
@@ -47,7 +47,7 @@ export class FriendV1 {
   }
 
   async sendFriendRequestTo(id: string): Promise<string | undefined> {
-    const response = await this.innerFetchPost('request/send', {
+    const response = await this.innerFetchPost('requests/send', {
       friendId: id,
     });
 
@@ -58,7 +58,7 @@ export class FriendV1 {
   }
 
   async acceptRequest(id: string): Promise<string | undefined> {
-    const response = await this.innerFetchPost('request/accept', {
+    const response = await this.innerFetchPost('requests/accept', {
       friendId: id,
     });
 
@@ -69,7 +69,7 @@ export class FriendV1 {
   }
 
   async declineRequest(id: string): Promise<string | undefined> {
-    const response = await this.innerFetchPost('request/ignore', {
+    const response = await this.innerFetchPost('requests/ignore', {
       friendId: id,
     });
 
