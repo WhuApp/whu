@@ -39,11 +39,11 @@ export class FriendV1 {
   }
 
   async getOutgoingFriendRequests(): Promise<string[]> {
-    return await this.innerFetch('requests/out/list');
+    return await this.innerFetch('request/out/list');
   }
 
   async getIncomingFriendRequests(): Promise<string[]> {
-    return await this.innerFetch('requests/in/list');
+    return await this.innerFetch('request/in/list');
   }
 
   async sendFriendRequestTo(id: string): Promise<string | undefined> {
