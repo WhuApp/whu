@@ -24,9 +24,11 @@ const FriendList: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const friendids = await friendsV1.getFriendIds();
+      if (friendsV1) {
+        const friendids = await friendsV1.getFriendIds();
 
-      setFriendIds(friendids);
+        setFriendIds(friendids);
+      }
     })();
   }, [friendsV1]);
 

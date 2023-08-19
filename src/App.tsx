@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import {
-  //  AddFriends,
+  AddFriends,
   Home,
   Profile,
   Settings,
@@ -62,13 +62,11 @@ const App: React.FC = () => {
                 component={Settings}
                 options={{ animation: "slide_from_bottom" }}
               />
-              {
-                /* <Stack.Screen
+              <Stack.Screen
                 name="AddFriends"
                 component={AddFriends}
                 options={{ animation: "slide_from_bottom" }}
-              /> */
-              }
+              />
               {__DEV__ && (
                 <Stack.Screen
                   name="DevPage"

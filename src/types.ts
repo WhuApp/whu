@@ -18,8 +18,3 @@ export type Location = {
   latitude: number;
   altitude: number;
 };
-
-export type PendingRequests = {
-  outgoing: string[];
-  incoming: string[];
-};

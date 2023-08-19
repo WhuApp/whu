@@ -1,0 +1,15 @@
+INFO    | Android emulator version 32.1.14.0 (build_id 10330179) (CL:N/A)
+INFO    | Found systemPath /opt/android-sdk/system-images/android-33/google_apis_playstore/x86_64/
+INFO    | Storing crashdata in: /tmp/android-kaij/emu-crash.db, detection is enabled
+INFO    | Duplicate loglines will be removed, if you wish to see each indiviudal line launch with the -log-nofilter flag.
+INFO    | Warning: Could not find the Qt platform plugin "wayland" in "/opt/android-sdk/emulator/lib64/qt/plugins" ((null):0, (null))
+INFO    | Sending adb public key [QAAAAHWBYiQjefgWTBJ/G5yI2TMCJVP4pvrm+LYIW/oOAOZALhcAuq0YOtXbKkl77x7j17aYTybQi4kx9ZD/TKBg4iTwa3H+oiflIgPKn4+HTDY0RVJEh12cXVcsBETFODiexbshszP7geYNLMY5HCMhCXKTya2vmyRWSjvJUOABYoWO6i3Gcr8PWYqY+q2ugm87avIcTIDhNPwMSxgBDyvZbmGtp4yD1zC5a4b2Ipmd+krrZuLVHnOqPJ6sdTBx8l29uIgk9tV+W/7/J7vM3sjMKuuw4xt1Nf6wmO8MEuD0chmHKxwZPeLzEQ2biVULz6vS37UHX4HFod8uZXf1wNo/0yR+o3PqbAQ7nDsuggf5EttZrfnMu6hAuc7dQGJmbjJnGSd8xfANvtYxOB+vRGYJuuStQlHkUGzfzU3p2Fq32rWbKC2esYf1voMaRYpq57RT76nj77qe21R8W07mL99u9nvLieKsLMGj9xxv3NNn19iIs7brw9Mt14jOPO3kD8EJwN/3E3Ltjs4quYqbN8FRoVaOV2x7sf2TIck67jddvym1hiUxJ/MJ/jXLkSJo6fZIly8XRbJqAw7aX/S436UvbmWteIwYttHJpiEfW/cm+X2xCIVMHKmBEJfRrMYJ+VF8zIOqKXElYP3a8poINzur+eifjFQMClRTEcgVr+M0cONjhC7zTgEAAQA= kaij@unknown]
+INFO    | added library /opt/android-sdk/emulator/lib64/vulkan/libvulkan.so
+INFO    | Started GRPC server at 127.0.0.1:8554, security: Local, auth: none
+INFO    | Advertising in: /run/user/1000/avd/running/pid_168368.ini
+INFO    | Setting display: 0 configuration to: 1440x3120, dpi: 560x560 
+INFO    | Boot completed in 16045 ms
+INFO    | Increasing screen off timeout, logcat buffer size to 2M.
+INFO    | Revoking microphone permissions for Google App.
+INFO    | Wait for emulator (pid 168368) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+INFO    | Info: Sandboxing disabled by user. ((null):0, (null))

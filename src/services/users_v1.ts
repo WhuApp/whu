@@ -26,6 +26,11 @@ export class UsersV1 {
     const response = await this.innerFetch("by-id/" + id);
     return await response.json();
   }
+
+  async findUserByNickname(nickname: string): Promise<string[]> {
+    const response = await this.innerFetch("search/by-nickname/" + nickname);
+    return await response.json();
+  }
 }
 
 export const useUsersV1 = (): UsersV1 | undefined => {
