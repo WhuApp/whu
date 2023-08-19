@@ -1,6 +1,6 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Icon, InsetView } from "../components";
 import { useColors } from "../utils";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -43,39 +43,39 @@ const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <InsetView style={styles.root}>
         <View style={styles.header}>
           <View style={styles.wrapper}>
-            <TouchableOpacity
+            <Pressable
               style={styles.button}
               onPress={() => navigation.navigate("Profile")}
             >
               <Icon name="user" />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={styles.button}
               onPress={() => {}}
             >
               <Icon name="award" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <View style={styles.wrapper}>
-            <TouchableOpacity
+            <Pressable
               style={styles.button}
               onPress={() => navigation.navigate("AddFriends")}
             >
               <Icon name="user-plus" />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={styles.button}
               onPress={() => navigation.navigate("Settings")}
             >
               <Icon name="settings" />
-            </TouchableOpacity>
+            </Pressable>
             {__DEV__ && (
-              <TouchableOpacity
+              <Pressable
                 style={styles.button}
                 onPress={() => navigation.navigate("DevPage")}
               >
                 <Icon name="code" />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>

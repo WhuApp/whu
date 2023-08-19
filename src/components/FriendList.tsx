@@ -1,15 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  View,
-  VirtualizedList,
-} from "react-native";
-import { useColors, useLiveHeading, useLiveLocation } from "../utils";
-import { calculateBearing, calculateDistance } from "../location";
-import Compass from "./Compass";
-import { useFriendsV1 } from "../services/friend_v1";
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'react-native';
+import { useColors, useLiveHeading, useLiveLocation } from '../utils';
+import { calculateBearing, calculateDistance } from '../location';
+import Compass from './Compass';
+import useFriendsV1 from '../services/friend_v1';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
@@ -18,17 +12,15 @@ const FriendList: React.FC = () => {
   const colors = useColors();
   const styles = StyleSheet.create({
     text: {
-      color: colors("textPrimary"),
+      color: colors('textPrimary'),
     },
   });
 
   useEffect(() => {
     (async () => {
-      if (friendsV1) {
-        const friendids = await friendsV1.getFriendIds();
+      const friendids = await friendsV1.getFriendIds();
 
-        setFriendIds(friendids);
-      }
+      setFriendIds(friendids);
     })();
   }, [friendsV1]);
 
@@ -62,16 +54,16 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
   const colors = useColors();
   const styles = StyleSheet.create({
     text: {
-      color: colors("textPrimary"),
+      color: colors('textPrimary'),
     },
     item: {
-      width: "100%",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      backgroundColor: colors("backgroundSecondary"),
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: colors('backgroundSecondary'),
       padding: 8,
       borderBottomWidth: 1,
-      alignItems: "center",
+      alignItems: 'center',
     },
   });
 
@@ -91,12 +83,10 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
   return (
     <View style={styles.item}>
       <Text style={styles.text}>{friendId}</Text>
-      {
-        /* {location && <Text style={styles.text}>{calcDistance()}m</Text>}
+      {/* {location && <Text style={styles.text}>{calcDistance()}m</Text>}
       {heading && location && <Text style={styles.text}>{calcHeading()}°</Text>}
       {heading && location && <Compass direction={calcHeading()} />}
-      <Text style={styles.text}>{time()}</Text> */
-      }
+      <Text style={styles.text}>{time()}</Text> */}
     </View>
   );
 };

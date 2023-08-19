@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Icon, TextInput } from "../components";
-import { useColors } from "../utils";
-import ModalLayout from "../layouts/ModalLayout";
-import { useFriendsV1 } from "../services/friend_v1";
-import { useUsersV1 } from "../services/users_v1";
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import { Icon, TextInput } from '../components';
+import { useColors } from '../utils';
+import ModalLayout from '../layouts/ModalLayout';
+import useFriendsV1 from '../services/friend_v1';
+import useUsersV1 from '../services/users_v1';
 
 interface RequestsProps {
   requests: string[];
 }
 
 const AddFriends: React.FC = () => {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>('');
   const [incoming, setIncoming] = useState(undefined);
   const [outgoing, setOutgoing] = useState(undefined);
   const friendsV1 = useFriendsV1();
@@ -20,64 +28,78 @@ const AddFriends: React.FC = () => {
 
   const styles = StyleSheet.create({
     iconWrapper: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 8,
     },
     label: {
-      color: colors("textSecondary"),
+      color: colors('textSecondary'),
     },
   });
 
   useEffect(() => {
     (async () => {
-      if (friendsV1) {
-        const data = await friendsV1.getIncomingFriendRequests();
-        setIncoming(data);
-      }
+      const data = await friendsV1.getIncomingFriendRequests();
+      setIncoming(data);
     })();
   }, [friendsV1]);
 
   useEffect(() => {
     (async () => {
-      if (friendsV1) {
-        const data = await friendsV1.getOutgoingFriendRequests();
-        setOutgoing(data);
-      }
+      const data = await friendsV1.getOutgoingFriendRequests();
+      setOutgoing(data);
     })();
   }, [friendsV1]);
 
-  const handleAdd = async () => {
-    console.log("input " + input);
-    const ids = await usersV1.findUserByNickname(input);
-    console.log("ids " + JSON.stringify(ids));
-    if (ids.length > 1) {
-      Alert.alert("Error", "Too many users?!");
-    } else if (ids.length == 0) {
-      Alert.alert("Error", "Could not find user!");
-    } else {
-      console.log("found " + ids[0]);
-      const reason = await friendsV1.sendFriendRequestTo(ids[0]);
+  const [isAdding, setIsAdding] = useState(false);
 
-      if (reason) {
-        Alert.alert("Error", reason);
+  const handleAdd = async () => {
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      console.log('input ' + input);
+      const ids = await usersV1.findUserByNickname(input);
+      console.log('ids ' + JSON.stringify(ids));
+      if (ids.length > 1) {
+        Alert.alert('Error', 'Too many users?!');
+      } else if (ids.length == 0) {
+        Alert.alert('Error', 'Could not find user!');
+      } else {
+        console.log('found ' + ids[0]);
+        const reason = await friendsV1.sendFriendRequestTo(ids[0]);
+
+        if (reason) {
+          Alert.alert('Error', reason);
+        }
       }
+    } finally {
+      setIsAdding(false);
     }
   };
 
+  useEffect(() => {
+    console.log(isAdding);
+  }, [isAdding]);
+
   return (
-    <ModalLayout title="Add Friends" onPressMore={() => {}}>
+    <ModalLayout title='Add Friends' onPressMore={() => {}}>
       <TextInput
-        placeholder="Search.."
+        placeholder='Search..'
         onChangeText={setInput}
-        contentLeft={<Icon name="search" />}
+        contentLeft={<Icon name='search' />}
         contentRight={
           <View style={styles.iconWrapper}>
-            <TouchableOpacity onPress={handleAdd}>
-              <Icon name="arrow-right" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Icon name="camera" />
-            </TouchableOpacity>
+            <TouchableWithoutFeedback
+              onPress={handleAdd}
+              disabled={isAdding}
+              onLongPress={handleAdd}
+            >
+              <View>{isAdding ? <ActivityIndicator /> : <Icon name='arrow-right' />}</View>
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback>
+              <View>
+                <Icon name='camera' />
+              </View>
+            </TouchableWithoutFeedback>
           </View>
         }
       />
@@ -104,28 +126,28 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
   const styles = StyleSheet.create({
     container: {
       borderRadius: 15,
-      overflow: "hidden",
-      backgroundColor: colors("backgroundSecondary"),
+      overflow: 'hidden',
+      backgroundColor: colors('backgroundSecondary'),
     },
     icon: {
       padding: 8,
-      backgroundColor: colors("backgroundTertiary"),
+      backgroundColor: colors('backgroundTertiary'),
       borderRadius: 10000,
     },
     item: {
-      flexDirection: "row",
+      flexDirection: 'row',
       paddingHorizontal: 6,
       paddingVertical: 3,
-      justifyContent: "space-between",
-      alignItems: "center",
+      justifyContent: 'space-between',
+      alignItems: 'center',
       borderBottomWidth: 1,
-      borderBottomColor: colors("backgroundTertiary"),
+      borderBottomColor: colors('backgroundTertiary'),
     },
     text: {
-      color: colors("textPrimary"),
+      color: colors('textPrimary'),
     },
     iconWrapper: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 8,
     },
   });
@@ -152,18 +174,12 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
         <View style={styles.item} key={user}>
           <Text style={styles.text}>{user}</Text>
           <View style={styles.iconWrapper}>
-            <TouchableOpacity
-              style={styles.icon}
-              onPress={() => handleAccept(user)}
-            >
-              <Icon name="user-check" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.icon}
-              onPress={() => handleDecline(user)}
-            >
-              <Icon name="x" />
-            </TouchableOpacity>
+            <Pressable style={styles.icon} onPress={() => handleAccept(user)}>
+              <Icon name='user-check' />
+            </Pressable>
+            <Pressable style={styles.icon} onPress={() => handleDecline(user)}>
+              <Icon name='x' />
+            </Pressable>
           </View>
         </View>
       ))}
@@ -178,25 +194,25 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
   const styles = StyleSheet.create({
     container: {
       borderRadius: 15,
-      overflow: "hidden",
-      backgroundColor: colors("backgroundSecondary"),
+      overflow: 'hidden',
+      backgroundColor: colors('backgroundSecondary'),
     },
     icon: {
       padding: 8,
-      backgroundColor: colors("backgroundTertiary"),
+      backgroundColor: colors('backgroundTertiary'),
       borderRadius: 10000,
     },
     item: {
-      flexDirection: "row",
+      flexDirection: 'row',
       paddingHorizontal: 6,
       paddingVertical: 3,
-      justifyContent: "space-between",
-      alignItems: "center",
+      justifyContent: 'space-between',
+      alignItems: 'center',
       borderBottomWidth: 1,
-      borderBottomColor: colors("backgroundTertiary"),
+      borderBottomColor: colors('backgroundTertiary'),
     },
     text: {
-      color: colors("textPrimary"),
+      color: colors('textPrimary'),
     },
   });
 
@@ -213,12 +229,9 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
       {requests.map((user) => (
         <View style={styles.item} key={user}>
           <Text style={styles.text}>{user}</Text>
-          <TouchableOpacity
-            style={styles.icon}
-            onPress={() => handleCancel(user)}
-          >
-            <Icon name="x" />
-          </TouchableOpacity>
+          <Pressable style={styles.icon} onPress={() => handleCancel(user)}>
+            <Icon name='x' />
+          </Pressable>
         </View>
       ))}
     </View>

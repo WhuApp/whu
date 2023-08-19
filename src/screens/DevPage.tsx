@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   VirtualizedList,
-} from "react-native";
-import { useAuth0 } from "react-native-auth0";
-import { useColors } from "../utils";
-import { ModalLayout } from "../layouts";
-import { useClipboard } from "@react-native-community/clipboard";
-import { TextInput } from "../components";
+} from 'react-native';
+import { useAuth0 } from 'react-native-auth0';
+import { useColors } from '../utils';
+import { ModalLayout } from '../layouts';
+import { useClipboard } from '@react-native-community/clipboard';
+import { TextInput } from '../components';
 
 const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   const c = children!.toString();
@@ -21,18 +21,18 @@ const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const styles = StyleSheet.create({
     code: {
-      color: colors("textSecondary"),
+      color: colors('textSecondary'),
     },
   });
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={() => {
         setClipboard(c);
       }}
     >
       <Text style={styles.code}>{c}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -46,11 +46,11 @@ const ObjectView: React.FC<{ obj: unknown }> = ({ obj }) => {
 
   const styles = StyleSheet.create({
     empty: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 20,
     },
     text: {
-      color: colors("textPrimary"),
+      color: colors('textPrimary'),
     },
   });
   return (
@@ -62,19 +62,13 @@ const ObjectView: React.FC<{ obj: unknown }> = ({ obj }) => {
         const content = item[1];
         return (
           <View style={styles.empty}>
-            <Text style={styles.text}>
-              {name}
-            </Text>
+            <Text style={styles.text}>{name}</Text>
             {!content && <Code>null</Code>}
-            {(content && typeof (content) === "string") && (
-              <Code>{content}</Code>
-            )}
-            {(content && typeof (content) === "number") && (
+            {content && typeof content === 'string' && <Code>{content}</Code>}
+            {content && typeof content === 'number' && (
               <Code>{(content as number).toString()}</Code>
             )}
-            {(content && typeof (content) === "object") && (
-              <ObjectView obj={content} />
-            )}
+            {content && typeof content === 'object' && <ObjectView obj={content} />}
           </View>
         );
       }}
@@ -96,18 +90,18 @@ const DevPage: React.FC = () => {
 
   const styles = StyleSheet.create({
     textList: {
-      display: "flex",
-      flexDirection: "column",
+      display: 'flex',
+      flexDirection: 'column',
       gap: 10,
     },
     title: {
-      color: colors("textPrimary"),
+      color: colors('textPrimary'),
       fontSize: 25,
     },
   });
 
   return (
-    <ModalLayout title={"Dev Page"} onPressMore={() => {}}>
+    <ModalLayout title={'Dev Page'} onPressMore={() => {}}>
       <View style={styles.textList}>
         <View>
           <Text style={styles.title}>Credentials</Text>
@@ -115,7 +109,7 @@ const DevPage: React.FC = () => {
         </View>
         <View
           style={{
-            borderBottomColor: "black",
+            borderBottomColor: 'black',
             borderBottomWidth: StyleSheet.hairlineWidth,
           }}
         />
