@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon, TextInput } from '../components';
 import { useColors } from '../utils';
 import ModalLayout from '../layouts/ModalLayout';
@@ -88,18 +80,14 @@ const AddFriends: React.FC = () => {
         contentLeft={<Icon name='search' />}
         contentRight={
           <View style={styles.iconWrapper}>
-            <TouchableWithoutFeedback
-              onPress={handleAdd}
-              disabled={isAdding}
-              onLongPress={handleAdd}
-            >
+            <Pressable onPress={handleAdd} disabled={isAdding}>
               <View>{isAdding ? <ActivityIndicator /> : <Icon name='arrow-right' />}</View>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback>
+            </Pressable>
+            <Pressable>
               <View>
                 <Icon name='camera' />
               </View>
-            </TouchableWithoutFeedback>
+            </Pressable>
           </View>
         }
       />
