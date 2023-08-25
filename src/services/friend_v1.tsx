@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
 import { responseWithJsonSafe } from '../utils/safe_json';
-import useAuth from './auth';
+import { useAuth } from '../components';
 
 const BASE_URL = 'https://api.whu.app/friends/v1/';
 
@@ -96,7 +96,6 @@ const FriendsV1Provider: React.FC<PropsWithChildren> = ({ children }) => {
   return <FriendsV1Context.Provider value={c}>{children}</FriendsV1Context.Provider>;
 };
 
-const useFriendV1 = () => useContext(FriendsV1Context);
+const useFriendsV1 = () => useContext(FriendsV1Context);
 
-export { FriendsV1Context, FriendsV1Provider };
-export default useFriendV1;
+export { FriendsV1Context, FriendsV1Provider, useFriendsV1 };

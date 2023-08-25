@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect } from 'react';
 import { responseWithJsonSafe } from '../utils/safe_json';
-import useAuth from './auth';
+import { useAuth } from '../components';
 
 const BASE_URL = 'https://api.whu.app/users/v1/';
 
@@ -51,5 +51,4 @@ const UsersV1Provider: React.FC<PropsWithChildren> = ({ children }) => {
 
 const useUsersV1 = () => useContext(UsersV1Context);
 
-export { UsersV1Context, UsersV1Provider };
-export default useUsersV1;
+export { UsersV1Context, UsersV1Provider, useUsersV1 };

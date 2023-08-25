@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'reac
 import { useColors, useLiveHeading, useLiveLocation } from '../utils';
 import { calculateBearing, calculateDistance } from '../location';
 import Compass from './Compass';
-import useFriendsV1 from '../services/friend_v1';
+import { useFriendsV1 } from '../services';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
