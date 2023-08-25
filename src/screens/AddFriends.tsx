@@ -48,15 +48,12 @@ const AddFriends: React.FC = () => {
     if (isAdding) return;
     setIsAdding(true);
     try {
-      console.log('input ' + input);
       const ids = await usersV1.findUserByNickname(input);
-      console.log('ids ' + JSON.stringify(ids));
       if (ids.length > 1) {
         Alert.alert('Error', 'Too many users?!');
       } else if (ids.length == 0) {
         Alert.alert('Error', 'Could not find user!');
       } else {
-        console.log('found ' + ids[0]);
         const reason = await friendsV1.sendFriendRequestTo(ids[0]);
 
         if (reason) {
@@ -67,10 +64,6 @@ const AddFriends: React.FC = () => {
       setIsAdding(false);
     }
   };
-
-  useEffect(() => {
-    console.log(isAdding);
-  }, [isAdding]);
 
   return (
     <ModalLayout title='Add Friends' onPressMore={() => {}}>
@@ -144,7 +137,7 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
     const reason = await friendsV1.acceptRequest(id);
 
     if (reason) {
-      console.log(reason);
+      Alert.alert(reason);
     }
   };
 
@@ -152,7 +145,7 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
     const reason = await friendsV1.declineRequest(id);
 
     if (reason) {
-      console.log(reason);
+      Alert.alert(reason);
     }
   };
 
@@ -208,7 +201,7 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
     const reason = await friendsV1.cancelRequest(id);
 
     if (reason) {
-      console.log(reason);
+      Alert.alert(reason);
     }
   };
 

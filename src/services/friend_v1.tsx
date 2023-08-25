@@ -30,7 +30,6 @@ export class FriendV1 {
       headers: { Authorization: 'Bearer ' + this.token, 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     };
-    console.log(BASE_URL + path, o);
     return await fetch(BASE_URL + path, o);
   }
 
