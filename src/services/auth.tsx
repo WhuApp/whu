@@ -23,4 +23,5 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
 const useAuth = () => useContext(AuthContext);
 
-export { AuthContext, AuthProvider, useAuth };
+export { AuthContext, AuthProvider };
+export default useAuth;

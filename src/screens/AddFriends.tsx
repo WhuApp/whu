@@ -3,7 +3,8 @@ import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'rea
 import { Icon, TextInput } from '../components';
 import { useColors } from '../utils';
 import ModalLayout from '../layouts/ModalLayout';
-import { useFriendsV1, useUsersV1 } from '../services';
+import useFriendsV1 from '../services/friend_v1';
+import useUsersV1 from '../services/users_v1';
 
 interface RequestsProps {
   requests: string[];

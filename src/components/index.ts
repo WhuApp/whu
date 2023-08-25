@@ -5,4 +5,3 @@ export { default as Icon } from './Icon';
 export { default as Compass } from './Compass';
 export { default as TextInput } from './TextInput';
 export { default as ServiceProvider } from './ServiceProvider';
-export * from './AuthContext';

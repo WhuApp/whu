@@ -1,5 +1,6 @@
-import { AuthProvider } from './';
-import { FriendsV1Provider, UsersV1Provider } from '../services';
+import { AuthProvider } from '../services/auth';
+import { FriendsV1Provider } from '../services/friend_v1';
+import { UsersV1Provider } from '../services/users_v1';
 
 const ServiceProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
