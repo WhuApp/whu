@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import { useColors } from '../utils';
 
 interface ButtonProps {
@@ -8,11 +8,7 @@ interface ButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  onPress,
-  title,
-  loading,
-}) => {
+const Button: React.FC<ButtonProps> = ({ onPress, title, loading }) => {
   const colors = useColors();
 
   const styles = StyleSheet.create({
@@ -33,21 +29,10 @@ const Button: React.FC<ButtonProps> = ({
   });
 
   return (
-    <TouchableOpacity
-      style={styles.button}
-      disabled={loading}
-      onPress={onPress}
-    >
-      {loading && (
-        <ActivityIndicator
-          size={'small'}
-          color={colors('textPrimary', 'dark')}
-        />
-      )}
-      <Text style={styles.text}>
-        {title}
-      </Text>
-    </TouchableOpacity>
+    <Pressable style={styles.button} disabled={loading} onPress={onPress}>
+      {loading && <ActivityIndicator size={'small'} color={colors('textPrimary', 'dark')} />}
+      <Text style={styles.text}>{title}</Text>
+    </Pressable>
   );
 };
 

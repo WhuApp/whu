@@ -1,7 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { InsetView, Icon } from '../components';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Icon, InsetView } from '../components';
 import { useColors } from '../utils';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
@@ -43,37 +43,28 @@ const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <InsetView style={styles.root}>
         <View style={styles.header}>
           <View style={styles.wrapper}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('Profile')}
-            >
+            <Pressable style={styles.button} onPress={() => navigation.navigate('Profile')}>
               <Icon name='user' />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => { }}
-            >
+            </Pressable>
+            <Pressable style={styles.button} onPress={() => {}}>
               <Icon name='award' />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <View style={styles.wrapper}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('AddFriends')}
-            >
+            <Pressable style={styles.button} onPress={() => navigation.navigate('AddFriends')}>
               <Icon name='user-plus' />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('Settings')}
-            >
+            </Pressable>
+            <Pressable style={styles.button} onPress={() => navigation.navigate('Settings')}>
               <Icon name='settings' />
-            </TouchableOpacity>
+            </Pressable>
+            {__DEV__ && (
+              <Pressable style={styles.button} onPress={() => navigation.navigate('DevPage')}>
+                <Icon name='code' />
+              </Pressable>
+            )}
           </View>
         </View>
-        <View style={styles.content}>
-          {children}
-        </View>
+        <View style={styles.content}>{children}</View>
       </InsetView>
       <StatusBar style='auto' />
     </>

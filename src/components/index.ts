@@ -4,3 +4,4 @@ export { default as FriendList } from './FriendList';
 export { default as Icon } from './Icon';
 export { default as Compass } from './Compass';
 export { default as TextInput } from './TextInput';
+export { default as ServiceProvider } from './ServiceProvider';

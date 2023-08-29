@@ -5,22 +5,16 @@ export type RootStackParamList = {
   AddFriends: undefined;
   Profile: undefined;
   Settings: undefined;
+  DevPage: undefined;
 };
 
 export type Friend = {
   id: string;
-  name: string;
-  lastLocationUpdate: Date;
-  location: Location;
+  username: string;
 };
 
 export type Location = {
   longitude: number;
   latitude: number;
   altitude: number;
-};
-
-export type PendingRequests = {
-  outgoing: string[];
-  incoming: string[];
 };

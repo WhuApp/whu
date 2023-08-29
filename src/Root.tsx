@@ -1,7 +1,7 @@
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Auth0Provider } from 'react-native-auth0';
-import { AUTH0_DOMAIN, AUTH0_CLIENT_ID } from './constants';
+import { AUTH0_CLIENT_ID, AUTH0_DOMAIN } from './constants';
 import App from './App';
 
 const Root: React.FC = () => {

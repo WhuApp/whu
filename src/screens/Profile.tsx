@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '../components';
 import ModalLayout from '../layouts/ModalLayout';
 import { useAuth0 } from 'react-native-auth0';
+import { Alert } from 'react-native';
 
 const Profile: React.FC = () => {
   const { clearSession } = useAuth0();
@@ -10,7 +11,7 @@ const Profile: React.FC = () => {
     try {
       await clearSession({}, {});
     } catch (e) {
-      console.log(e);
+      Alert.alert(e);
     }
   };
 
