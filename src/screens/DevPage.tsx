@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   Pressable,
   StyleSheet,
   Text,
@@ -12,7 +11,6 @@ import { useAuth0 } from 'react-native-auth0';
 import { useColors } from '../utils';
 import { ModalLayout } from '../layouts';
 import { useClipboard } from '@react-native-community/clipboard';
-import { TextInput } from '../components';
 
 const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   const c = children!.toString();
