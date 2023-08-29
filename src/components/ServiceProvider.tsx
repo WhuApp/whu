@@ -1,4 +1,4 @@
-import { AuthProvider } from '../services/auth';
+import { AuthProvider } from './AuthContext';
 import { FriendsV1Provider } from '../services/friend_v1';
 import { UsersV1Provider } from '../services/users_v1';
 
