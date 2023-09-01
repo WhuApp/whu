@@ -79,7 +79,14 @@ export class FriendV1 {
   }
 
   async cancelRequest(id: string): Promise<string> {
-    return 'UNIMPLEMENTED BY NOAH GERBER';
+    const response = await this.innerFetchPost('requests/cancel', {
+      friendId: id,
+    });
+
+    if (response.ok) {
+      return null;
+    }
+    return await response.text();
   }
 }
 
