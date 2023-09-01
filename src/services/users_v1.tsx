@@ -1,5 +1,4 @@
 import { PropsWithChildren, createContext, useContext, useEffect } from 'react';
-import { responseWithJsonSafe } from '../utils/safe_json';
 import useAuth from '../components/AuthContext';
 
 const BASE_URL = 'https://api.whu.app/users/v1/';
@@ -21,10 +20,11 @@ export class UsersV1 {
     if (typeof this.token != 'string') {
       this.token = await this.token;
     }
-    return await responseWithJsonSafe(BASE_URL + path, {
+    const response = await fetch(BASE_URL + path, {
       method: 'GET',
       headers: { Authorization: 'Bearer ' + this.token },
     });
+    return await response.json();
   }
 
   async getUserInfo(id: string): Promise<UserInfo> {
