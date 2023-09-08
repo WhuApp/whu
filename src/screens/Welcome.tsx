@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
@@ -54,9 +54,9 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
           <Button title='Sign In' onPress={() => navigation.navigate('SignIn')} />
           <View style={styles.wrapper}>
             <Text style={styles.text}>No account yet?</Text>
-            <Pressable onPress={() => navigation.navigate('SignIn')}>
+            <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
               <Text style={styles.link}>Sign Up</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </InsetView>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Icon, InsetView } from '../components';
 import { useColors } from '../utils';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
@@ -43,24 +43,30 @@ const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <InsetView style={styles.root}>
         <View style={styles.header}>
           <View style={styles.wrapper}>
-            <Pressable style={styles.button} onPress={() => navigation.navigate('Profile')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')}>
               <Icon name='user' />
-            </Pressable>
-            <Pressable style={styles.button} onPress={() => {}}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {}}>
               <Icon name='award' />
-            </Pressable>
+            </TouchableOpacity>
           </View>
           <View style={styles.wrapper}>
-            <Pressable style={styles.button} onPress={() => navigation.navigate('AddFriends')}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('AddFriends')}
+            >
               <Icon name='user-plus' />
-            </Pressable>
-            <Pressable style={styles.button} onPress={() => navigation.navigate('Settings')}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
               <Icon name='settings' />
-            </Pressable>
+            </TouchableOpacity>
             {__DEV__ && (
-              <Pressable style={styles.button} onPress={() => navigation.navigate('DevPage')}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('DevPage')}
+              >
                 <Icon name='code' />
-              </Pressable>
+              </TouchableOpacity>
             )}
           </View>
         </View>
