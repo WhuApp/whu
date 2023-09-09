@@ -1,7 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect } from 'react';
 import useAuth from '../components/AuthContext';
-
-const BASE_URL = 'https://api.whu.app/users/v1/';
+import { Service } from './fetch';
 
 export type UserInfo = {
   user_id: string;
@@ -9,30 +8,18 @@ export type UserInfo = {
   nickname: string;
 };
 
-export class UsersV1 {
-  token: string | Promise<string>;
-
-  constructor(token: Promise<string>) {
-    this.token = token;
+export class UsersV1 extends Service {
+  constructor(token: string) {
+    super(token, 'https://api.whu.app/friends/v1/');
   }
 
-  async innerFetch<T = unknown>(path: string): Promise<T> {
-    if (typeof this.token != 'string') {
-      this.token = await this.token;
-    }
-    const response = await fetch(BASE_URL + path, {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + this.token },
-    });
-    return await response.json();
-  }
-
-  async getUserInfo(id: string): Promise<UserInfo> {
-    return await this.innerFetch('by-id/' + id);
+  async getUserInfo(id?: string): Promise<UserInfo> {
+    const path = id ? 'by-id/' + id : 'me';
+    return await this.innerFetch<UserInfo>(path);
   }
 
   async findUserByNickname(nickname: string): Promise<string[]> {
-    return await this.innerFetch('search/by-nickname/' + nickname);
+    return await this.innerFetch<string[]>('search/by-nickname/' + nickname);
   }
 }
 

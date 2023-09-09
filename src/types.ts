@@ -13,6 +13,8 @@ export type Friend = {
   username: string;
 };
 
+export type TimedLocation = Location & { timestamp: number };
+
 export type Location = {
   longitude: number;
   latitude: number;
