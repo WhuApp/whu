@@ -77,8 +77,10 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
     });
   }, [locationContext]);
 
+  // TODO: This makes an error since location is undefined in the begining
   const calcDistance = Math.floor(calculateDistance(location, friendLocation));
 
+  // TODO: This makes an error since location is undefined in the begining
   const calcHeading =
     (Math.floor(calculateBearing(location, friendLocation) - heading) + 360) % 360;
 
