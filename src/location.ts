@@ -1,4 +1,4 @@
-import type { Location } from './types';
+import type { Location, TimedLocation } from './types';
 
 /*
 Functions calculateDistance & calculateBearing were taken from
@@ -27,10 +27,11 @@ const normalize = (location: Location): Location => {
   };
 };
 
-export const denormalize = (location: Location): Location => ({
+export const denormalize = (location: TimedLocation): TimedLocation => ({
   longitude: location.longitude * 90,
   latitude: location.latitude * 180,
   altitude: location.altitude * 100000,
+  timestamp: location.timestamp,
 });
 
 export const calculateDistance = (from: Location, to: Location) => {

@@ -16,7 +16,7 @@ export type Friend = {
 export type TimedLocation = Location & { timestamp: number };
 
 export type Location = {
-  longitude: number;
   latitude: number;
+  longitude: number;
   altitude: number;
 };
