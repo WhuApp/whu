@@ -73,7 +73,6 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
   useEffect(() => {
     locationContext.getLocation(friendId).then((timedLocation: TimedLocation) => {
       setFriendLocation(denormalize(timedLocation));
-      console.log(denormalize(timedLocation));
     });
   }, [locationContext]);
 
