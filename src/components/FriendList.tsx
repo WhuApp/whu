@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  VirtualizedList,
+} from 'react-native';
 import { useColors, useLiveLocation } from '../hooks';
 import { calculateDistance, denormalize } from '../utils/location';
 import Compass from './Compass';
 import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';
-import { TimedLocation } from '../types';
+import { RootStackParamList, TimedLocation } from '../types';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
@@ -76,19 +84,29 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
     });
   }, [locationContext]);
 
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const handlePress = () => {
+    navigation.navigate('CompassView', { userId: friendId });
+  };
+
   return (
-    <View style={styles.item}>
-      <Text style={styles.text}>{friendId}</Text>
-      {location && friendLocation && (
-        <Text style={styles.text}>{Math.floor(calculateDistance(location, friendLocation))}m</Text>
-      )}
-      <Compass location={friendLocation} />
-      {friendLocation && (
-        <Text style={styles.text}>
-          {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}
-        </Text>
-      )}
-    </View>
+    <Pressable onPress={handlePress}>
+      <View style={styles.item}>
+        <Text style={styles.text}>{friendId}</Text>
+        {location && friendLocation && (
+          <Text style={styles.text}>
+            {Math.floor(calculateDistance(location, friendLocation))}m
+          </Text>
+        )}
+        <Compass location={friendLocation} />
+        {friendLocation && (
+          <Text style={styles.text}>
+            {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}
+          </Text>
+        )}
+      </View>
+    </Pressable>
   );
 };
 
