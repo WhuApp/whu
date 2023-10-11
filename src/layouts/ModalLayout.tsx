@@ -1,12 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {
-  View,
-  ViewStyle,
-  Text,
-  TextStyle,
-  TouchableOpacity
-} from 'react-native';
+import { TouchableOpacity, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Icon, InsetView } from '../components';
 import { useColors } from '../hooks';
 import { RootStackParamList } from '../types';
@@ -20,7 +14,7 @@ interface ModalLayoutProps {
 const ModalLayout: React.FC<React.PropsWithChildren & ModalLayoutProps> = ({
   title,
   onPressMore,
-  children
+  children,
 }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const colors = useColors();
@@ -60,13 +54,11 @@ const ModalLayout: React.FC<React.PropsWithChildren & ModalLayoutProps> = ({
             <Icon name='more-horizontal' />
           </TouchableOpacity>
         </View>
-        <View style={contentStyle}>
-          {children}
-        </View>
+        <View style={contentStyle}>{children}</View>
       </InsetView>
       <StatusBar style='auto' />
     </>
   );
-}
+};
 
 export default ModalLayout;

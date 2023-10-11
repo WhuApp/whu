@@ -4,8 +4,10 @@ import { TextInput, Icon } from '../components';
 import { removeFriend, getFriendRequests } from '../services/friends';
 import { addFriend } from '../services/friends';
 import type { PendingRequests } from '../types';
-import { useColors } from '../hooks';
+import { useColors } from '../utils';
 import ModalLayout from '../layouts/ModalLayout';
+import useFriendsV1 from '../services/friends_v1';
+import useUsersV1 from '../services/users_v1';
 
 interface RequestsProps {
   requests: string[];
@@ -13,7 +15,10 @@ interface RequestsProps {
 
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
-  const [requests, setRequests] = useState<PendingRequests>({ incoming: [], outgoing: [] });
+  const [incoming, setIncoming] = useState(undefined);
+  const [outgoing, setOutgoing] = useState(undefined);
+  const friendsV1 = useFriendsV1();
+  const usersV1 = useUsersV1();
   const colors = useColors();
 
   const styles = StyleSheet.create({
@@ -28,63 +33,79 @@ const AddFriends: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const data = await getFriendRequests();
-      setRequests(data);
+      const data = await friendsV1.getIncomingFriendRequests();
+      setIncoming(data);
     })();
-  }, []);
+  }, [friendsV1]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await friendsV1.getOutgoingFriendRequests();
+      setOutgoing(data);
+    })();
+  }, [friendsV1]);
+
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleAdd = async () => {
-    const reason = await addFriend(input);
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      const ids = await usersV1.findUserByNickname(input);
+      if (ids.length > 1) {
+        Alert.alert('Error', 'Too many users?!');
+      } else if (ids.length == 0) {
+        Alert.alert('Error', 'Could not find user!');
+      } else {
+        const reason = await friendsV1.sendFriendRequestTo(ids[0]);
 
-    if (reason) {
-      Alert.alert('Error', reason);
+        if (reason) {
+          Alert.alert('Error', reason);
+        }
+      }
+    } finally {
+      setIsAdding(false);
     }
   };
 
   return (
-    <ModalLayout
-      title='Add Friends'
-      onPressMore={() => { }}
-    >
+    <ModalLayout title='Add Friends' onPressMore={() => {}}>
       <TextInput
         placeholder='Search..'
         onChangeText={setInput}
-        contentLeft={
-          <Icon name='search' />
-        }
+        contentLeft={<Icon name='search' />}
         contentRight={
           <View style={styles.iconWrapper}>
-            <TouchableOpacity onPress={handleAdd}>
-              <Icon name='arrow-right' />
+            <TouchableOpacity onPress={handleAdd} disabled={isAdding}>
+              <View>{isAdding ? <ActivityIndicator /> : <Icon name='arrow-right' />}</View>
             </TouchableOpacity>
             <TouchableOpacity>
-              <Icon name='camera' />
+              <View>
+                <Icon name='camera' />
+              </View>
             </TouchableOpacity>
           </View>
         }
       />
-      {requests.incoming.length > 0 && (
+      {incoming && incoming.length > 0 && (
         <>
-          <Text style={styles.label}>
-            Added Me
-          </Text>
-          <IncomingRequests requests={requests.incoming} />
+          <Text style={styles.label}>Added Me</Text>
+          <IncomingRequests requests={incoming} />
         </>
       )}
-      {requests.outgoing.length > 0 && (
+      {outgoing && outgoing.length > 0 && (
         <>
-          <Text style={styles.label}>
-            Pending
-          </Text>
-          <OutgoingRequests requests={requests.outgoing} />
+          <Text style={styles.label}>Pending</Text>
+          <OutgoingRequests requests={outgoing} />
         </>
       )}
     </ModalLayout>
-  )
+  );
 };
 
 const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
   const colors = useColors();
+  const friendsV1 = useFriendsV1();
 
   const styles = StyleSheet.create({
     container: {
@@ -116,18 +137,18 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
   });
 
   const handleAccept = async (id: string) => {
-    const reason = await addFriend(id);
+    const reason = await friendsV1.acceptRequest(id);
 
     if (reason) {
-      console.log(reason);
+      Alert.alert(reason);
     }
   };
 
   const handleDecline = async (id: string) => {
-    const reason = await removeFriend(id);
+    const reason = await friendsV1.declineRequest(id);
 
     if (reason) {
-      console.log(reason);
+      Alert.alert(reason);
     }
   };
 
@@ -135,20 +156,12 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
     <View style={styles.container}>
       {requests.map((user) => (
         <View style={styles.item} key={user}>
-          <Text style={styles.text}>
-            {user}
-          </Text>
+          <Text style={styles.text}>{user}</Text>
           <View style={styles.iconWrapper}>
-            <TouchableOpacity
-              style={styles.icon}
-              onPress={() => handleAccept(user)}
-            >
+            <TouchableOpacity style={styles.icon} onPress={() => handleAccept(user)}>
               <Icon name='user-check' />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.icon}
-              onPress={() => handleDecline(user)}
-            >
+            <TouchableOpacity style={styles.icon} onPress={() => handleDecline(user)}>
               <Icon name='x' />
             </TouchableOpacity>
           </View>
@@ -160,6 +173,7 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
 
 const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
   const colors = useColors();
+  const friendsV1 = useFriendsV1();
 
   const styles = StyleSheet.create({
     container: {
@@ -187,10 +201,10 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
   });
 
   const handleCancel = async (id: string) => {
-    const reason = await removeFriend(id);
+    const reason = await friendsV1.cancelRequest(id);
 
     if (reason) {
-      console.log(reason);
+      Alert.alert(reason);
     }
   };
 
@@ -198,13 +212,8 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
     <View style={styles.container}>
       {requests.map((user) => (
         <View style={styles.item} key={user}>
-          <Text style={styles.text}>
-            {user}
-          </Text>
-          <TouchableOpacity
-            style={styles.icon}
-            onPress={() => handleCancel(user)}
-          >
+          <Text style={styles.text}>{user}</Text>
+          <TouchableOpacity style={styles.icon} onPress={() => handleCancel(user)}>
             <Icon name='x' />
           </TouchableOpacity>
         </View>

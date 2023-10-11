@@ -1,7 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { InsetView, Icon } from '../components';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Icon, InsetView } from '../components';
 import { useColors } from '../hooks';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';

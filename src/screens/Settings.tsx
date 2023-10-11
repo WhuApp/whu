@@ -8,13 +8,8 @@ const Settings: React.FC = () => {
   const colors = useColors();
 
   return (
-    <ModalLayout
-      title='Settings'
-      onPressMore={() => { }}
-    >
-      <Text style={{ color: colors('textPrimary') }}>
-        Color scheme: {colorScheme}
-      </Text>
+    <ModalLayout title='Settings' onPressMore={() => {}}>
+      <Text style={{ color: colors('textPrimary') }}>Color scheme: {colorScheme}</Text>
     </ModalLayout>
   );
 };

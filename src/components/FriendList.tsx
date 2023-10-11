@@ -1,65 +1,95 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, useColorScheme } from 'react-native';
-import { getStyles, Elements } from '../styles';
-import type { Friend } from '../types';
-import { getFriends } from '../services/friends';
-import { useLiveHeading, useLiveLocation } from '../hooks';
-import { calculateBearing, calculateDistance } from '../location';
+import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'react-native';
+import { useColors, useLiveLocation } from '../hooks';
+import { calculateDistance, denormalize } from '../utils/location';
 import Compass from './Compass';
+import useFriendsV1 from '../services/friends_v1';
+import useLocationsV1 from '../services/locations_v1';
+import { TimedLocation } from '../types';
 
 const FriendList: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const friendsV1 = useFriendsV1();
+  const [friendIds, setFriendIds] = useState<string[] | undefined>(undefined);
 
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
+  const colors = useColors();
+  const styles = StyleSheet.create({
+    text: {
+      color: colors('textPrimary'),
+    },
+  });
 
   useEffect(() => {
-    getFriends().then((friends) => {
-      setFriends(friends);
-      setLoading(false);
-    });
-  }, []);
+    (async () => {
+      const friendids = await friendsV1.getFriendIds();
 
-  if (loading) return <Text>Loading..</Text>;
-  if (!friends.length) return <Text style={styles('text')}>You dont have any friends</Text>;
+      setFriendIds(friendids);
+    })();
+  }, [friendsV1]);
 
+  if (!friendIds) return <ActivityIndicator />;
+  if (friendIds.length === 0) {
+    return <Text style={styles.text}>You dont have any friends</Text>;
+  }
   return (
-    <View>
-      <Text style={styles('title')}>Friends</Text>
-      {friends.map((friend, index) => (
-        <FriendListItem key={index} friend={friend} />
-      ))}
-    </View>
+    <VirtualizedList
+      data={friendIds}
+      initialNumToRender={100}
+      renderItem={({ item }) => {
+        return <FriendListItem friendId={item} />;
+      }}
+      keyExtractor={(item: string) => item}
+      getItemCount={(o): number => o.length}
+      getItem={(o, i): string => o[i]}
+    />
   );
 };
 
 interface FriendListItemProps {
-  friend: Friend;
-};
+  friendId: string;
+}
 
-const FriendListItem: React.FC<FriendListItemProps> = ({ friend }) => {
-  const colorScheme = useColorScheme();
-  const styles = (element: keyof Elements) => getStyles(element, colorScheme);
-
+const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
+  const [friendLocation, setFriendLocation] = useState<TimedLocation>(undefined);
   const location = useLiveLocation();
-  const heading = useLiveHeading();
 
-  const calcDistance = () => Math.floor(calculateDistance(location, friend.location));
+  const colors = useColors();
+  const styles = StyleSheet.create({
+    text: {
+      color: colors('textPrimary'),
+    },
+    item: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      backgroundColor: colors('backgroundSecondary'),
+      padding: 8,
+      borderBottomWidth: 1,
+      alignItems: 'center',
+    },
+  });
 
-  const calcHeading = () => (Math.floor(calculateBearing(location, friend.location) - heading) + 360) % 360;
+  const locationContext = useLocationsV1();
 
-  const time = () => (friend.location.timestamp as Date).toTimeString().split(' ')[0].slice(0, -3);
+  useEffect(() => {
+    locationContext.getLocation(friendId).then((timedLocation: TimedLocation) => {
+      setFriendLocation(denormalize(timedLocation));
+    });
+  }, [locationContext]);
 
   return (
-    <View style={[styles('listItem'), { width: '100%' }]}>
-      <Text style={styles('text')}>{friend.name}</Text>
-      {location && <Text style={styles('text')}>{calcDistance()}m</Text>}
-      {heading && location && <Text style={styles('text')}>{calcHeading()}°</Text>}
-      {heading && location && <Compass direction={calcHeading()} />}
-      <Text style={styles('text')}>{time()}</Text>
+    <View style={styles.item}>
+      <Text style={styles.text}>{friendId}</Text>
+      {location && friendLocation && (
+        <Text style={styles.text}>{Math.floor(calculateDistance(location, friendLocation))}m</Text>
+      )}
+      <Compass location={friendLocation} />
+      {friendLocation && (
+        <Text style={styles.text}>
+          {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}
+        </Text>
+      )}
     </View>
-  )
+  );
 };
 
 export default FriendList;
