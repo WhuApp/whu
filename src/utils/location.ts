@@ -1,4 +1,4 @@
-import type { Location, TimedLocation } from './types';
+import type { Location, TimedLocation } from '../types';
 
 /*
 Functions calculateDistance & calculateBearing were taken from

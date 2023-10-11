@@ -1,9 +1,9 @@
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Icon from './Icon';
-import { useColors, useLiveLocation, useLiveHeading } from '../utils';
+import { useColors, useLiveLocation, useLiveHeading } from '../hooks';
 import { Location } from '../types';
-import { calculateBearing } from '../location';
+import { calculateBearing } from '../utils/location';
 
 interface CompassProps {
   location: Location;

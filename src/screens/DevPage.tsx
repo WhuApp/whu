@@ -9,7 +9,7 @@ import {
   VirtualizedList,
 } from 'react-native';
 import { useAuth0 } from 'react-native-auth0';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 import { ModalLayout } from '../layouts';
 import { useClipboard } from '@react-native-community/clipboard';
 import { TextInput } from '../components';

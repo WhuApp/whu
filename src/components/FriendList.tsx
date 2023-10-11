@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'react-native';
-import { useColors, useLiveLocation } from '../utils';
-import { calculateDistance, denormalize } from '../location';
+import { useColors, useLiveLocation } from '../hooks';
+import { calculateDistance, denormalize } from '../utils/location';
 import Compass from './Compass';
 import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';

@@ -4,7 +4,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, InsetView } from '../components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 
 const earthImage = require('./../../assets/earth.jpg');
 

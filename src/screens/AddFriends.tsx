@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon, TextInput } from '../components';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 import ModalLayout from '../layouts/ModalLayout';
 import useFriendsV1 from '../services/friends_v1';
 import useUsersV1 from '../services/users_v1';

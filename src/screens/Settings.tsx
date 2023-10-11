@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, useColorScheme } from 'react-native';
 import ModalLayout from '../layouts/ModalLayout';
-import { useColors } from '../utils';
+import { useColors } from '../hooks';
 
 const Settings: React.FC = () => {
   const colorScheme = useColorScheme();

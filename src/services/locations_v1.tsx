@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useContext, useEffect } from 'react';
+import React, { PropsWithChildren, createContext, useContext, useEffect } from 'react';
 import useAuth from '../components/AuthContext';
 import { Service } from './fetch';
 import { TimedLocation } from '../types';

@@ -8,11 +8,6 @@ export type RootStackParamList = {
   DevPage: undefined;
 };
 
-export type Friend = {
-  id: string;
-  username: string;
-};
-
 export type TimedLocation = Location & { timestamp: number };
 
 export type Location = {

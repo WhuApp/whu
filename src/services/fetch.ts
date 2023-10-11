@@ -2,7 +2,7 @@ export abstract class Service {
   token: string | Promise<string>;
   BASE_URL: string;
 
-  constructor(token: string | Promise<string>, BASE_URL: string) {
+  protected constructor(token: string | Promise<string>, BASE_URL: string) {
     this.token = token;
     this.BASE_URL = BASE_URL;
   }
