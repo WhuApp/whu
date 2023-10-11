@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'react-native';
-import { useColors, useLiveHeading, useLiveLocation } from '../utils';
-import { calculateBearing, calculateDistance } from '../location';
+import { useColors, useLiveLocation } from '../hooks';
+import { calculateDistance, denormalize } from '../utils/location';
 import Compass from './Compass';
-import useFriendsV1 from '../services/friend_v1';
+import useFriendsV1 from '../services/friends_v1';
+import useLocationsV1 from '../services/locations_v1';
+import { TimedLocation } from '../types';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
@@ -28,7 +30,6 @@ const FriendList: React.FC = () => {
   if (friendIds.length === 0) {
     return <Text style={styles.text}>You dont have any friends</Text>;
   }
-
   return (
     <VirtualizedList
       data={friendIds}
@@ -48,8 +49,8 @@ interface FriendListItemProps {
 }
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
+  const [friendLocation, setFriendLocation] = useState<TimedLocation>(undefined);
   const location = useLiveLocation();
-  const heading = useLiveHeading();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -67,26 +68,26 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
     },
   });
 
-  // const calcDistance = () =>
-  //   Math.floor(calculateDistance(location, friend.location));
+  const locationContext = useLocationsV1();
 
-  // const calcHeading = () =>
-  //   (Math.floor(calculateBearing(location, friend.location) - heading) + 360) %
-  //   360;
-
-  // const time = () =>
-  //   (friend.lastLocationUpdate as Date).toTimeString().split(" ")[0].slice(
-  //     0,
-  //     -3,
-  //   );
+  useEffect(() => {
+    locationContext.getLocation(friendId).then((timedLocation: TimedLocation) => {
+      setFriendLocation(denormalize(timedLocation));
+    });
+  }, [locationContext]);
 
   return (
     <View style={styles.item}>
       <Text style={styles.text}>{friendId}</Text>
-      {/* {location && <Text style={styles.text}>{calcDistance()}m</Text>}
-      {heading && location && <Text style={styles.text}>{calcHeading()}°</Text>}
-      {heading && location && <Compass direction={calcHeading()} />}
-      <Text style={styles.text}>{time()}</Text> */}
+      {location && friendLocation && (
+        <Text style={styles.text}>{Math.floor(calculateDistance(location, friendLocation))}m</Text>
+      )}
+      <Compass location={friendLocation} />
+      {friendLocation && (
+        <Text style={styles.text}>
+          {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}
+        </Text>
+      )}
     </View>
   );
 };

@@ -3,7 +3,7 @@ import { AddFriends, Home, Profile, Settings, SignIn, Test, Welcome, DevPage } f
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
-import { useColors } from './utils';
+import { useColors } from './hooks';
 import { MainLayout } from './layouts';
 import { useAuth0 } from 'react-native-auth0';
 import { ServiceProvider } from './components';
