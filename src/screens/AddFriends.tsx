@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 import { Icon, TextInput } from '../components';
 import { useColors } from '../hooks';
 import ModalLayout from '../layouts/ModalLayout';
@@ -73,14 +73,14 @@ const AddFriends: React.FC = () => {
         contentLeft={<Icon name='search' />}
         contentRight={
           <View style={styles.iconWrapper}>
-            <Pressable onPress={handleAdd} disabled={isAdding}>
+            <TouchableOpacity onPress={handleAdd} disabled={isAdding}>
               <View>{isAdding ? <ActivityIndicator /> : <Icon name='arrow-right' />}</View>
-            </Pressable>
-            <Pressable>
+            </TouchableOpacity>
+            <TouchableOpacity>
               <View>
                 <Icon name='camera' />
               </View>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         }
       />
@@ -155,12 +155,12 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
         <View style={styles.item} key={user}>
           <Text style={styles.text}>{user}</Text>
           <View style={styles.iconWrapper}>
-            <Pressable style={styles.icon} onPress={() => handleAccept(user)}>
+            <TouchableOpacity style={styles.icon} onPress={() => handleAccept(user)}>
               <Icon name='user-check' />
-            </Pressable>
-            <Pressable style={styles.icon} onPress={() => handleDecline(user)}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.icon} onPress={() => handleDecline(user)}>
               <Icon name='x' />
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       ))}
@@ -210,9 +210,9 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
       {requests.map((user) => (
         <View style={styles.item} key={user}>
           <Text style={styles.text}>{user}</Text>
-          <Pressable style={styles.icon} onPress={() => handleCancel(user)}>
+          <TouchableOpacity style={styles.icon} onPress={() => handleCancel(user)}>
             <Icon name='x' />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       ))}
     </View>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { TouchableOpacity, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Icon, InsetView } from '../components';
 import { useColors } from '../hooks';
 import { RootStackParamList } from '../types';
@@ -46,13 +46,13 @@ const ModalLayout: React.FC<React.PropsWithChildren & ModalLayoutProps> = ({
     <>
       <InsetView style={rootStyle}>
         <View style={headerStyle}>
-          <Pressable onPress={navigation.goBack}>
+          <TouchableOpacity onPress={navigation.goBack}>
             <Icon name='chevron-down' />
-          </Pressable>
+          </TouchableOpacity>
           <Text style={titleStyle}>{title}</Text>
-          <Pressable onPress={onPressMore}>
+          <TouchableOpacity onPress={onPressMore}>
             <Icon name='more-horizontal' />
-          </Pressable>
+          </TouchableOpacity>
         </View>
         <View style={contentStyle}>{children}</View>
       </InsetView>

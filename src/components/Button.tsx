@@ -29,10 +29,10 @@ const Button: React.FC<ButtonProps> = ({ onPress, title, loading }) => {
   });
 
   return (
-    <Pressable style={styles.button} disabled={loading} onPress={onPress}>
+    <TouchableOpacity style={styles.button} disabled={loading} onPress={onPress}>
       {loading && <ActivityIndicator size={'small'} color={colors('textPrimary', 'dark')} />}
       <Text style={styles.text}>{title}</Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 

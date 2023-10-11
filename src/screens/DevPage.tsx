@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
-  Pressable,
+  TouchableOpacity,
   StyleSheet,
   Text,
   View,
@@ -12,7 +11,6 @@ import { useAuth0 } from 'react-native-auth0';
 import { useColors } from '../hooks';
 import { ModalLayout } from '../layouts';
 import { useClipboard } from '@react-native-community/clipboard';
-import { TextInput } from '../components';
 
 const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   const c = children!.toString();
@@ -26,13 +24,13 @@ const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   });
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={() => {
         setClipboard(c);
       }}
     >
       <Text style={styles.code}>{c}</Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 
