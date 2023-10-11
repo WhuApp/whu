@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Input, InputProps } from '../../atoms';
+import { Input, InputProps } from '../../atoms/Input';
 import { TouchableOpacity } from 'react-native';
-import Icon from '../Icon';
+import Icon from '../../atoms/Icon';
 
 const PasswordInput: React.FC<InputProps> = ({ onChangeText, ...rest }) => {
   const [hidden, setHidden] = useState<boolean>(true);

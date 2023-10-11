@@ -1,10 +1,11 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Icon, InsetView } from '../components';
+import { InsetView } from '../components';
 import { useColors } from '../hooks';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
+import Icon from '../atoms/Icon';
 
 const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

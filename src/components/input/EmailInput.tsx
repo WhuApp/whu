@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, InputProps } from '../../atoms';
+import { Input, InputProps } from '../../atoms/Input';
 
 const EmailInput: React.FC<InputProps> = ({ onChangeText, ...rest }) => {
   const [error, setError] = useState<string>(null);

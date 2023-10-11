@@ -1,7 +1,7 @@
 import React, { ComponentPropsWithRef, ReactNode, Ref, forwardRef } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useColors } from '../hooks';
-import { Icon } from '../components';
+import Icon from './Icon'
 
 export interface InputProps extends ComponentPropsWithRef<typeof TextInput> {
   prefix?: ReactNode,

@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert, TouchableOpacity, StyleSheet } from 'react-native';
-import { TextInput, Icon } from '../components';
-import { removeFriend, getFriendRequests } from '../services/friends';
-import { addFriend } from '../services/friends';
-import type { PendingRequests } from '../types';
-import { useColors } from '../utils';
 import ModalLayout from '../layouts/ModalLayout';
 import useFriendsV1 from '../services/friends_v1';
 import useUsersV1 from '../services/users_v1';
+import { useColors } from '../hooks';
+import Icon from '../atoms/Icon';
 
 interface RequestsProps {
   requests: string[];
@@ -70,7 +67,7 @@ const AddFriends: React.FC = () => {
 
   return (
     <ModalLayout title='Add Friends' onPressMore={() => {}}>
-      <TextInput
+      {/*<TextInput
         placeholder='Search..'
         onChangeText={setInput}
         contentLeft={<Icon name='search' />}
@@ -86,7 +83,7 @@ const AddFriends: React.FC = () => {
             </TouchableOpacity>
           </View>
         }
-      />
+      />*/}
       {incoming && incoming.length > 0 && (
         <>
           <Text style={styles.label}>Added Me</Text>

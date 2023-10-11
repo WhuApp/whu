@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useColors } from '../hooks';
 
 interface ButtonProps {

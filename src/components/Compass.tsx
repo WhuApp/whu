@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import Icon from './Icon';
+import Icon from '../atoms/Icon';
 import { useColors, useLiveLocation, useLiveHeading } from '../hooks';
 import { Location } from '../types';
 import { calculateBearing } from '../utils/location';

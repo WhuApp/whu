@@ -1,3 +1,4 @@
+import React from 'react';
 import { AuthProvider } from './AuthContext';
 import { FriendsV1Provider } from '../services/friends_v1';
 import { UsersV1Provider } from '../services/users_v1';
