@@ -6,4 +6,4 @@ export { default as Profile } from './Profile';
 export { default as Settings } from './Settings';
 export { default as Test } from './Test';
 export { default as DevPage } from './DevPage';
-export { default as CompassView, CompassViewProps } from './CompassView';
+export { default as CompassView } from './CompassView';

@@ -10,7 +10,7 @@ export type UserInfo = {
 
 export class UsersV1 extends Service {
   constructor(token: string) {
-    super(token, 'https://api.whu.app/friends/v1/');
+    super(token, 'https://api.whu.app/users/v1/');
   }
 
   async getUserInfo(id?: string): Promise<UserInfo> {

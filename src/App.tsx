@@ -1,5 +1,15 @@
 import React, { useEffect } from 'react';
-import { AddFriends, Home, Profile, Settings, SignIn, Test, Welcome, DevPage } from './screens';
+import {
+  AddFriends,
+  Home,
+  Profile,
+  Settings,
+  SignIn,
+  Test,
+  Welcome,
+  DevPage,
+  CompassView,
+} from './screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
@@ -66,6 +76,11 @@ const App: React.FC = () => {
                 options={{ animation: 'simple_push' }}
               />
             )}
+            <Stack.Screen
+              name={'CompassView'}
+              component={CompassView}
+              options={{ animation: 'simple_push' }}
+            />
           </Stack.Navigator>
         </ServiceProvider>
       ) : (

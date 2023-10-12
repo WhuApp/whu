@@ -5,17 +5,22 @@ import { BaseLayout } from '../layouts';
 import { Text } from 'react-native';
 import useUsersV1, { UserInfo } from '../services/users_v1';
 import useLocationsV1 from '../services/locations_v1';
-import { TimedLocation } from '../types';
+import { RootStackParamList, TimedLocation } from '../types';
 import Icon from '../atoms/Icon';
-import { calculateBearing, calculateDistance } from '../utils/location';
+import { calculateBearing, calculateDistance, denormalize } from '../utils/location';
+import { RouteProp } from '@react-navigation/native';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
-export interface CompassViewProps {
-  userId: string;
+type CompassViewNavigationProp = RouteProp<RootStackParamList, 'CompassView'>;
+
+interface CompassViewProps {
+  route: CompassViewNavigationProp;
 }
 
-const CompassView: React.FC<CompassViewProps> = ({ userId }) => {
+const CompassView: React.FC<CompassViewProps> = ({ route }) => {
+  const { userId } = route.params;
+
   const location = useLiveLocation();
   const heading = useLiveHeading();
 
@@ -46,15 +51,20 @@ const CompassView: React.FC<CompassViewProps> = ({ userId }) => {
     })();
   }, []);
 
+  // TODO: First call on init
   useInterval(() => {
     (async () => {
-      setUserLocation(await locationsContext.getLocation(userId));
+      setUserLocation(denormalize(await locationsContext.getLocation(userId)));
     })();
   }, UPDATE_DELAY);
 
   // TODO: Loading indicator or something
   if (!location || !heading || !userInfo || !userLocation) {
-    return <Text>Loading</Text>;
+    return (
+      <BaseLayout>
+        <Text>Loading {userId}</Text>
+      </BaseLayout>
+    );
   }
 
   return (

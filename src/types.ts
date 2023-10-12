@@ -1,5 +1,3 @@
-import { CompassViewProps } from './screens';
-
 export type RootStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
@@ -8,7 +6,7 @@ export type RootStackParamList = {
   Profile: undefined;
   Settings: undefined;
   DevPage: undefined;
-  CompassView: CompassViewProps;
+  CompassView: { userId: string };
 };
 
 export type TimedLocation = Location & { timestamp: number };
