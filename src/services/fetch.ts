@@ -16,8 +16,15 @@ export abstract class Service {
       method: 'GET',
       headers: { Authorization: 'Bearer ' + this.token },
     });
+    const json = await response.json();
 
-    return await response.json();
+    console.log(
+      `[API_REQUEST] GET ${this.BASE_URL + path}: ${response.status} with text ${JSON.stringify(
+        json
+      )}`
+    );
+
+    return json;
   }
 
   async innerFetchPost(path: string, body: any): Promise<Response> {
