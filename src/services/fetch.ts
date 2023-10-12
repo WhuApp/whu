@@ -31,11 +31,16 @@ export abstract class Service {
     if (typeof this.token != 'string') {
       this.token = await this.token;
     }
-    const o = {
+    const options = {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + this.token, 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     };
-    return await fetch(this.BASE_URL + path, o);
+
+    const response = await fetch(this.BASE_URL + path, options);
+
+    console.log(`[API_REQUEST] POST ${this.BASE_URL + path}: ${response.status}`);
+
+    return response;
   }
 }

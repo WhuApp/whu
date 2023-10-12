@@ -6,7 +6,7 @@ https://www.movable-type.co.uk/scripts/latlong.html
 */
 
 //optimizable (while loops)
-const normalize = (location: Location): Location => {
+export const normalize = (location: Location): Location => {
   let longitude = location.longitude;
   let latitude = location.latitude;
 
