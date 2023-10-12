@@ -32,7 +32,10 @@ const useLiveHeading = () => {
         setSubscription(await watchHeadingAsync(onHeadingUpdate));
       }
 
-      return () => subscription.remove();
+      return () => {
+        subscription.remove();
+        setSubscription(null);
+      };
     })();
   }, []);
 

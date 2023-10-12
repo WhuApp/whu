@@ -18,6 +18,7 @@ import { MainLayout } from './layouts';
 import { useAuth0 } from 'react-native-auth0';
 import { ServiceProvider } from './components';
 import { Alert } from 'react-native';
+import { LocationProvider } from './components/LocationContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createNativeStackNavigator();
@@ -38,50 +39,52 @@ const App: React.FC = () => {
   }, []);
 
   // TODO: What is SafeAreaView
-  // TODO: somehow pass screen options from component
+  // TODO: somehow pass screen options from component (by making the layout return stack.screen)
   return (
     <NavigationContainer>
       {user ? (
         <ServiceProvider>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-              navigationBarColor: colors('backgroundPrimary'),
-            }}
-          >
-            <Stack.Screen
-              name='MainView'
-              component={MainView}
-              options={{ animation: 'simple_push' }}
-            />
-            <Stack.Screen
-              name='Profile'
-              component={Profile}
-              options={{ animation: 'slide_from_bottom' }}
-            />
-            <Stack.Screen
-              name='Settings'
-              component={Settings}
-              options={{ animation: 'slide_from_bottom' }}
-            />
-            <Stack.Screen
-              name='AddFriends'
-              component={AddFriends}
-              options={{ animation: 'slide_from_bottom' }}
-            />
-            {__DEV__ && (
+          <LocationProvider>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+                navigationBarColor: colors('backgroundPrimary'),
+              }}
+            >
               <Stack.Screen
-                name='DevPage'
-                component={DevPage}
+                name='MainView'
+                component={MainView}
                 options={{ animation: 'simple_push' }}
               />
-            )}
-            <Stack.Screen
-              name={'CompassView'}
-              component={CompassView}
-              options={{ animation: 'simple_push', navigationBarColor: colors('accent') }}
-            />
-          </Stack.Navigator>
+              <Stack.Screen
+                name='Profile'
+                component={Profile}
+                options={{ animation: 'slide_from_bottom' }}
+              />
+              <Stack.Screen
+                name='Settings'
+                component={Settings}
+                options={{ animation: 'slide_from_bottom' }}
+              />
+              <Stack.Screen
+                name='AddFriends'
+                component={AddFriends}
+                options={{ animation: 'slide_from_bottom' }}
+              />
+              {__DEV__ && (
+                <Stack.Screen
+                  name='DevPage'
+                  component={DevPage}
+                  options={{ animation: 'simple_push' }}
+                />
+              )}
+              <Stack.Screen
+                name={'CompassView'}
+                component={CompassView}
+                options={{ animation: 'simple_push', navigationBarColor: colors('accent') }}
+              />
+            </Stack.Navigator>
+          </LocationProvider>
         </ServiceProvider>
       ) : (
         <>

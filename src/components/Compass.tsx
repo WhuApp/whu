@@ -1,20 +1,20 @@
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Icon from '../atoms/Icon';
-import { useColors, useLiveLocation, useLiveHeading } from '../hooks';
+import { useColors } from '../hooks';
 import { Location } from '../types';
 import { calculateBearing } from '../utils/location';
+import useLocation from './LocationContext';
 
 interface CompassProps {
-  location: Location;
+  loc: Location;
 }
 
-const Compass: React.FC<CompassProps> = ({ location }) => {
-  const heading = useLiveHeading(); // TODO: use something else e.g. maybe animation or memo -> ask kai
-  const selfLocation = useLiveLocation();
+const Compass: React.FC<CompassProps> = ({ loc }) => {
+  const { location, heading } = useLocation();
   const colors = useColors();
 
-  if (!location || !selfLocation || !heading) {
+  if (!location || !loc || !heading) {
     return <ActivityIndicator />;
   }
 
@@ -24,9 +24,7 @@ const Compass: React.FC<CompassProps> = ({ location }) => {
         style={{
           transform: [
             {
-              rotate: `${
-                (Math.floor(calculateBearing(selfLocation, location) - heading) + 360) % 360
-              }deg`,
+              rotate: `${(Math.floor(calculateBearing(location, loc) - heading) + 360) % 360}deg`,
             },
           ],
         }}

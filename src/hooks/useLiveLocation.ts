@@ -37,6 +37,7 @@ const useLiveLocation = () => {
 
       return () => {
         subscription.remove();
+        setSubscription(null);
       };
     })();
   }, []);

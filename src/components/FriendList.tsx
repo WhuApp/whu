@@ -7,13 +7,14 @@ import {
   View,
   VirtualizedList,
 } from 'react-native';
-import { useColors, useLiveLocation } from '../hooks';
+import { useColors } from '../hooks';
 import { calculateDistance, denormalize } from '../utils/location';
 import Compass from './Compass';
 import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';
 import { RootStackParamList, TimedLocation } from '../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import useLocation from './LocationContext';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
@@ -58,7 +59,7 @@ interface FriendListItemProps {
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
   const [friendLocation, setFriendLocation] = useState<TimedLocation>(undefined);
-  const location = useLiveLocation();
+  const { location } = useLocation();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -99,7 +100,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
             {Math.floor(calculateDistance(location, friendLocation))}m
           </Text>
         )}
-        <Compass location={friendLocation} />
+        <Compass loc={friendLocation} />
         {friendLocation && (
           <Text style={styles.text}>
             {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useColors, useInterval, useLiveHeading, useLiveLocation } from '../hooks';
+import { useColors, useInterval } from '../hooks';
 import { StyleSheet, View } from 'react-native';
 import { BaseLayout } from '../layouts';
 import { Text } from 'react-native';
@@ -10,6 +10,7 @@ import Icon from '../atoms/Icon';
 import { calculateBearing, calculateDistance, denormalize } from '../utils/location';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
+import useLocation from '../components/LocationContext';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
@@ -24,8 +25,7 @@ interface CompassViewProps {
 const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
   const { userId } = route.params;
 
-  const location = useLiveLocation();
-  const heading = useLiveHeading();
+  const { location, heading } = useLocation();
 
   const usersContext = useUsersV1();
   const locationsContext = useLocationsV1();
