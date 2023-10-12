@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { watchHeadingAsync, LocationHeadingObject, LocationSubscription } from 'expo-location';
 
-const SMOOTHNESS = 10; // the lower, the smoother
+const SMOOTHNESS = 0.5; // the lower, the smoother
 const BUFFER_SIZE = 8; // the lower, the more accurate
 
 // DANGER!!! This hook expects to already have permissions to get foreground location data

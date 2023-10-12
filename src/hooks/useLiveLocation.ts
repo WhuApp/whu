@@ -3,7 +3,7 @@ import { watchPositionAsync, Accuracy, LocationSubscription, LocationObject } fr
 import { Location } from '../types';
 
 const UPDATE_INTERVAL = 1000; // 1 second
-const DISTANCE_INTERVAL = 3; // measured in metres
+const DISTANCE_INTERVAL = 1; // measured in metres
 
 // DANGER!!! This hook expects to already have permissions to get foreground location data
 const useLiveLocation = () => {
