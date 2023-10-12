@@ -5,3 +5,4 @@ export { default as Compass } from './Compass';
 export { default as PasswordInput } from './input/PasswordInput';
 export { default as EmailInput } from './input/EmailInput';
 export { default as ServiceProvider } from './ServiceProvider';
+export { default as IconButton } from './button/IconButton';

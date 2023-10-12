@@ -79,7 +79,7 @@ const App: React.FC = () => {
             <Stack.Screen
               name={'CompassView'}
               component={CompassView}
-              options={{ animation: 'simple_push' }}
+              options={{ animation: 'simple_push', navigationBarColor: colors('accent') }}
             />
           </Stack.Navigator>
         </ServiceProvider>
