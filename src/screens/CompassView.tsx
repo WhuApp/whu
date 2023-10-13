@@ -87,6 +87,8 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     );
   }
 
+  const rotation = (Math.floor(calculateBearing(location, userLocation) - heading) + 360) % 360;
+
   return (
     <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
       <View style={styles.content}>
@@ -100,9 +102,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
             {
               transform: [
                 {
-                  rotate: `${
-                    (Math.floor(calculateBearing(location, userLocation) - heading) + 360) % 360
-                  }deg`,
+                  rotate: `${rotation}deg`,
                 },
               ],
             },
@@ -113,7 +113,8 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
         <View style={styles.footer}>
           <Text style={styles.distance}>
             {Math.floor(calculateDistance(location, userLocation))}{' '}
-            <Text style={styles.unit}>m</Text>
+            {/* TODO: Remove rotation text */}
+            <Text style={styles.unit}>m ({rotation}°)</Text>
           </Text>
           <IconButton icon={'x'} onPress={navigation.goBack} padding={15} />
         </View>
