@@ -44,16 +44,10 @@ const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <InsetView style={styles.root}>
         <View style={styles.header}>
           <View style={styles.wrapper}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('Profile')}
-            >
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Profile')}>
               <Icon name='user' />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => { }}
-            >
+            <TouchableOpacity style={styles.button} onPress={() => {}}>
               <Icon name='award' />
             </TouchableOpacity>
           </View>
@@ -64,17 +58,20 @@ const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
             >
               <Icon name='user-plus' />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('Settings')}
-            >
+            {__DEV__ && (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('DevPage')}
+              >
+                <Icon name='code' />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
               <Icon name='settings' />
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.content}>
-          {children}
-        </View>
+        <View style={styles.content}>{children}</View>
       </InsetView>
       <StatusBar style='auto' />
     </>
