@@ -1,11 +1,11 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { useColors } from '../hooks';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { useColors } from '../../hooks';
 
 interface ButtonProps {
   title: string;
   loading?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const Button: React.FC<ButtonProps> = ({ onPress, title, loading }) => {

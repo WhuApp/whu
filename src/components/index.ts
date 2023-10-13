@@ -1,7 +1,6 @@
-export { default as Button } from './Button';
+export { default as Button } from './button/Button';
 export { default as InsetView } from './InsetView';
 export { default as FriendList } from './FriendList';
-export { default as Icon } from './Icon';
-export { default as Compass } from './Compass';
-export { default as TextInput } from './TextInput';
+export { default as TextInput } from './input/TextInput';
 export { default as ServiceProvider } from './ServiceProvider';
+export { default as IconButton } from './button/IconButton';

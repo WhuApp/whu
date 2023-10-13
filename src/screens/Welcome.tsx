@@ -1,21 +1,19 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
-import { Button, InsetView } from '../components';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
+import { Image, TouchableOpacity, StyleSheet, Text, View, Alert } from 'react-native';
+import { Button } from '../components';
 import { useColors } from '../hooks';
+import { useAuth0 } from 'react-native-auth0';
+import { BaseLayout } from '../layouts';
 
 const earthImage = require('./../../assets/earth.jpg');
 
-type WelcomeProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+const Welcome: React.FC = () => {
+  const { authorize } = useAuth0();
 
-const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
   const colors = useColors();
-
   const styles = StyleSheet.create({
     root: {
-      backgroundColor: '#0F0F31',
+      height: '100%',
       justifyContent: 'space-around',
       alignItems: 'center',
     },
@@ -45,23 +43,26 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
     },
   });
 
+  function handleSignIn() {
+    authorize({}, {}).catch((e) => Alert.alert(e));
+  }
+
   return (
-    <>
-      <InsetView style={styles.root}>
+    <BaseLayout backgroundColor={'#0F0F31'} statusBarStyle={'light'}>
+      <View style={styles.root}>
         <Text style={styles.title}>Whu</Text>
         <Image style={styles.image} source={earthImage} />
         <View style={styles.container}>
-          <Button title='Sign In' onPress={() => navigation.navigate('SignIn')} />
+          <Button title='Sign In' onPress={handleSignIn} />
           <View style={styles.wrapper}>
             <Text style={styles.text}>No account yet?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+            <TouchableOpacity onPress={handleSignIn}>
               <Text style={styles.link}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </InsetView>
-      <StatusBar style='light' />
-    </>
+      </View>
+    </BaseLayout>
   );
 };
 

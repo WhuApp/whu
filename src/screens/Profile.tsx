@@ -2,22 +2,21 @@ import React from 'react';
 import { Button } from '../components';
 import ModalLayout from '../layouts/ModalLayout';
 import { useAuth0 } from 'react-native-auth0';
-import { Alert } from 'react-native';
+import { Alert, Text } from 'react-native';
+import { useColors } from '../hooks';
 
 const Profile: React.FC = () => {
-  const { clearSession } = useAuth0();
+  const { clearSession, user } = useAuth0();
+  const colors = useColors();
 
-  const onPress = async () => {
-    try {
-      await clearSession({}, {});
-    } catch (e) {
-      Alert.alert(e);
-    }
+  const handleSignOut = () => {
+    clearSession({}, {}).catch((e) => Alert.alert(e));
   };
 
   return (
     <ModalLayout title='Profile' onPressMore={() => {}}>
-      <Button title='Sign Out' onPress={onPress} />
+      {user && <Text style={{ color: colors('textPrimary') }}>Signed in as {user.name}</Text>}
+      <Button title='Sign Out' onPress={handleSignOut} />
     </ModalLayout>
   );
 };

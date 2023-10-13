@@ -1,16 +1,12 @@
 import React from 'react';
-import { Text } from 'react-native';
-import { useAuth0 } from 'react-native-auth0';
 import { FriendList } from '../components';
+import { MainLayout } from '../layouts';
 
 const Home: React.FC = () => {
-  const { user } = useAuth0();
-
   return (
-    <>
-      <Text>Logged in as {user.name}</Text>
+    <MainLayout>
       <FriendList />
-    </>
+    </MainLayout>
   );
 };
 

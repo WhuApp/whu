@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Profile: undefined;
   Settings: undefined;
   DevPage: undefined;
+  CompassView: { userId: string };
 };
 
 export type TimedLocation = Location & { timestamp: number };

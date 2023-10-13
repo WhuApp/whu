@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, VirtualizedList } from 'react-native';
-import { useColors, useLiveLocation } from '../hooks';
-import { calculateDistance, denormalize } from '../utils/location';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  VirtualizedList,
+} from 'react-native';
+import { useColors } from '../hooks';
+import { calculateDistance } from '../utils/location';
 import Compass from './Compass';
 import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';
-import { TimedLocation } from '../types';
+import { RootStackParamList, TimedLocation } from '../types';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import useLocation from './context/LocationContext';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
@@ -20,9 +29,9 @@ const FriendList: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const friendids = await friendsV1.getFriendIds();
+      const friendIds = await friendsV1.getFriendIds();
 
-      setFriendIds(friendids);
+      setFriendIds(friendIds);
     })();
   }, [friendsV1]);
 
@@ -50,7 +59,7 @@ interface FriendListItemProps {
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
   const [friendLocation, setFriendLocation] = useState<TimedLocation>(undefined);
-  const location = useLiveLocation();
+  const { location } = useLocation();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -72,23 +81,33 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
 
   useEffect(() => {
     locationContext.getLocation(friendId).then((timedLocation: TimedLocation) => {
-      setFriendLocation(denormalize(timedLocation));
+      setFriendLocation(timedLocation);
     });
   }, [locationContext]);
 
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const handlePress = () => {
+    navigation.navigate('CompassView', { userId: friendId });
+  };
+
   return (
-    <View style={styles.item}>
-      <Text style={styles.text}>{friendId}</Text>
-      {location && friendLocation && (
-        <Text style={styles.text}>{Math.floor(calculateDistance(location, friendLocation))}m</Text>
-      )}
-      <Compass location={friendLocation} />
-      {friendLocation && (
-        <Text style={styles.text}>
-          {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}
-        </Text>
-      )}
-    </View>
+    <Pressable onPress={handlePress}>
+      <View style={styles.item}>
+        <Text style={styles.text}>{friendId}</Text>
+        {location && friendLocation && (
+          <Text style={styles.text}>
+            {Math.floor(calculateDistance(location, friendLocation))}m
+          </Text>
+        )}
+        <Compass loc={friendLocation} />
+        {friendLocation && (
+          <Text style={styles.text}>
+            {new Date(friendLocation.timestamp).toTimeString().split(' ')[0].slice(0, -3)}
+          </Text>
+        )}
+      </View>
+    </Pressable>
   );
 };
 

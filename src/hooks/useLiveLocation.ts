@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
-import { watchPositionAsync, Accuracy } from 'expo-location';
-import type { LocationObject } from 'expo-location';
-import type { Location } from '../types';
+import { watchPositionAsync, Accuracy, LocationSubscription, LocationObject } from 'expo-location';
+import { Location } from '../types';
+
+const UPDATE_INTERVAL = 1000; // 1 second
+const DISTANCE_INTERVAL = 1; // measured in metres
 
 // DANGER!!! This hook expects to already have permissions to get foreground location data
 const useLiveLocation = () => {
+  const [subscription, setSubscription] = useState<LocationSubscription>();
   const [location, setLocation] = useState<Location>();
 
   const onLocationUpdate = (data: LocationObject) => {
+    // console.log('Updated location');
+
     setLocation({
       longitude: data.coords.longitude,
       latitude: data.coords.latitude,
@@ -17,16 +22,23 @@ const useLiveLocation = () => {
 
   useEffect(() => {
     (async () => {
-      const subscription = await watchPositionAsync(
-        {
-          accuracy: Accuracy.High, // <= 10m accuracy
-          timeInterval: 1000,
-          distanceInterval: 1,
-        },
-        onLocationUpdate
-      );
+      if (!subscription) {
+        setSubscription(
+          await watchPositionAsync(
+            {
+              accuracy: Accuracy.High, // <= 10m accuracy
+              timeInterval: UPDATE_INTERVAL,
+              distanceInterval: DISTANCE_INTERVAL,
+            },
+            onLocationUpdate
+          )
+        );
+      }
 
-      return () => subscription.remove();
+      return () => {
+        subscription.remove();
+        setSubscription(null);
+      };
     })();
   }, []);
 

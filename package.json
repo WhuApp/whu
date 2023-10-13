@@ -20,6 +20,7 @@
     "expo-location": "~15.1.1",
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
+    "prettier": "^3.0.3",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-auth0": "^3.0.0",
