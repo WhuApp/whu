@@ -7,7 +7,7 @@ import useUsersV1, { UserInfo } from '../services/users_v1';
 import useLocationsV1 from '../services/locations_v1';
 import { RootStackParamList, TimedLocation } from '../types';
 import Icon from '../atoms/Icon';
-import { calculateBearing, calculateDistance, denormalize } from '../utils/location';
+import { calculateBearing, calculateDistance } from '../utils/location';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/LocationContext';
@@ -74,7 +74,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
   // TODO: First call on init
   useInterval(() => {
     (async () => {
-      setUserLocation(denormalize(await locationsContext.getLocation(userId)));
+      setUserLocation(await locationsContext.getLocation(userId));
     })();
   }, UPDATE_DELAY);
 

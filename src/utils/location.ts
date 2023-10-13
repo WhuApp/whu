@@ -1,39 +1,7 @@
-import type { Location, TimedLocation } from '../types';
+import type { Location } from '../types';
 
-/*
-Functions calculateDistance & calculateBearing were taken from
-https://www.movable-type.co.uk/scripts/latlong.html
-*/
-
-//optimizable (while loops)
-export const normalize = (location: Location): Location => {
-  let longitude = location.longitude;
-  let latitude = location.latitude;
-
-  while (longitude > 90 || longitude < -90) {
-    if (longitude > 90) longitude = 180 - longitude;
-    if (longitude < -90) longitude = -180 - longitude;
-    latitude += 180;
-  }
-  while (latitude > 180 || latitude < -180) {
-    if (latitude > 180) latitude -= 360;
-    if (latitude < -180) latitude += 360;
-  }
-
-  return {
-    longitude: longitude / 90,
-    latitude: latitude / 180,
-    altitude: location.altitude / 100000, // max height 100 000 meters
-  };
-};
-
-export const denormalize = (location: TimedLocation): TimedLocation => ({
-  longitude: location.longitude * 90,
-  latitude: location.latitude * 180,
-  altitude: location.altitude * 100000,
-  timestamp: location.timestamp,
-});
-
+// https://www.movable-type.co.uk/scripts/latlong.html
+// TODO: Rename Non-ASCII characters
 export const calculateDistance = (from: Location, to: Location) => {
   const R = 6371.071e3; // metres
   const φ1 = (from.latitude * Math.PI) / 180; // φ, λ in radians

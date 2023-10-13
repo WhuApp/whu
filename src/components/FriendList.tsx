@@ -8,7 +8,7 @@ import {
   VirtualizedList,
 } from 'react-native';
 import { useColors } from '../hooks';
-import { calculateDistance, denormalize } from '../utils/location';
+import { calculateDistance } from '../utils/location';
 import Compass from './Compass';
 import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';
@@ -81,7 +81,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
 
   useEffect(() => {
     locationContext.getLocation(friendId).then((timedLocation: TimedLocation) => {
-      setFriendLocation(denormalize(timedLocation));
+      setFriendLocation(timedLocation);
     });
   }, [locationContext]);
 

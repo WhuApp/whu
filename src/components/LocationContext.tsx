@@ -2,7 +2,7 @@ import { Location } from '../types';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
 import { useInterval, useLiveHeading, useLiveLocation } from '../hooks';
 import useLocationsV1 from '../services/locations_v1';
-import { calculateDistance, normalize } from '../utils/location';
+import { calculateDistance } from '../utils/location';
 import { Alert } from 'react-native';
 
 const LOCATION_UPLOAD_DELAY = 1000 * 10; // 10 seconds
@@ -34,7 +34,7 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
 
     const temp = location;
-    const payload = { ...normalize(temp), timestamp: Date.now() };
+    const payload = { ...temp, timestamp: Date.now() };
 
     if (
       !lastLocation ||
