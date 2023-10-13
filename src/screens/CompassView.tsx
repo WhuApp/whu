@@ -7,7 +7,7 @@ import useUsersV1, { UserInfo } from '../services/users_v1';
 import useLocationsV1 from '../services/locations_v1';
 import { RootStackParamList, TimedLocation } from '../types';
 import Icon from '../atoms/Icon';
-import { calculateBearing, calculateDistance } from '../utils/location';
+import { calculateBearing, calculateDistance, formatDistance } from '../utils/location';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
@@ -88,6 +88,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
   }
 
   const rotation = (Math.floor(calculateBearing(location, userLocation) - heading) + 360) % 360;
+  const distance = formatDistance(Math.floor(calculateDistance(location, userLocation)));
 
   return (
     <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
@@ -112,9 +113,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
         </View>
         <View style={styles.footer}>
           <Text style={styles.distance}>
-            {Math.floor(calculateDistance(location, userLocation))}{' '}
-            {/* TODO: Remove rotation text */}
-            <Text style={styles.unit}>m ({rotation}°)</Text>
+            {distance.value} <Text style={styles.unit}>{distance.unit}</Text>
           </Text>
           <IconButton icon={'x'} onPress={navigation.goBack} padding={15} />
         </View>

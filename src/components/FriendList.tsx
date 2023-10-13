@@ -8,7 +8,7 @@ import {
   VirtualizedList,
 } from 'react-native';
 import { useColors } from '../hooks';
-import { calculateDistance } from '../utils/location';
+import { calculateDistance, formatDistance } from '../utils/location';
 import Compass from './Compass';
 import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';
@@ -91,13 +91,20 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ friendId }) => {
     navigation.navigate('CompassView', { userId: friendId });
   };
 
+  if (!friendLocation || !location) {
+    return <Text style={styles.text}>Loading</Text>;
+  }
+
+  const distance = formatDistance(Math.floor(calculateDistance(location, friendLocation)));
+
   return (
     <Pressable onPress={handlePress}>
       <View style={styles.item}>
         <Text style={styles.text}>{friendId}</Text>
         {location && friendLocation && (
           <Text style={styles.text}>
-            {Math.floor(calculateDistance(location, friendLocation))}m
+            {distance.value}
+            {distance.unit}
           </Text>
         )}
         <Compass loc={friendLocation} />
