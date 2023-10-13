@@ -10,7 +10,7 @@ import Icon from '../atoms/Icon';
 import { calculateBearing, calculateDistance } from '../utils/location';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
-import useLocation from '../components/LocationContext';
+import useLocation from '../components/context/LocationContext';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
@@ -115,7 +115,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
             {Math.floor(calculateDistance(location, userLocation))}{' '}
             <Text style={styles.unit}>m</Text>
           </Text>
-          <IconButton icon={'x'} onPress={navigation.goBack} />
+          <IconButton icon={'x'} onPress={navigation.goBack} padding={15} />
         </View>
       </View>
     </BaseLayout>

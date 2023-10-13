@@ -7,7 +7,7 @@ import { useColors } from './hooks';
 import { useAuth0 } from 'react-native-auth0';
 import { ServiceProvider } from './components';
 import { Alert } from 'react-native';
-import { LocationProvider } from './components/LocationContext';
+import { LocationProvider } from './components/context/LocationContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -59,7 +59,7 @@ const App: React.FC = () => {
                 <Stack.Screen
                   name='DevPage'
                   component={DevPage}
-                  options={{ animation: 'simple_push' }}
+                  options={{ animation: 'slide_from_bottom' }}
                 />
               )}
               <Stack.Screen

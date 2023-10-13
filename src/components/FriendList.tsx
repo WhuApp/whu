@@ -14,7 +14,7 @@ import useFriendsV1 from '../services/friends_v1';
 import useLocationsV1 from '../services/locations_v1';
 import { RootStackParamList, TimedLocation } from '../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import useLocation from './LocationContext';
+import useLocation from './context/LocationContext';
 
 const FriendList: React.FC = () => {
   const friendsV1 = useFriendsV1();
@@ -29,9 +29,9 @@ const FriendList: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const friendids = await friendsV1.getFriendIds();
+      const friendIds = await friendsV1.getFriendIds();
 
-      setFriendIds(friendids);
+      setFriendIds(friendIds);
     })();
   }, [friendsV1]);
 

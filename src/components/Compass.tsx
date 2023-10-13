@@ -4,7 +4,7 @@ import Icon from '../atoms/Icon';
 import { useColors } from '../hooks';
 import { Location } from '../types';
 import { calculateBearing } from '../utils/location';
-import useLocation from './LocationContext';
+import useLocation from './context/LocationContext';
 
 interface CompassProps {
   loc: Location;

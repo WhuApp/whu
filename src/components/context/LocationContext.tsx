@@ -1,8 +1,8 @@
-import { Location } from '../types';
-import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
-import { useInterval, useLiveHeading, useLiveLocation } from '../hooks';
-import useLocationsV1 from '../services/locations_v1';
-import { calculateDistance } from '../utils/location';
+import { Location } from '../../types';
+import React, { createContext, PropsWithChildren, useContext, useState } from 'react';
+import { useInterval, useLiveHeading, useLiveLocation } from '../../hooks';
+import useLocationsV1 from '../../services/locations_v1';
+import { calculateDistance } from '../../utils/location';
 import { Alert } from 'react-native';
 
 const LOCATION_UPLOAD_DELAY = 1000 * 10; // 10 seconds

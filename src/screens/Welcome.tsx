@@ -1,23 +1,19 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { Image, TouchableOpacity, StyleSheet, Text, View, Alert } from 'react-native';
-import { Button, InsetView } from '../components';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
+import { Button } from '../components';
 import { useColors } from '../hooks';
 import { useAuth0 } from 'react-native-auth0';
+import { BaseLayout } from '../layouts';
 
 const earthImage = require('./../../assets/earth.jpg');
 
-type WelcomeProps = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
-
-const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
+const Welcome: React.FC = () => {
   const { authorize } = useAuth0();
 
   const colors = useColors();
   const styles = StyleSheet.create({
     root: {
-      backgroundColor: '#0F0F31',
+      height: '100%',
       justifyContent: 'space-around',
       alignItems: 'center',
     },
@@ -52,8 +48,8 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
   }
 
   return (
-    <>
-      <InsetView style={styles.root}>
+    <BaseLayout backgroundColor={'#0F0F31'} statusBarStyle={'light'}>
+      <View style={styles.root}>
         <Text style={styles.title}>Whu</Text>
         <Image style={styles.image} source={earthImage} />
         <View style={styles.container}>
@@ -65,9 +61,8 @@ const Welcome: React.FC<WelcomeProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </InsetView>
-      <StatusBar style='light' />
-    </>
+      </View>
+    </BaseLayout>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, createContext, useContext, useEffect } from 'react';
-import useAuth from '../components/AuthContext';
+import useAuth from '../components/context/AuthContext';
 import { Service } from './fetch';
 
 export type UserInfo = {
