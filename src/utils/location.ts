@@ -31,3 +31,20 @@ export const calculateBearing = (from: Location, to: Location) => {
 
   return brng;
 };
+
+export const formatDistance = (meters: number): { value: string; unit: 'm' | 'km' } => {
+  const kilometers = meters / 1000;
+
+  if (meters < 10000) {
+    return { value: meters.toString(), unit: 'm' };
+  }
+
+  if (meters >= 1000 * 9999) {
+    return { value: '>9999', unit: 'km' };
+  }
+
+  return {
+    value: kilometers >= 1000 ? kilometers.toFixed(0) : kilometers.toFixed(2),
+    unit: 'km',
+  };
+};
