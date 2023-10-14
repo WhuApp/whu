@@ -21,7 +21,6 @@ const initialContext: LocationContextInterface = {
 const LocationContext = createContext<LocationContextInterface>(initialContext);
 
 const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  // TODO: Create hooks in this file so they cant be used otherwise
   const location = useLiveLocation();
   const heading = useLiveHeading();
 

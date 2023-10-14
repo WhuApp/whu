@@ -1,7 +1,6 @@
 import type { Location } from '../types';
 
 // https://www.movable-type.co.uk/scripts/latlong.html
-// TODO: Rename Non-ASCII characters
 export const calculateDistance = (from: Location, to: Location) => {
   const R = 6371.071e3; // metres
   const φ1 = (from.latitude * Math.PI) / 180; // φ, λ in radians

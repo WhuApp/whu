@@ -71,14 +71,12 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     })();
   }, []);
 
-  // TODO: First call on init
   useInterval(() => {
     (async () => {
       setUserLocation(await locationsContext.getLocation(userId));
     })();
   }, UPDATE_DELAY);
 
-  // TODO: Loading indicator or something
   if (!location || !heading || !userInfo || !userLocation) {
     return (
       <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>

@@ -26,8 +26,6 @@ const App: React.FC = () => {
     })();
   }, []);
 
-  // TODO: What is SafeAreaView
-  // TODO: somehow pass screen options from component (by making the layout return stack.screen)
   return (
     <NavigationContainer>
       {user ? (
