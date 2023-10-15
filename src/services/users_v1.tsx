@@ -1,21 +1,16 @@
 import React, { PropsWithChildren, createContext, useContext, useEffect } from 'react';
 import useAuth from '../components/context/AuthContext';
 import { Service } from './fetch';
-
-export type UserInfo = {
-  user_id: string;
-  email: string;
-  nickname: string;
-};
+import { User } from '../types';
 
 export class UsersV1 extends Service {
   constructor(token: string) {
     super(token, 'https://api.whu.app/users/v1/');
   }
 
-  async getUserInfo(id?: string): Promise<UserInfo> {
+  async getUserInfo(id?: string): Promise<User> {
     const path = id ? 'by-id/' + id : 'me';
-    return await this.innerFetch<UserInfo>(path);
+    return await this.innerFetch<User>(path);
   }
 
   async findUserByNickname(nickname: string): Promise<string[]> {

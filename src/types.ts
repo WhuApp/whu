@@ -16,3 +16,9 @@ export type Location = {
   longitude: number;
   altitude: number;
 };
+
+export type User = {
+  user_id: string; // TODO: rename this property
+  email: string;
+  nickname: string;
+};
