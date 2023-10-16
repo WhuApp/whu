@@ -17,7 +17,7 @@ const useMagneticHeading = () => {
   const [heading, setHeading] = useState<number>(0);
 
   const updateHeading = ({ x, y }: MagnetometerMeasurement) => {
-    setHeading(Math.atan2(y, x) + Math.PI);
+    setHeading((Math.atan2(y, x) + 3 * Math.PI) % (2 * Math.PI));
   };
 
   useEffect(() => {

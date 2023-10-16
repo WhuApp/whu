@@ -3,7 +3,7 @@ import { useColors, useInterval } from '../hooks';
 import { StyleSheet, View } from 'react-native';
 import { BaseLayout } from '../layouts';
 import { Text } from 'react-native';
-import useUsersV1, { UserInfo } from '../services/users_v1';
+import useUsersV1 from '../services/users_v1';
 import useLocationsV1 from '../services/locations_v1';
 import { RootStackParamList, TimedLocation } from '../types';
 import Icon from '../atoms/Icon';
@@ -11,6 +11,7 @@ import { calculateBearing, calculateDistance, formatDistance } from '../utils/lo
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
+import { User } from '../types';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
@@ -29,7 +30,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
 
   const usersContext = useUsersV1();
   const locationsContext = useLocationsV1();
-  const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [userInfo, setUserInfo] = useState<User>();
   const [userLocation, setUserLocation] = useState<TimedLocation>();
 
   const colors = useColors();

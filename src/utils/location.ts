@@ -15,9 +15,9 @@ export const calculateDistance = (from: Location, to: Location) => {
   const a =
     yDeltaHalfSin * yDeltaHalfSin + Math.cos(fromY) * Math.cos(toY) * xDeltaHalfSin * xDeltaHalfSin;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const d = earthRadius * c; // in metres
 
-  return d;
+  // in metres
+  return earthRadius * c;
 };
 
 export const calculateBearing = (from: Location, to: Location) => {
