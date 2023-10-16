@@ -24,7 +24,7 @@ const Compass: React.FC<CompassProps> = ({ loc }) => {
         style={{
           transform: [
             {
-              rotate: `${(Math.floor(calculateBearing(location, loc) - heading) + 360) % 360}deg`,
+              rotate: `${calculateBearing(location, loc) - heading}rad`,
             },
           ],
         }}

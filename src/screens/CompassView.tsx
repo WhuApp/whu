@@ -71,14 +71,12 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     })();
   }, []);
 
-  // TODO: First call on init
   useInterval(() => {
     (async () => {
       setUserLocation(await locationsContext.getLocation(userId));
     })();
   }, UPDATE_DELAY);
 
-  // TODO: Loading indicator or something
   if (!location || !heading || !userInfo || !userLocation) {
     return (
       <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
@@ -87,7 +85,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     );
   }
 
-  const rotation = (Math.floor(calculateBearing(location, userLocation) - heading) + 360) % 360;
+  const rotation = calculateBearing(location, userLocation) - heading;
   const distance = formatDistance(Math.floor(calculateDistance(location, userLocation)));
 
   return (
@@ -103,7 +101,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
             {
               transform: [
                 {
-                  rotate: `${rotation}deg`,
+                  rotate: `${rotation}rad`,
                 },
               ],
             },
