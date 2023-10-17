@@ -1,4 +1,4 @@
-import { Location } from '../../types';
+import { Location, TimedLocation } from '../../types';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
 import { useInterval } from '../../hooks';
 import useLocationsV1 from '../../services/locations_v1';
@@ -9,7 +9,6 @@ import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } fr
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
 const UPLOAD_DISTANCE_INTERVAL = 10; // measured in metres
-// TODO: implement this
 const UPLOAD_MAX_DELAY = 1000 * 60 * 5; // 5 minutes
 
 const MAGNETOMETER_UPDATE_INTERVAL = 50; // milliseconds
@@ -86,23 +85,27 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const location = useLiveLocation();
   const heading = useMagneticHeading();
 
-  const [lastLocation, setLastLocation] = useState<Location>();
+  const [lastLocation, setLastLocation] = useState<TimedLocation>();
   const locationsService = useLocationsV1();
 
+  // Upload location
   useInterval(() => {
     if (!location) {
       return;
     }
 
-    const temp = location;
-    const payload = { ...temp, timestamp: Date.now() };
+    const payload = { ...location, timestamp: Date.now() };
 
-    if (!lastLocation || calculateDistance(lastLocation, location) > UPLOAD_DISTANCE_INTERVAL) {
+    if (
+      !lastLocation ||
+      calculateDistance(lastLocation, location) > UPLOAD_DISTANCE_INTERVAL ||
+      payload.timestamp - lastLocation.timestamp >= UPLOAD_MAX_DELAY
+    ) {
       locationsService.setLocation(payload).then((reason) => {
         if (reason) {
           Alert.alert(reason);
         } else {
-          setLastLocation(temp);
+          setLastLocation(payload);
         }
       });
     }
