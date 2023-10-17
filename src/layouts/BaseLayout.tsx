@@ -1,8 +1,8 @@
 import React from 'react';
-import { InsetView } from '../components';
 import { StatusBar, StatusBarStyle } from 'expo-status-bar';
 import { useColors } from '../hooks';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface BaseLayoutProps {
   backgroundColor?: string;
@@ -23,10 +23,10 @@ const BaseLayout: React.FC<React.PropsWithChildren & BaseLayoutProps> = ({
   });
 
   return (
-    <>
-      <InsetView style={styles.root}>{children}</InsetView>
+    <SafeAreaView style={styles.root}>
+      <View>{children}</View>
       <StatusBar style={statusBarStyle ?? 'auto'} />
-    </>
+    </SafeAreaView>
   );
 };
 

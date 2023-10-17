@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { useAuth0 } from 'react-native-auth0';
 import { useColors } from '../hooks';
-import { ModalLayout } from '../layouts';
 import { useClipboard } from '@react-native-community/clipboard';
+import { BaseLayout } from '../layouts';
 
 const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   const c = children!.toString();
@@ -99,7 +99,7 @@ const DevPage: React.FC = () => {
   });
 
   return (
-    <ModalLayout title={'Dev Page'} onPressMore={() => {}}>
+    <BaseLayout>
       <View style={styles.textList}>
         <View>
           <Text style={styles.title}>Credentials</Text>
@@ -112,7 +112,7 @@ const DevPage: React.FC = () => {
           }}
         />
       </View>
-    </ModalLayout>
+    </BaseLayout>
   );
 };
 
