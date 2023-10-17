@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from '../components';
-import ModalLayout from '../layouts/ModalLayout';
 import { useAuth0 } from 'react-native-auth0';
 import { Alert, Text } from 'react-native';
 import { useColors } from '../hooks';
+import { BaseLayout } from '../layouts';
 
 const Profile: React.FC = () => {
   const { clearSession, user } = useAuth0();
@@ -14,10 +14,10 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <ModalLayout title='Profile' onPressMore={() => {}}>
+    <BaseLayout>
       {user && <Text style={{ color: colors('textPrimary') }}>Signed in as {user.name}</Text>}
       <Button title='Sign Out' onPress={handleSignOut} />
-    </ModalLayout>
+    </BaseLayout>
   );
 };
 

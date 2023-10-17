@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert, StyleSheet } from 'react-native';
-import ModalLayout from '../layouts/ModalLayout';
 import useFriendsV1 from '../services/friends_v1';
 import useUsersV1 from '../services/users_v1';
 import { useColors } from '../hooks';
 import Icon from '../atoms/Icon';
 import { IconButton, TextInput } from '../components';
+import { BaseLayout } from '../layouts';
 
 interface RequestsProps {
   requests: string[];
@@ -66,7 +66,7 @@ const AddFriends: React.FC = () => {
   };
 
   return (
-    <ModalLayout title='Add Friends' onPressMore={() => {}}>
+    <BaseLayout>
       <TextInput
         placeholder='Search..'
         onChangeText={setInput}
@@ -95,7 +95,7 @@ const AddFriends: React.FC = () => {
           <OutgoingRequests requests={outgoing} />
         </>
       )}
-    </ModalLayout>
+    </BaseLayout>
   );
 };
 
