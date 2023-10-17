@@ -52,7 +52,7 @@ const FriendList: React.FC = () => {
       data={friends}
       initialNumToRender={100}
       renderItem={({ item }) => <FriendListItem user={item} />}
-      keyExtractor={(item: User) => item.user_id}
+      keyExtractor={(item: User) => item.userId}
       getItemCount={(o): number => o.length}
       getItem={(o, i): User => o[i]}
     />
@@ -64,7 +64,7 @@ interface FriendListItemProps {
 }
 
 const FriendListItem: React.FC<FriendListItemProps> = ({ user }) => {
-  const { user_id, nickname } = user;
+  const { userId, nickname } = user;
 
   const [friendLocation, setFriendLocation] = useState<TimedLocation>(undefined);
   const { location } = useLocation();
@@ -88,7 +88,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ user }) => {
   const locationContext = useLocationsV1();
 
   useEffect(() => {
-    locationContext.getLocation(user_id).then((timedLocation: TimedLocation) => {
+    locationContext.getLocation(userId).then((timedLocation: TimedLocation) => {
       setFriendLocation(timedLocation);
     });
   }, [locationContext]);
@@ -96,7 +96,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ user }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handlePress = () => {
-    navigation.navigate('CompassView', { userId: user_id });
+    navigation.navigate('CompassView', { userId: userId });
   };
 
   if (!friendLocation || !location) {

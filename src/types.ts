@@ -18,7 +18,7 @@ export type Location = {
 };
 
 export type User = {
-  user_id: string; // TODO: rename this property
+  userId: string;
   email: string;
   nickname: string;
 };
