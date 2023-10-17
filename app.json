@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "whu",
+    "name": "Whu",
     "slug": "whuapp",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       "bundleIdentifier": "app.whu"
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
