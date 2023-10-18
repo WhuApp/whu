@@ -53,13 +53,11 @@ const App: React.FC = () => {
                 component={AddFriends}
                 options={{ animation: 'slide_from_bottom' }}
               />
-              {__DEV__ && (
-                <Stack.Screen
-                  name='DevPage'
-                  component={DevPage}
-                  options={{ animation: 'slide_from_bottom' }}
-                />
-              )}
+              <Stack.Screen
+                name='DevPage'
+                component={DevPage}
+                options={{ animation: 'slide_from_bottom' }}
+              />
               <Stack.Screen
                 name={'CompassView'}
                 component={CompassView}

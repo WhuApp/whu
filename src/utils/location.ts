@@ -21,20 +21,16 @@ export const calculateDistance = (from: Location, to: Location) => {
 };
 
 export const calculateBearing = (from: Location, to: Location) => {
-  //to radians
-  // x = longitude
-  // y = latitude
-  const fromX = (from.longitude * Math.PI) / 180;
-  const fromY = (from.latitude * Math.PI) / 180;
-  const toX = (to.longitude * Math.PI) / 180;
-  const toY = (to.latitude * Math.PI) / 180;
+  // const φ1 = (from.latitude * Math.PI) / 180; // φ, λ in radians
+  // const φ2 = (to.latitude * Math.PI) / 180;
+  // const λ1 = (from.longitude * Math.PI) / 180; // φ, λ in radians
+  // const λ2 = (to.longitude * Math.PI) / 180;
+  // const y = Math.sin(λ2 - λ1) * Math.cos(φ2);
+  // const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(λ2 - λ1);
+  // const θ = Math.atan2(y, x);
+  const radians = Math.atan2(from.longitude - to.longitude, from.latitude - to.latitude);
 
-  const toYCos = Math.cos(toY);
-
-  const y = Math.sin(toX - fromX) * toYCos;
-  const x = Math.cos(fromY) * Math.sin(toY) - Math.sin(fromY) * toYCos * Math.cos(toX - fromX);
-
-  return (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
+  return radians + Math.PI;
 };
 
 export const formatDistance = (meters: number): { value: string; unit: 'm' | 'km' } => {
