@@ -86,7 +86,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     );
   }
 
-  const rotation = calculateBearing(location, userLocation) - heading;
+  const rotation = calculateBearing(location, userLocation) + heading;
   const distance = formatDistance(Math.floor(calculateDistance(location, userLocation)));
 
   return (
