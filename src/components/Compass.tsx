@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import Icon from '../atoms/Icon';
 import { useColors } from '../hooks';
 import { Location } from '../types';
-import { calculateBearing } from '../utils/location';
+import { computeHeading } from '../utils/location';
 import useLocation from './context/LocationContext';
 
 interface CompassProps {
@@ -19,7 +19,7 @@ const Compass: React.FC<CompassProps> = ({ loc, devMode = false }) => {
     return <ActivityIndicator />;
   }
 
-  const bearing = devMode ? heading : calculateBearing(location, loc) - heading;
+  const rotation = devMode ? heading : computeHeading(location, loc) + heading;
 
   return (
     <View
@@ -33,7 +33,7 @@ const Compass: React.FC<CompassProps> = ({ loc, devMode = false }) => {
         style={{
           transform: [
             {
-              rotate: `${bearing}rad`,
+              rotate: `${rotation}deg`,
             },
           ],
         }}

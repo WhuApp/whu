@@ -6,6 +6,7 @@ import { calculateDistance } from '../../utils/location';
 import { Alert } from 'react-native';
 import { Magnetometer, MagnetometerMeasurement } from 'expo-sensors';
 import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } from 'expo-location';
+import { toDegrees, wrap } from '../../utils/math';
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
 const UPLOAD_DISTANCE_INTERVAL = 10; // measured in metres
@@ -62,7 +63,7 @@ const useMagneticHeading = () => {
       angle = radians + 2 * Math.PI;
     }
 
-    setHeading(angle);
+    setHeading(wrap(toDegrees(angle), -180, 180));
   };
 
   useEffect(() => {
