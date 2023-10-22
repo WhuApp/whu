@@ -55,15 +55,8 @@ const useMagneticHeading = () => {
 
   const updateHeading = ({ x, y }: MagnetometerMeasurement) => {
     const radians = Math.atan2(x, y);
-    let angle: number;
 
-    if (radians >= 0) {
-      angle = radians;
-    } else {
-      angle = radians + 2 * Math.PI;
-    }
-
-    setHeading(wrap(toDegrees(angle), -180, 180));
+    setHeading(wrap(toDegrees(radians), -180, 180));
   };
 
   useEffect(() => {
