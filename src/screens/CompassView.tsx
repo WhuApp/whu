@@ -5,10 +5,12 @@ import { BaseLayout } from '../layouts';
 import { Text } from 'react-native';
 import { RootStackParamList } from '../types';
 import Icon from '../atoms/Icon';
-import { calculateBearing, calculateDistance, formatDistance } from '../utils/location';
+import { calculateDistance, computeHeading, formatDistance } from '../utils/location';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
+import { User } from '../types';
+import { wrap } from '../utils/math';
 import { getUserById } from '../api/users';
 import { getLocationById } from '../api/locations';
 import { useQueryClient } from '@tanstack/react-query';
@@ -78,8 +80,9 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     );
   }
 
-  const rotation = calculateBearing(location, userLocation) - heading;
-  const distance = formatDistance(Math.floor(calculateDistance(location, userLocation)));
+  const bearing = computeHeading(location, userLocation);
+  const rotation = wrap(bearing + heading, -180, 180);
+  const distance = formatDistance(calculateDistance(location, userLocation));
 
   return (
     <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
@@ -87,6 +90,9 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
         <View>
           <Text style={styles.title}>Tracking</Text>
           <Text style={styles.name}>{user.nickname}</Text>
+          <Text style={styles.title}>Heading: {bearing}</Text>
+          <Text style={styles.title}>Phone: {heading}</Text>
+          <Text style={styles.title}>Result: {rotation}</Text>
         </View>
         <View
           style={[
@@ -94,7 +100,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
             {
               transform: [
                 {
-                  rotate: `${rotation}rad`,
+                  rotate: `${rotation}deg`,
                 },
               ],
             },

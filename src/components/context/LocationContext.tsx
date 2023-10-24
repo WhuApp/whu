@@ -4,6 +4,7 @@ import { useInterval } from '../../hooks';
 import { calculateDistance } from '../../utils/location';
 import { Magnetometer, MagnetometerMeasurement } from 'expo-sensors';
 import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } from 'expo-location';
+import { toDegrees, wrap } from '../../utils/math';
 import { updateLocation } from '../../api/locations';
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
@@ -52,7 +53,16 @@ const useMagneticHeading = () => {
   const [heading, setHeading] = useState<number>(0);
 
   const updateHeading = ({ x, y }: MagnetometerMeasurement) => {
-    setHeading((Math.atan2(y, x) + 3 * Math.PI) % (2 * Math.PI));
+    const radians = Math.atan2(x, y);
+    let angle: number;
+
+    if (radians >= 0) {
+      angle = radians;
+    } else {
+      angle = radians + 2 * Math.PI;
+    }
+
+    setHeading(wrap(toDegrees(angle), -180, 180));
   };
 
   useEffect(() => {

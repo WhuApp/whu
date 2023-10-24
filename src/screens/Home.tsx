@@ -42,7 +42,7 @@ const Home: React.FC = () => {
         </View>
         <View style={styles.wrapper}>
           <IconButton icon='user-plus' onPress={() => navigation.navigate('AddFriends')} />
-          {__DEV__ && <IconButton icon='code' onPress={() => navigation.navigate('DevPage')} />}
+          <IconButton icon='code' onPress={() => navigation.navigate('DevPage')} />
           <IconButton icon='settings' onPress={() => navigation.navigate('Settings')} />
         </View>
       </View>

@@ -83,7 +83,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ userId }) => {
     return <Text style={styles.text}>Loading</Text>;
   }
 
-  const distance = formatDistance(Math.floor(calculateDistance(location, friendLocation)));
+  const distance = formatDistance(calculateDistance(location, friendLocation));
 
   return (
     <Pressable onPress={handlePress}>

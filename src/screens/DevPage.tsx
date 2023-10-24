@@ -11,6 +11,7 @@ import { useAuth0 } from 'react-native-auth0';
 import { useColors } from '../hooks';
 import { useClipboard } from '@react-native-community/clipboard';
 import { BaseLayout } from '../layouts';
+import Compass from '../components/Compass';
 
 const Code: React.FC<React.PropsWithChildren> = ({ children }) => {
   const c = children!.toString();
@@ -52,28 +53,31 @@ const ObjectView: React.FC<{ obj: unknown }> = ({ obj }) => {
     },
   });
   return (
-    <VirtualizedList
-      data={s}
-      initialNumToRender={s.length}
-      renderItem={({ item }) => {
-        const name = item[0];
-        const content = item[1];
-        return (
-          <View style={styles.empty}>
-            <Text style={styles.text}>{name}</Text>
-            {!content && <Code>null</Code>}
-            {content && typeof content === 'string' && <Code>{content}</Code>}
-            {content && typeof content === 'number' && (
-              <Code>{(content as number).toString()}</Code>
-            )}
-            {content && typeof content === 'object' && <ObjectView obj={content} />}
-          </View>
-        );
-      }}
-      keyExtractor={(item) => item[0]}
-      getItemCount={(o) => o.length}
-      getItem={(o, i) => o[i]}
-    />
+    <>
+      <VirtualizedList
+        data={s}
+        initialNumToRender={s.length}
+        renderItem={({ item }) => {
+          const name = item[0];
+          const content = item[1];
+          return (
+            <View style={styles.empty}>
+              <Text style={styles.text}>{name}</Text>
+              {!content && <Code>null</Code>}
+              {content && typeof content === 'string' && <Code>{content}</Code>}
+              {content && typeof content === 'number' && (
+                <Code>{(content as number).toString()}</Code>
+              )}
+              {content && typeof content === 'object' && <ObjectView obj={content} />}
+            </View>
+          );
+        }}
+        keyExtractor={(item) => item[0]}
+        getItemCount={(o) => o.length}
+        getItem={(o, i) => o[i]}
+      />
+      <Compass loc={null} devMode />
+    </>
   );
 };
 
