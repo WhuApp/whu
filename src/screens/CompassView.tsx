@@ -9,7 +9,6 @@ import { calculateDistance, computeHeading, formatDistance } from '../utils/loca
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
-import { User } from '../types';
 import { wrap } from '../utils/math';
 import { getUserById } from '../api/users';
 import { getLocationById } from '../api/locations';
