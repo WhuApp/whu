@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -10,17 +10,15 @@ import {
 import { useColors } from '../hooks';
 import { calculateDistance, formatDistance } from '../utils/location';
 import Compass from './Compass';
-import useFriendsV1 from '../services/friends_v1';
-import useLocationsV1 from '../services/locations_v1';
-import { RootStackParamList, TimedLocation, User } from '../types';
+import { RootStackParamList } from '../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import useLocation from './context/LocationContext';
-import useUsersV1 from '../services/users_v1';
+import { getLocationById } from '../api/locations';
+import { getFriends } from '../api/friends';
+import { getUserById } from '../api/users';
 
 const FriendList: React.FC = () => {
-  const friendsService = useFriendsV1();
-  const usersService = useUsersV1();
-  const [friends, setFriends] = useState<User[]>([]);
+  const { data, isPending } = getFriends();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -29,45 +27,35 @@ const FriendList: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    (async () => {
-      const friendIds = await friendsService.getFriendIds();
-      const friendObjects = [];
+  if (isPending) {
+    return <ActivityIndicator />;
+  }
 
-      for (const id of friendIds) {
-        const friend = await usersService.getUserInfo(id);
-        friendObjects.push(friend);
-      }
-
-      setFriends(friendObjects);
-    })();
-  }, [friendsService, usersService]);
-
-  if (!friends) return <ActivityIndicator />;
-  if (friends.length === 0) {
+  if (data.length === 0) {
     return <Text style={styles.text}>You dont have any friends</Text>;
   }
+
   return (
     <VirtualizedList
-      data={friends}
+      data={data}
       initialNumToRender={100}
-      renderItem={({ item }) => <FriendListItem user={item} />}
-      keyExtractor={(item: User) => item.userId}
+      renderItem={({ item }) => <FriendListItem userId={item} />}
+      keyExtractor={(item: string) => item}
       getItemCount={(o): number => o.length}
-      getItem={(o, i): User => o[i]}
+      getItem={(o, i): string => o[i]}
     />
   );
 };
 
 interface FriendListItemProps {
-  user: User;
+  userId: string;
 }
 
-const FriendListItem: React.FC<FriendListItemProps> = ({ user }) => {
-  const { userId, nickname } = user;
-
-  const [friendLocation, setFriendLocation] = useState<TimedLocation>(undefined);
+const FriendListItem: React.FC<FriendListItemProps> = ({ userId }) => {
   const { location } = useLocation();
+
+  const { data: friend, isPending: friendPending } = getUserById(userId);
+  const { data: friendLocation, isPending: friendLocationPending } = getLocationById(userId);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -85,21 +73,13 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ user }) => {
     },
   });
 
-  const locationContext = useLocationsV1();
-
-  useEffect(() => {
-    locationContext.getLocation(userId).then((timedLocation: TimedLocation) => {
-      setFriendLocation(timedLocation);
-    });
-  }, [locationContext]);
-
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handlePress = () => {
     navigation.navigate('CompassView', { userId: userId });
   };
 
-  if (!friendLocation || !location) {
+  if (!location || friendPending || friendLocationPending) {
     return <Text style={styles.text}>Loading</Text>;
   }
 
@@ -108,7 +88,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ user }) => {
   return (
     <Pressable onPress={handlePress}>
       <View style={styles.item}>
-        <Text style={styles.text}>{nickname}</Text>
+        <Text style={styles.text}>{friend.nickname}</Text>
         {location && friendLocation && (
           <Text style={styles.text}>
             {distance.value}

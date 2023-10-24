@@ -1,24 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Alert, StyleSheet } from 'react-native';
-import useFriendsV1 from '../services/friends_v1';
-import useUsersV1 from '../services/users_v1';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useColors } from '../hooks';
 import Icon from '../atoms/Icon';
 import { IconButton, TextInput } from '../components';
 import { BaseLayout } from '../layouts';
+import {
+  acceptFriendRequest,
+  cancelFriendRequest,
+  declineFriendRequest,
+  getIncomingFriendRequests,
+  getOutgoingFriendRequests,
+  sendFriendRequest,
+} from '../api/friends';
+import { getUserById } from '../api/users';
 
-interface RequestsProps {
-  requests: string[];
-}
-
+// TODO: how to remove friends?
+// TODO: remove this;;; Note for later put components inside the page component to use styles and mutations from top level component
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
-  const [incoming, setIncoming] = useState<string[]>([]);
-  const [outgoing, setOutgoing] = useState<string[]>([]);
-  const [isAdding, setIsAdding] = useState<boolean>(false);
 
-  const friendsService = useFriendsV1();
-  const usersService = useUsersV1();
+  const { data: incoming, isPending: incomingPending } = getIncomingFriendRequests();
+  const { data: outgoing, isPending: outgoingPending } = getOutgoingFriendRequests();
+  const { mutate: sendRequest, isPending: sendRequestPending } = sendFriendRequest();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -29,41 +32,20 @@ const AddFriends: React.FC = () => {
     label: {
       color: colors('textSecondary'),
     },
+    container: {
+      borderRadius: 15,
+      overflow: 'hidden',
+      backgroundColor: colors('backgroundSecondary'),
+    },
   });
 
-  useEffect(() => {
-    (async () => {
-      const dataIn = await friendsService.getIncomingFriendRequests();
-      const dataOut = await friendsService.getOutgoingFriendRequests();
+  function handleAdd() {
+    sendRequest(input);
+  }
 
-      setIncoming(dataIn);
-      setOutgoing(dataOut);
-    })();
-  }, [friendsService]);
-
-  const handleAdd = async () => {
-    if (isAdding) return;
-
-    setIsAdding(true);
-
-    try {
-      const ids = await usersService.findUserByNickname(input);
-
-      if (ids.length > 1) {
-        Alert.alert('Error', 'Too many users?!');
-      } else if (ids.length == 0) {
-        Alert.alert('Error', 'Could not find user!');
-      } else {
-        const reason = await friendsService.sendFriendRequestTo(ids[0]);
-
-        if (reason) {
-          Alert.alert('Error', reason);
-        }
-      }
-    } finally {
-      setIsAdding(false);
-    }
-  };
+  if (incomingPending || outgoingPending) {
+    return <ActivityIndicator />;
+  }
 
   return (
     <BaseLayout>
@@ -74,9 +56,9 @@ const AddFriends: React.FC = () => {
         suffix={
           <View style={styles.iconWrapper}>
             <IconButton
-              icon={isAdding ? 'loader' : 'arrow-right'}
+              icon={sendRequestPending ? 'loader' : 'arrow-right'}
               onPress={handleAdd}
-              disabled={isAdding}
+              disabled={sendRequestPending}
               background={false}
             />
             <IconButton icon='camera' background={false} />
@@ -86,29 +68,40 @@ const AddFriends: React.FC = () => {
       {incoming.length > 0 && (
         <>
           <Text style={styles.label}>Added Me</Text>
-          <IncomingRequests requests={incoming} />
+          <View style={styles.container}>
+            {incoming.map((id) => (
+              <IncomingRequest id={id} />
+            ))}
+          </View>
         </>
       )}
       {outgoing.length > 0 && (
         <>
           <Text style={styles.label}>Pending</Text>
-          <OutgoingRequests requests={outgoing} />
+          <View style={styles.container}>
+            {outgoing.map((id) => (
+              <OutgoingRequest id={id} />
+            ))}
+          </View>
         </>
       )}
     </BaseLayout>
   );
 };
 
-const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
-  const friendsService = useFriendsV1();
+interface RequestProps {
+  id: string;
+}
+
+// TODO: add optimistic updates (https://tanstack.com/query/v5/docs/react/guides/optimistic-updates)
+
+const IncomingRequest: React.FC<RequestProps> = ({ id }) => {
+  const { data, isPending } = getUserById(id);
+  const { mutate: acceptRequest } = acceptFriendRequest();
+  const { mutate: declineRequest } = declineFriendRequest();
 
   const colors = useColors();
   const styles = StyleSheet.create({
-    container: {
-      borderRadius: 15,
-      overflow: 'hidden',
-      backgroundColor: colors('backgroundSecondary'),
-    },
     item: {
       flexDirection: 'row',
       paddingHorizontal: 6,
@@ -127,47 +120,27 @@ const IncomingRequests: React.FC<RequestsProps> = ({ requests }) => {
     },
   });
 
-  const handleAccept = async (id: string) => {
-    const reason = await friendsService.acceptRequest(id);
-
-    if (reason) {
-      Alert.alert(reason);
-    }
-  };
-
-  const handleDecline = async (id: string) => {
-    const reason = await friendsService.declineRequest(id);
-
-    if (reason) {
-      Alert.alert(reason);
-    }
-  };
+  if (isPending) {
+    return <ActivityIndicator />;
+  }
 
   return (
-    <View style={styles.container}>
-      {requests.map((user) => (
-        <View style={styles.item} key={user}>
-          <Text style={styles.text}>{user}</Text>
-          <View style={styles.iconWrapper}>
-            <IconButton icon='user-check' onPress={() => handleAccept(user)} background={false} />
-            <IconButton icon='x' onPress={() => handleDecline(user)} background={false} />
-          </View>
-        </View>
-      ))}
+    <View style={styles.item} key={id}>
+      <Text style={styles.text}>{data.nickname}</Text>
+      <View style={styles.iconWrapper}>
+        <IconButton icon='user-check' onPress={() => acceptRequest(id)} background={false} />
+        <IconButton icon='x' onPress={() => declineRequest(id)} background={false} />
+      </View>
     </View>
   );
 };
 
-const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
-  const friendsService = useFriendsV1();
+const OutgoingRequest: React.FC<RequestProps> = ({ id }) => {
+  const { data, isPending } = getUserById(id);
+  const { mutate: cancelRequest } = cancelFriendRequest();
 
   const colors = useColors();
   const styles = StyleSheet.create({
-    container: {
-      borderRadius: 15,
-      overflow: 'hidden',
-      backgroundColor: colors('backgroundSecondary'),
-    },
     item: {
       flexDirection: 'row',
       paddingHorizontal: 6,
@@ -182,22 +155,14 @@ const OutgoingRequests: React.FC<RequestsProps> = ({ requests }) => {
     },
   });
 
-  const handleCancel = async (id: string) => {
-    const reason = await friendsService.cancelRequest(id);
-
-    if (reason) {
-      Alert.alert(reason);
-    }
-  };
+  if (isPending) {
+    return <ActivityIndicator />;
+  }
 
   return (
-    <View style={styles.container}>
-      {requests.map((user) => (
-        <View style={styles.item} key={user}>
-          <Text style={styles.text}>{user}</Text>
-          <IconButton icon='x' onPress={() => handleCancel(user)} background={false} />
-        </View>
-      ))}
+    <View style={styles.item} key={id}>
+      <Text style={styles.text}>{data.nickname}</Text>
+      <IconButton icon='x' onPress={() => cancelRequest(id)} background={false} />
     </View>
   );
 };

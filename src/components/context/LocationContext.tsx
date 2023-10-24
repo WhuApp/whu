@@ -1,11 +1,10 @@
 import { Location, TimedLocation } from '../../types';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
 import { useInterval } from '../../hooks';
-import useLocationsV1 from '../../services/locations_v1';
 import { calculateDistance } from '../../utils/location';
-import { Alert } from 'react-native';
 import { Magnetometer, MagnetometerMeasurement } from 'expo-sensors';
 import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } from 'expo-location';
+import { updateLocation } from '../../api/locations';
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
 const UPLOAD_DISTANCE_INTERVAL = 10; // measured in metres
@@ -85,8 +84,9 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const location = useLiveLocation();
   const heading = useMagneticHeading();
 
-  const [lastLocation, setLastLocation] = useState<TimedLocation>();
-  const locationsService = useLocationsV1();
+  const [lastLocation, setLastLocation] = useState<TimedLocation>(); // TODO: use caching functions provided by react-query
+
+  const { mutate: setLocation } = updateLocation();
 
   // Upload location
   useInterval(() => {
@@ -101,13 +101,9 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
       calculateDistance(lastLocation, location) > UPLOAD_DISTANCE_INTERVAL ||
       payload.timestamp - lastLocation.timestamp >= UPLOAD_MAX_DELAY
     ) {
-      locationsService.setLocation(payload).then((reason) => {
-        if (reason) {
-          Alert.alert(reason);
-        } else {
-          setLastLocation(payload);
-        }
-      });
+      // TODO: validate that location has been updated before setting last location
+      setLocation(payload);
+      setLastLocation(payload);
     }
   }, UPLOAD_DELAY);
 
