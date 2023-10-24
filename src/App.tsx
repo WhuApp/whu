@@ -5,15 +5,16 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { useColors } from './hooks';
 import { useAuth0 } from 'react-native-auth0';
-import { ServiceProvider } from './components';
-import { Alert } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { LocationProvider } from './components/context/LocationContext';
+import useAuth from './components/context/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   const colors = useColors();
   const { user } = useAuth0();
+  const { idToken } = useAuth();
 
   // TODO: no?
   useEffect(() => {
@@ -26,46 +27,50 @@ const App: React.FC = () => {
     })();
   }, []);
 
+  // Make sure there is a valid id token for api fetching
+  // TODO: find a better solution in the future
+  if (!idToken) {
+    return <ActivityIndicator />;
+  }
+
   return (
     <NavigationContainer>
       {user ? (
-        <ServiceProvider>
-          <LocationProvider>
-            <Stack.Navigator
-              screenOptions={{
-                headerShown: false,
-                navigationBarColor: colors('backgroundPrimary'),
-              }}
-            >
-              <Stack.Screen name='Home' component={Home} options={{ animation: 'simple_push' }} />
-              <Stack.Screen
-                name='Profile'
-                component={Profile}
-                options={{ animation: 'slide_from_bottom' }}
-              />
-              <Stack.Screen
-                name='Settings'
-                component={Settings}
-                options={{ animation: 'slide_from_bottom' }}
-              />
-              <Stack.Screen
-                name='AddFriends'
-                component={AddFriends}
-                options={{ animation: 'slide_from_bottom' }}
-              />
+        <LocationProvider>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              navigationBarColor: colors('backgroundPrimary'),
+            }}
+          >
+            <Stack.Screen name='Home' component={Home} options={{ animation: 'simple_push' }} />
+            <Stack.Screen
+              name='Profile'
+              component={Profile}
+              options={{ animation: 'slide_from_bottom' }}
+            />
+            <Stack.Screen
+              name='Settings'
+              component={Settings}
+              options={{ animation: 'slide_from_bottom' }}
+            />
+            <Stack.Screen
+              name='AddFriends'
+              component={AddFriends}
+              options={{ animation: 'slide_from_bottom' }}
+            />
               <Stack.Screen
                 name='DevPage'
                 component={DevPage}
                 options={{ animation: 'slide_from_bottom' }}
               />
-              <Stack.Screen
-                name={'CompassView'}
-                component={CompassView}
-                options={{ animation: 'simple_push', navigationBarColor: colors('accent') }}
-              />
-            </Stack.Navigator>
-          </LocationProvider>
-        </ServiceProvider>
+            <Stack.Screen
+              name={'CompassView'}
+              component={CompassView}
+              options={{ animation: 'simple_push', navigationBarColor: colors('accent') }}
+            />
+          </Stack.Navigator>
+        </LocationProvider>
       ) : (
         <>
           <Stack.Navigator

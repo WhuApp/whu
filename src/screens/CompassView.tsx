@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useColors, useInterval } from '../hooks';
 import { StyleSheet, View } from 'react-native';
 import { BaseLayout } from '../layouts';
 import { Text } from 'react-native';
-import useUsersV1 from '../services/users_v1';
-import useLocationsV1 from '../services/locations_v1';
-import { RootStackParamList, TimedLocation } from '../types';
+import { RootStackParamList } from '../types';
 import Icon from '../atoms/Icon';
 import { calculateDistance, computeHeading, formatDistance } from '../utils/location';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
-import { User } from '../types';
 import { wrap } from '../utils/math';
+import { getUserById } from '../api/users';
+import { getLocationById } from '../api/locations';
+import { useQueryClient } from '@tanstack/react-query';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
@@ -29,10 +29,10 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
 
   const { location, heading } = useLocation();
 
-  const usersContext = useUsersV1();
-  const locationsContext = useLocationsV1();
-  const [userInfo, setUserInfo] = useState<User>();
-  const [userLocation, setUserLocation] = useState<TimedLocation>();
+  const { data: user, isPending: userPending } = getUserById(userId);
+  const { data: userLocation, isPending: userLocationPending } = getLocationById(userId);
+
+  const queryClient = useQueryClient();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -67,19 +67,11 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     },
   });
 
-  useEffect(() => {
-    (async () => {
-      setUserInfo(await usersContext.getUserInfo(userId));
-    })();
-  }, []);
-
   useInterval(() => {
-    (async () => {
-      setUserLocation(await locationsContext.getLocation(userId));
-    })();
+    queryClient.invalidateQueries({ queryKey: ['locations', userId] });
   }, UPDATE_DELAY);
 
-  if (!location || !heading || !userInfo || !userLocation) {
+  if (!location || !heading || userPending || userLocationPending) {
     return (
       <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
         <Text style={styles.title}>Loading {userId}...</Text>
@@ -96,7 +88,7 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
       <View style={styles.content}>
         <View>
           <Text style={styles.title}>Tracking</Text>
-          <Text style={styles.name}>{userInfo.nickname}</Text>
+          <Text style={styles.name}>{user.nickname}</Text>
           <Text style={styles.title}>Heading: {bearing}</Text>
           <Text style={styles.title}>Phone: {heading}</Text>
           <Text style={styles.title}>Result: {rotation}</Text>

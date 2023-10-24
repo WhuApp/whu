@@ -2,7 +2,7 @@ import React, { createContext, PropsWithChildren, useContext, useEffect, useStat
 import { useAuth0 } from 'react-native-auth0';
 
 export type AuthContextInterface = {
-  idToken: string | Promise<string>;
+  idToken: string;
 };
 
 const initialContext: AuthContextInterface = {
@@ -12,10 +12,12 @@ const initialContext: AuthContextInterface = {
 const AuthContext = createContext<AuthContextInterface>(initialContext);
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const { user, getCredentials } = useAuth0();
-  const [idToken, setIdToken] = useState(getCredentials().then((c) => c.idToken));
+  const [idToken, setIdToken] = useState(undefined);
 
   useEffect(() => {
-    setIdToken(getCredentials().then((c) => c.idToken));
+    getCredentials().then((credentials) => {
+      setIdToken(credentials.idToken);
+    });
   }, [user]);
 
   return <AuthContext.Provider value={{ idToken }}>{children}</AuthContext.Provider>;
