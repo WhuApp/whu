@@ -15,6 +15,11 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [idToken, setIdToken] = useState(undefined);
 
   useEffect(() => {
+    // We can not fetch a token if the user is not signed in
+    if (!user) {
+      return;
+    }
+
     getCredentials().then((credentials) => {
       setIdToken(credentials.idToken);
     });

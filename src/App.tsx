@@ -29,7 +29,7 @@ const App: React.FC = () => {
 
   // Make sure there is a valid id token for api fetching
   // TODO: find a better solution in the future
-  if (!idToken) {
+  if (user && !idToken) {
     return <ActivityIndicator />;
   }
 
@@ -59,11 +59,11 @@ const App: React.FC = () => {
               component={AddFriends}
               options={{ animation: 'slide_from_bottom' }}
             />
-              <Stack.Screen
-                name='DevPage'
-                component={DevPage}
-                options={{ animation: 'slide_from_bottom' }}
-              />
+            <Stack.Screen
+              name='DevPage'
+              component={DevPage}
+              options={{ animation: 'slide_from_bottom' }}
+            />
             <Stack.Screen
               name={'CompassView'}
               component={CompassView}
