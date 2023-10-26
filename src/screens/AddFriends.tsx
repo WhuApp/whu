@@ -5,23 +5,24 @@ import Icon from '../atoms/Icon';
 import { IconButton, TextInput } from '../components';
 import { BaseLayout } from '../layouts';
 import {
-  acceptFriendRequest,
-  cancelFriendRequest,
-  declineFriendRequest,
-  getIncomingFriendRequests,
-  getOutgoingFriendRequests,
-  sendFriendRequest,
+  useAcceptFriendRequest,
+  useCancelFriendRequest,
+  useDeclineFriendRequest,
+  useGetIncomingFriendRequests,
+  useGetOutgoingFriendRequests,
+  useSendFriendRequest,
 } from '../api/friends';
-import { getUserById } from '../api/users';
+import { useGetUser } from '../api/users';
 
 // TODO: how to remove friends?
 // TODO: remove this;;; Note for later put components inside the page component to use styles and mutations from top level component
+// TODO: add search feature
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
 
-  const { data: incoming, isPending: incomingPending } = getIncomingFriendRequests();
-  const { data: outgoing, isPending: outgoingPending } = getOutgoingFriendRequests();
-  const { mutate: sendRequest, isPending: sendRequestPending } = sendFriendRequest();
+  const { data: incoming, isPending: incomingPending } = useGetIncomingFriendRequests();
+  const { data: outgoing, isPending: outgoingPending } = useGetOutgoingFriendRequests();
+  const { sendFriendRequest, isPending: sendRequestPending } = useSendFriendRequest();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -40,7 +41,7 @@ const AddFriends: React.FC = () => {
   });
 
   function handleAdd() {
-    sendRequest(input);
+    sendFriendRequest(input);
   }
 
   if (incomingPending || outgoingPending) {
@@ -96,9 +97,9 @@ interface RequestProps {
 // TODO: add optimistic updates (https://tanstack.com/query/v5/docs/react/guides/optimistic-updates)
 
 const IncomingRequest: React.FC<RequestProps> = ({ id }) => {
-  const { data, isPending } = getUserById(id);
-  const { mutate: acceptRequest } = acceptFriendRequest();
-  const { mutate: declineRequest } = declineFriendRequest();
+  const { data, isPending } = useGetUser(id);
+  const { acceptFriendRequest } = useAcceptFriendRequest();
+  const { declineFriendRequest } = useDeclineFriendRequest();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -128,16 +129,16 @@ const IncomingRequest: React.FC<RequestProps> = ({ id }) => {
     <View style={styles.item} key={id}>
       <Text style={styles.text}>{data.nickname}</Text>
       <View style={styles.iconWrapper}>
-        <IconButton icon='user-check' onPress={() => acceptRequest(id)} background={false} />
-        <IconButton icon='x' onPress={() => declineRequest(id)} background={false} />
+        <IconButton icon='user-check' onPress={() => acceptFriendRequest(id)} background={false} />
+        <IconButton icon='x' onPress={() => declineFriendRequest(id)} background={false} />
       </View>
     </View>
   );
 };
 
 const OutgoingRequest: React.FC<RequestProps> = ({ id }) => {
-  const { data, isPending } = getUserById(id);
-  const { mutate: cancelRequest } = cancelFriendRequest();
+  const { data, isPending } = useGetUser(id);
+  const { cancelFriendRequest } = useCancelFriendRequest();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -162,7 +163,7 @@ const OutgoingRequest: React.FC<RequestProps> = ({ id }) => {
   return (
     <View style={styles.item} key={id}>
       <Text style={styles.text}>{data.nickname}</Text>
-      <IconButton icon='x' onPress={() => cancelRequest(id)} background={false} />
+      <IconButton icon='x' onPress={() => cancelFriendRequest(id)} background={false} />
     </View>
   );
 };

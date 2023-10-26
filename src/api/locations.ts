@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useApiFetch } from '../hooks';
 import { TimedLocation } from '../types';
 
-export const getLocationById = (id: string) => {
+export const useGetLocation = (id: string) => {
   const { get } = useApiFetch();
 
   return useQuery({
@@ -11,10 +11,12 @@ export const getLocationById = (id: string) => {
   });
 };
 
-export const updateLocation = () => {
+export const useUpdateLocation = () => {
   const { post } = useApiFetch();
 
-  return useMutation({
+  const { mutateAsync: updateLocation, ...rest } = useMutation({
     mutationFn: (location: TimedLocation) => post('/locations/v1/me', location),
   });
+
+  return { updateLocation, ...rest };
 };

@@ -13,12 +13,12 @@ import Compass from './Compass';
 import { RootStackParamList } from '../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import useLocation from './context/LocationContext';
-import { getLocationById } from '../api/locations';
-import { getFriends } from '../api/friends';
-import { getUserById } from '../api/users';
+import { useGetLocation } from '../api/locations';
+import { useGetFriends } from '../api/friends';
+import { useGetUser } from '../api/users';
 
 const FriendList: React.FC = () => {
-  const { data, isPending } = getFriends();
+  const { data, isPending } = useGetFriends();
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -54,8 +54,8 @@ interface FriendListItemProps {
 const FriendListItem: React.FC<FriendListItemProps> = ({ userId }) => {
   const { location } = useLocation();
 
-  const { data: friend, isPending: friendPending } = getUserById(userId);
-  const { data: friendLocation, isPending: friendLocationPending } = getLocationById(userId);
+  const { data: friend, isPending: friendPending } = useGetUser(userId);
+  const { data: friendLocation, isPending: friendLocationPending } = useGetLocation(userId);
 
   const colors = useColors();
   const styles = StyleSheet.create({

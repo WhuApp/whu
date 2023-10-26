@@ -4,12 +4,12 @@ import { useAuth0 } from 'react-native-auth0';
 import { ActivityIndicator, Alert, Text } from 'react-native';
 import { useColors } from '../hooks';
 import { BaseLayout } from '../layouts';
-import { getUser } from '../api/users';
+import { useGetUser } from '../api/users';
 
 const Profile: React.FC = () => {
   const { clearSession } = useAuth0();
 
-  const { data, isPending } = getUser();
+  const { data, isPending } = useGetUser();
 
   const colors = useColors();
 

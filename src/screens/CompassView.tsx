@@ -10,8 +10,8 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
 import { wrap } from '../utils/math';
-import { getUserById } from '../api/users';
-import { getLocationById } from '../api/locations';
+import { useGetUser } from '../api/users';
+import { useGetLocation } from '../api/locations';
 import { useQueryClient } from '@tanstack/react-query';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
@@ -29,8 +29,8 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
 
   const { location, heading } = useLocation();
 
-  const { data: user, isPending: userPending } = getUserById(userId);
-  const { data: userLocation, isPending: userLocationPending } = getLocationById(userId);
+  const { data: user, isPending: userPending } = useGetUser(userId);
+  const { data: userLocation, isPending: userLocationPending } = useGetLocation(userId);
 
   const queryClient = useQueryClient();
 
