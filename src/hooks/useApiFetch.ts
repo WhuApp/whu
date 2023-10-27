@@ -28,7 +28,10 @@ const useApiFetch = () => {
 
     const response = fetch(API_URL + path, {
       method: 'POST',
-      headers: { Authorization: 'Bearer ' + idToken },
+      headers: {
+        Authorization: 'Bearer ' + idToken,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(body),
     });
 

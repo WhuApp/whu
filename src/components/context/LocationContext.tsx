@@ -104,9 +104,7 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
       calculateDistance(lastLocation, location) > UPLOAD_DISTANCE_INTERVAL ||
       payload.timestamp - lastLocation.timestamp >= UPLOAD_MAX_DELAY
     ) {
-      updateLocation(payload).then((response) => {
-        setLastLocation(payload);
-      });
+      updateLocation(payload).then(() => setLastLocation(payload));
     }
   }, UPLOAD_DELAY);
 
