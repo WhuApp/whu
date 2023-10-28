@@ -19,9 +19,8 @@ import { useGetUser } from '../api/users';
 // TODO: add search feature
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
-
-  const { data: incoming, isPending: incomingPending } = useGetIncomingFriendRequests();
-  const { data: outgoing, isPending: outgoingPending } = useGetOutgoingFriendRequests();
+  const incoming = useGetIncomingFriendRequests();
+  const outgoing = useGetOutgoingFriendRequests();
   const { sendFriendRequest, isPending: sendRequestPending } = useSendFriendRequest();
 
   const colors = useColors();
@@ -44,7 +43,8 @@ const AddFriends: React.FC = () => {
     sendFriendRequest(input);
   }
 
-  if (incomingPending || outgoingPending) {
+  // Loading state
+  if (incoming.isPending || outgoing.isPending) {
     return <ActivityIndicator />;
   }
 
@@ -66,21 +66,21 @@ const AddFriends: React.FC = () => {
           </View>
         }
       />
-      {incoming.length > 0 && (
+      {incoming.data.length > 0 && (
         <>
           <Text style={styles.label}>Added Me</Text>
           <View style={styles.container}>
-            {incoming.map((id) => (
+            {incoming.data.map((id) => (
               <IncomingRequest id={id} />
             ))}
           </View>
         </>
       )}
-      {outgoing.length > 0 && (
+      {outgoing.data.length > 0 && (
         <>
           <Text style={styles.label}>Pending</Text>
           <View style={styles.container}>
-            {outgoing.map((id) => (
+            {outgoing.data.map((id) => (
               <OutgoingRequest id={id} />
             ))}
           </View>

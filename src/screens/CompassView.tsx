@@ -28,13 +28,11 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
   const { userId } = route.params;
 
   const { location, heading } = useLocation();
-
-  const { data: user, isPending: userPending } = useGetUser(userId);
-  const { data: userLocation, isPending: userLocationPending } = useGetLocation(userId);
-
+  const user = useGetUser(userId);
+  const userLocation = useGetLocation(userId);
   const queryClient = useQueryClient();
-
   const colors = useColors();
+
   const styles = StyleSheet.create({
     content: {
       padding: 15,
@@ -67,11 +65,13 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     },
   });
 
+  // Force location refetch
   useInterval(() => {
     queryClient.invalidateQueries({ queryKey: ['locations', userId] });
   }, UPDATE_DELAY);
 
-  if (!location || !heading || userPending || userLocationPending) {
+  // Loading state
+  if (!location || !heading || user.isPending || userLocation.isPending) {
     return (
       <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
         <Text style={styles.title}>Loading {userId}...</Text>
@@ -79,16 +79,16 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     );
   }
 
-  const bearing = computeHeading(location, userLocation);
+  const bearing = computeHeading(location, userLocation.data);
   const rotation = wrap(bearing + heading, -180, 180);
-  const distance = formatDistance(calculateDistance(location, userLocation));
+  const distance = formatDistance(calculateDistance(location, userLocation.data));
 
   return (
     <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
       <View style={styles.content}>
         <View>
           <Text style={styles.title}>Tracking</Text>
-          <Text style={styles.name}>{user.nickname}</Text>
+          <Text style={styles.name}>{user.data.nickname}</Text>
           <Text style={styles.title}>Heading: {bearing}</Text>
           <Text style={styles.title}>Phone: {heading}</Text>
           <Text style={styles.title}>Result: {rotation}</Text>
