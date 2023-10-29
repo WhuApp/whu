@@ -5,7 +5,7 @@ import { calculateDistance } from '../../utils/location';
 import { Magnetometer, MagnetometerMeasurement } from 'expo-sensors';
 import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } from 'expo-location';
 import { toDegrees, wrap } from '../../utils/math';
-import { updateLocation } from '../../api/locations';
+import { useUpdateLocation } from '../../api/locations';
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
 const UPLOAD_DISTANCE_INTERVAL = 10; // measured in metres
@@ -87,9 +87,9 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const location = useLiveLocation();
   const heading = useMagneticHeading();
 
-  const [lastLocation, setLastLocation] = useState<TimedLocation>(); // TODO: use caching functions provided by react-query
+  const [lastLocation, setLastLocation] = useState<TimedLocation>();
 
-  const { mutate: setLocation } = updateLocation();
+  const { updateLocation } = useUpdateLocation();
 
   // Upload location
   useInterval(() => {
@@ -104,9 +104,7 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
       calculateDistance(lastLocation, location) > UPLOAD_DISTANCE_INTERVAL ||
       payload.timestamp - lastLocation.timestamp >= UPLOAD_MAX_DELAY
     ) {
-      // TODO: validate that location has been updated before setting last location
-      setLocation(payload);
-      setLastLocation(payload);
+      updateLocation(payload).then(() => setLastLocation(payload));
     }
   }, UPLOAD_DELAY);
 

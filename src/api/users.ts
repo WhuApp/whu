@@ -2,22 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useApiFetch } from '../hooks';
 import { User } from '../types';
 
-export const getUserById = (id: string) => {
+export const useGetUser = (id?: string) => {
   const { get } = useApiFetch();
 
-  return useQuery({
-    queryFn: async () => await get<User>('/users/v1/by-id/' + id),
-    queryKey: ['users', id],
-  });
-};
-
-export const getUser = () => {
-  const { get } = useApiFetch();
+  const path = id ? `by-id/${id}` : 'me';
 
   return useQuery({
-    queryFn: async () => await get<User>('/users/v1/me'),
-    queryKey: ['users', 'me'],
+    queryFn: async () => await get<User>('/users/v1/' + path),
+    queryKey: ['users', id ?? 'me'],
   });
 };
-
-// TODO: add findUserByNickname
