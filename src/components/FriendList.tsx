@@ -16,7 +16,7 @@ import useLocation from './context/LocationContext';
 import { useGetLocation } from '../api/locations';
 import { useGetFriends } from '../api/friends';
 import { useGetUser } from '../api/users';
-import { Button } from './index';
+import Button from './button/Button';
 
 // TODO: sort friends by timestamp
 const FriendList: React.FC = () => {
