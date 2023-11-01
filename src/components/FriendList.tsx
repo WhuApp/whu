@@ -17,6 +17,7 @@ import { useGetLocation } from '../api/locations';
 import { useGetFriends } from '../api/friends';
 import { useGetUser } from '../api/users';
 import Button from './button/Button';
+import dayjs from 'dayjs';
 
 // TODO: sort friends by timestamp
 const FriendList: React.FC = () => {
@@ -99,10 +100,7 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ userId }) => {
   }
 
   const distance = formatDistance(calculateDistance(location, friendLocation.data));
-  const updatedAt = new Date(friendLocation.data.timestamp)
-    .toTimeString()
-    .split(' ')[0]
-    .slice(0, -3);
+  const updatedAt = dayjs(friendLocation.data.timestamp).fromNow();
 
   return (
     <TouchableOpacity onPress={handlePress}>
