@@ -4,19 +4,22 @@ import { useAuth0 } from 'react-native-auth0';
 import { ActivityIndicator, Alert, Text } from 'react-native';
 import { useColors } from '../hooks';
 import { BaseLayout } from '../layouts';
-import { gql, useQuery } from 'urql';
+import { useQuery } from 'urql';
+import { graphql } from '../gql';
+
+const ProfileRootQuery = graphql(`
+  query ProfileRootQuery {
+    me {
+      id
+      email
+    }
+  }
+`);
 
 const Profile: React.FC = () => {
   const { clearSession } = useAuth0();
   const [self, reloadSelf] = useQuery({
-    query: gql`
-      query {
-        me {
-          id
-          email
-        }
-      }
-    `,
+    query: ProfileRootQuery,
   });
 
   const colors = useColors();

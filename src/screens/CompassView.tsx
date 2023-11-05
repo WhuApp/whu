@@ -10,7 +10,8 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
 import { wrap } from '../utils/math';
-import { gql, useQuery } from 'urql';
+import { useQuery } from 'urql';
+import { graphql } from '../gql';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
@@ -22,25 +23,27 @@ interface CompassViewProps {
   route: CompassViewRouteProp;
 }
 
+const CompassRootQuery = graphql(`
+  query CompassRootQuery($id: String!) {
+    getUserById(id: $id) {
+      id
+      nickname
+      location {
+        altitude
+        latitude
+        longitude
+        timestamp
+      }
+    }
+  }
+`);
+
 const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
   const { userId } = route.params;
 
   const { location, heading } = useLocation();
   const [result, refresh] = useQuery({
-    query: gql`
-      query ($id: String!) {
-        getUserById(id: $id) {
-          id
-          nickname
-          location {
-            altitude
-            latitude
-            longitude
-            timestamp
-          }
-        }
-      }
-    `,
+    query: CompassRootQuery,
     variables: {
       id: userId,
     },

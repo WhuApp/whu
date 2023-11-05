@@ -4,7 +4,27 @@ import { useColors } from '../hooks';
 import Icon from '../atoms/Icon';
 import { IconButton, TextInput } from '../components';
 import { BaseLayout } from '../layouts';
-import { gql, useMutation, useQuery } from 'urql';
+import { useMutation, useQuery } from 'urql';
+import { graphql } from '../gql';
+
+const FriendRequestsQuery = graphql(`
+  query FriendRequestsQuery {
+    incomingFriendRequests {
+      id
+      nickname
+    }
+    outgoingFriendRequests {
+      id
+      nickname
+    }
+  }
+`);
+
+const SendFriendRequest = graphql(`
+  mutation SendFriendRequest($id: String!) {
+    sendFriendRequest(to: $id)
+  }
+`);
 
 // TODO: how to remove friends?
 // TODO: remove this;;; Note for later put components inside the page component to use styles and mutations from top level component
@@ -12,24 +32,9 @@ import { gql, useMutation, useQuery } from 'urql';
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
   const [data, _refresh] = useQuery({
-    query: gql`
-      query {
-        incomingFriendRequests {
-          id
-          nickname
-        }
-        outgoingFriendRequests {
-          id
-          nickname
-        }
-      }
-    `,
+    query: FriendRequestsQuery,
   });
-  const [fr, sendFR] = useMutation(gql`
-    mutation ($id: String!) {
-      sendFriendRequest(to: $id)
-    }
-  `);
+  const [fr, sendFR] = useMutation(SendFriendRequest);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -105,17 +110,21 @@ interface RequestProps {
 
 // TODO: add optimistic updates (https://tanstack.com/query/v5/docs/react/guides/optimistic-updates)
 
+const AcceptFriendRequest = graphql(`
+  mutation AcceptFriendRequest($id: String!) {
+    acceptFriendRequest(to: $id)
+  }
+`);
+
+const IgnoreFriendRequest = graphql(`
+  mutation IgnoreFriendRequest($id: String!) {
+    ignoreFriendRequest(to: $id)
+  }
+`);
+
 const IncomingRequest: React.FC<RequestProps> = ({ id, nickname }) => {
-  const [accept, sendAccept] = useMutation(gql`
-    mutation ($id: String!) {
-      acceptFriendRequest(to: $id)
-    }
-  `);
-  const [ignore, sendIgnore] = useMutation(gql`
-    mutation ($id: String!) {
-      ignoreFriendRequest(to: $id)
-    }
-  `);
+  const [accept, sendAccept] = useMutation(AcceptFriendRequest);
+  const [ignore, sendIgnore] = useMutation(IgnoreFriendRequest);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -148,12 +157,14 @@ const IncomingRequest: React.FC<RequestProps> = ({ id, nickname }) => {
   );
 };
 
+const CancelFriendRequest = graphql(`
+  mutation CancelFriendRequest($id: String!) {
+    cancelFriendRequest(to: $id)
+  }
+`);
+
 const OutgoingRequest: React.FC<RequestProps> = ({ id, nickname }) => {
-  const [cancel, sendCancel] = useMutation(gql`
-    mutation ($id: String!) {
-      cancelFriendRequest(to: $id)
-    }
-  `);
+  const [cancel, sendCancel] = useMutation(CancelFriendRequest);
 
   const colors = useColors();
   const styles = StyleSheet.create({

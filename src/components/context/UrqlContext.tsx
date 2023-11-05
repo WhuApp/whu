@@ -3,19 +3,33 @@ import { retryExchange } from '@urql/exchange-retry';
 import { authExchange } from '@urql/exchange-auth';
 import { useAuth0 } from 'react-native-auth0';
 import { PropsWithChildren, useMemo } from 'react';
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { offlineExchange } from '@urql/exchange-graphcache';
 import { refocusExchange } from '../../refocusExchange';
+import { requestPolicyExchange } from '@urql/exchange-request-policy';
+import { makeAsyncStorage } from '@urql/storage-rn';
+import schema from '../../../graphql.schema.json';
 
 const Component: React.FC<PropsWithChildren> = ({ children }) => {
-  const { user, getCredentials, hasValidCredentials } = useAuth0();
+  const { user, getCredentials } = useAuth0();
+
+  const storage = makeAsyncStorage({
+    dataKey: 'graphcache-data', // The AsyncStorage key used for the data (defaults to graphcache-data)
+    metadataKey: 'graphcache-metadata', // The AsyncStorage key used for the metadata (defaults to graphcache-metadata)
+    maxAge: 7, // How long to persist the data in storage (defaults to 7 days)
+  });
 
   const client = useMemo(
     () =>
       new Client({
         url: 'https://api.whu.app/graphql',
         exchanges: [
+          requestPolicyExchange({
+            ttl: 30000, // be fairly aggressive about updates
+          }),
           refocusExchange() as any, // for some reason TS complains about @urql/core.Exchange != urql.Exchange
-          cacheExchange({
+          offlineExchange({
+            schema: schema,
+            storage: storage,
             keys: {
               Location(_) {
                 return null;

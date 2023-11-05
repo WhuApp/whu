@@ -15,20 +15,22 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import useLocation from './context/LocationContext';
 import Button from './button/Button';
 import dayjs from 'dayjs';
-import { gql, useQuery } from 'urql';
+import { useQuery } from 'urql';
 import { isDevelopmentBuild } from 'expo-dev-client';
+import { graphql } from '../gql/gql';
+import { FragmentType, getFragmentData, makeFragmentData } from '../gql';
+import { FriendListItemFragmentFragment, FriendListItemFragmentFragmentDoc } from '../gql/graphql';
 
 // TODO: sort friends by timestamp
 const FriendList: React.FC = () => {
   const [friends, reloadFriends] = useQuery({
-    query: gql`
-      query {
+    query: graphql(`
+      query FriendList {
         friends {
           ...FriendListItemFragment
         }
       }
-      ${FriendListItemFragment}
-    `,
+    `),
   });
 
   const colors = useColors();
@@ -56,55 +58,50 @@ const FriendList: React.FC = () => {
   }
 
   // Friend list empty
-  if (friends.data && friends.data.length === 0) {
+  if (friends.data && friends.data.friends.length === 0) {
     return <Text style={styles.text}>You dont have any friends</Text>;
   }
 
   return (
     <VirtualizedList
-      data={friends.data.friends as FriendListItemType[]}
+      data={friends.data.friends as FriendListItemFragmentFragment[]}
       initialNumToRender={100}
-      renderItem={(obj) => <FriendListItem {...obj.item} />}
-      keyExtractor={(item: FriendListItemType) => item.id}
+      renderItem={(obj) => (
+        <FriendListItem {...makeFragmentData(obj.item, FriendListItemFragmentFragmentDoc)} />
+      )}
+      keyExtractor={(item: FriendListItemFragmentFragment) => item.id}
       getItemCount={(o): number => o.length}
-      getItem={(o, i): FriendListItemType => o[i]}
+      getItem={(o, i): FriendListItemFragmentFragment => o[i]}
     />
   );
 };
 
-const TimedLocationFragment = gql`
+const TimedLocationFragment = graphql(`
   fragment TimedLocationFragment on Location {
     altitude
     latitude
     longitude
     timestamp
   }
-`;
+`);
 
-const FriendListItemFragment = gql`
+const FriendListItemFragment = graphql(`
   fragment FriendListItemFragment on User {
-    nickname
     id
+    nickname
     location {
       ...TimedLocationFragment
     }
   }
+`);
 
-  ${TimedLocationFragment}
-`;
-
-type FriendListItemType = {
-  nickname: string;
-  id: string;
-  location: TimedLocation;
-};
-
-const FriendListItem: React.FC<FriendListItemType> = ({
-  nickname,
-  id,
-  location: friendLocation,
-}) => {
+const FriendListItem: React.FC<FragmentType<typeof FriendListItemFragment>> = (fragment) => {
   const { location } = useLocation();
+  const {
+    id,
+    nickname,
+    location: friendLocationFrag,
+  } = getFragmentData(FriendListItemFragment, fragment);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -127,6 +124,8 @@ const FriendListItem: React.FC<FriendListItemType> = ({
   const handlePress = () => {
     navigation.navigate('CompassView', { userId: id });
   };
+
+  const friendLocation = getFragmentData(TimedLocationFragment, friendLocationFrag);
 
   const distance = useMemo(
     () => location && friendLocation && formatDistance(calculateDistance(location, friendLocation)),

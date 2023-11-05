@@ -5,7 +5,8 @@ import { calculateDistance } from '../../utils/location';
 import { Magnetometer, MagnetometerMeasurement } from 'expo-sensors';
 import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } from 'expo-location';
 import { toDegrees, wrap } from '../../utils/math';
-import { gql, useMutation } from 'urql';
+import { useMutation } from 'urql';
+import { graphql } from '../../gql';
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
 const UPLOAD_DISTANCE_INTERVAL = 10; // measured in metres
@@ -83,17 +84,19 @@ const initialContext: LocationContextInterface = {
 
 const LocationContext = createContext<LocationContextInterface>(initialContext);
 
+const UpdateLocation = graphql(`
+  mutation UpdateLocation($location: LocationParam!) {
+    setLocation(location: $location)
+  }
+`);
+
 const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const location = useLiveLocation();
   const heading = useMagneticHeading();
 
   const [lastLocation, setLastLocation] = useState<TimedLocation>();
 
-  const [_result, updateLocation] = useMutation(gql`
-    mutation ($location: LocationParam!) {
-      setLocation(location: $location)
-    }
-  `);
+  const [_result, updateLocation] = useMutation(UpdateLocation);
 
   // Upload location
   useInterval(() => {
@@ -108,7 +111,7 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
       calculateDistance(lastLocation, location) > UPLOAD_DISTANCE_INTERVAL ||
       payload.timestamp - lastLocation.timestamp >= UPLOAD_MAX_DELAY
     ) {
-      updateLocation(payload).then(() => setLastLocation(payload));
+      updateLocation({ location: payload }).then(() => setLastLocation(payload));
     }
   }, UPLOAD_DELAY);
 
