@@ -7,14 +7,12 @@ import { useColors } from './hooks';
 import { useAuth0 } from 'react-native-auth0';
 import { ActivityIndicator, Alert } from 'react-native';
 import { LocationProvider } from './components/context/LocationContext';
-import useAuth from './components/context/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   const colors = useColors();
   const { user } = useAuth0();
-  const { idToken } = useAuth();
 
   // TODO: no?
   useEffect(() => {
@@ -26,12 +24,6 @@ const App: React.FC = () => {
       }
     })();
   }, []);
-
-  // Make sure there is a valid id token for api fetching
-  // TODO: find a better solution in the future
-  if (user && !idToken) {
-    return <ActivityIndicator />;
-  }
 
   return (
     <NavigationContainer>

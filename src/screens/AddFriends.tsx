@@ -4,24 +4,32 @@ import { useColors } from '../hooks';
 import Icon from '../atoms/Icon';
 import { IconButton, TextInput } from '../components';
 import { BaseLayout } from '../layouts';
-import {
-  useAcceptFriendRequest,
-  useCancelFriendRequest,
-  useDeclineFriendRequest,
-  useGetIncomingFriendRequests,
-  useGetOutgoingFriendRequests,
-  useSendFriendRequest,
-} from '../api/friends';
-import { useGetUser } from '../api/users';
+import { gql, useMutation, useQuery } from 'urql';
 
 // TODO: how to remove friends?
 // TODO: remove this;;; Note for later put components inside the page component to use styles and mutations from top level component
 // TODO: add search feature
 const AddFriends: React.FC = () => {
   const [input, setInput] = useState<string>('');
-  const incoming = useGetIncomingFriendRequests();
-  const outgoing = useGetOutgoingFriendRequests();
-  const { sendFriendRequest, isPending: sendRequestPending } = useSendFriendRequest();
+  const [data, _refresh] = useQuery({
+    query: gql`
+      query {
+        incomingFriendRequests {
+          id
+          nickname
+        }
+        outgoingFriendRequests {
+          id
+          nickname
+        }
+      }
+    `,
+  });
+  const [fr, sendFR] = useMutation(gql`
+    mutation ($id: String!) {
+      sendFriendRequest(to: $id)
+    }
+  `);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -40,11 +48,11 @@ const AddFriends: React.FC = () => {
   });
 
   function handleAdd() {
-    sendFriendRequest(input);
+    sendFR({ id: input });
   }
 
   // Loading state
-  if (incoming.isPending || outgoing.isPending) {
+  if (data.fetching) {
     return <ActivityIndicator />;
   }
 
@@ -57,31 +65,31 @@ const AddFriends: React.FC = () => {
         suffix={
           <View style={styles.iconWrapper}>
             <IconButton
-              icon={sendRequestPending ? 'loader' : 'arrow-right'}
+              icon={fr.fetching ? 'loader' : 'arrow-right'}
               onPress={handleAdd}
-              disabled={sendRequestPending}
+              disabled={fr.fetching}
               background={false}
             />
             <IconButton icon='camera' background={false} />
           </View>
         }
       />
-      {incoming.data.length > 0 && (
+      {data.data.incomingFriendRequests.length > 0 && (
         <>
           <Text style={styles.label}>Added Me</Text>
           <View style={styles.container}>
-            {incoming.data.map((id) => (
-              <IncomingRequest id={id} />
+            {data.data.incomingFriendRequests.map((obj) => (
+              <IncomingRequest {...obj} />
             ))}
           </View>
         </>
       )}
-      {outgoing.data.length > 0 && (
+      {data.data.outgoingFriendRequests.length > 0 && (
         <>
           <Text style={styles.label}>Pending</Text>
           <View style={styles.container}>
-            {outgoing.data.map((id) => (
-              <OutgoingRequest id={id} />
+            {data.data.outgoingFriendRequests.map((obj) => (
+              <OutgoingRequest {...obj} />
             ))}
           </View>
         </>
@@ -92,14 +100,22 @@ const AddFriends: React.FC = () => {
 
 interface RequestProps {
   id: string;
+  nickname: string;
 }
 
 // TODO: add optimistic updates (https://tanstack.com/query/v5/docs/react/guides/optimistic-updates)
 
-const IncomingRequest: React.FC<RequestProps> = ({ id }) => {
-  const { data, isPending } = useGetUser(id);
-  const { acceptFriendRequest } = useAcceptFriendRequest();
-  const { declineFriendRequest } = useDeclineFriendRequest();
+const IncomingRequest: React.FC<RequestProps> = ({ id, nickname }) => {
+  const [accept, sendAccept] = useMutation(gql`
+    mutation ($id: String!) {
+      acceptFriendRequest(to: $id)
+    }
+  `);
+  const [ignore, sendIgnore] = useMutation(gql`
+    mutation ($id: String!) {
+      ignoreFriendRequest(to: $id)
+    }
+  `);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -121,24 +137,23 @@ const IncomingRequest: React.FC<RequestProps> = ({ id }) => {
     },
   });
 
-  if (isPending) {
-    return <ActivityIndicator />;
-  }
-
   return (
     <View style={styles.item} key={id}>
-      <Text style={styles.text}>{data.nickname}</Text>
+      <Text style={styles.text}>{nickname}</Text>
       <View style={styles.iconWrapper}>
-        <IconButton icon='user-check' onPress={() => acceptFriendRequest(id)} background={false} />
-        <IconButton icon='x' onPress={() => declineFriendRequest(id)} background={false} />
+        <IconButton icon='user-check' onPress={() => sendAccept({ id })} background={false} />
+        <IconButton icon='x' onPress={() => sendIgnore({ id })} background={false} />
       </View>
     </View>
   );
 };
 
-const OutgoingRequest: React.FC<RequestProps> = ({ id }) => {
-  const { data, isPending } = useGetUser(id);
-  const { cancelFriendRequest } = useCancelFriendRequest();
+const OutgoingRequest: React.FC<RequestProps> = ({ id, nickname }) => {
+  const [cancel, sendCancel] = useMutation(gql`
+    mutation ($id: String!) {
+      cancelFriendRequest(to: $id)
+    }
+  `);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -156,14 +171,10 @@ const OutgoingRequest: React.FC<RequestProps> = ({ id }) => {
     },
   });
 
-  if (isPending) {
-    return <ActivityIndicator />;
-  }
-
   return (
     <View style={styles.item} key={id}>
-      <Text style={styles.text}>{data.nickname}</Text>
-      <IconButton icon='x' onPress={() => cancelFriendRequest(id)} background={false} />
+      <Text style={styles.text}>{nickname}</Text>
+      <IconButton icon='x' onPress={() => sendCancel({ id })} background={false} />
     </View>
   );
 };

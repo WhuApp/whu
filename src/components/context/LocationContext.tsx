@@ -5,7 +5,7 @@ import { calculateDistance } from '../../utils/location';
 import { Magnetometer, MagnetometerMeasurement } from 'expo-sensors';
 import { Accuracy, LocationObject, LocationSubscription, watchPositionAsync } from 'expo-location';
 import { toDegrees, wrap } from '../../utils/math';
-import { useUpdateLocation } from '../../api/locations';
+import { gql, useMutation } from 'urql';
 
 const UPLOAD_DELAY = 1000 * 10; // 10 seconds
 const UPLOAD_DISTANCE_INTERVAL = 10; // measured in metres
@@ -89,7 +89,11 @@ const LocationProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const [lastLocation, setLastLocation] = useState<TimedLocation>();
 
-  const { updateLocation } = useUpdateLocation();
+  const [_result, updateLocation] = useMutation(gql`
+    mutation ($location: LocationParam!) {
+      setLocation(location: $location)
+    }
+  `);
 
   // Upload location
   useInterval(() => {
