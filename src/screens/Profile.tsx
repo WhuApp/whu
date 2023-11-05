@@ -4,12 +4,23 @@ import { useAuth0 } from 'react-native-auth0';
 import { ActivityIndicator, Alert, Text } from 'react-native';
 import { useColors } from '../hooks';
 import { BaseLayout } from '../layouts';
-import { useGetUser } from '../api/users';
+import { useQuery } from 'urql';
+import { graphql } from '../gql';
+
+const ProfileRootQuery = graphql(`
+  query ProfileRootQuery {
+    me {
+      id
+      email
+    }
+  }
+`);
 
 const Profile: React.FC = () => {
   const { clearSession } = useAuth0();
-
-  const self = useGetUser();
+  const [self, reloadSelf] = useQuery({
+    query: ProfileRootQuery,
+  });
 
   const colors = useColors();
 
@@ -18,13 +29,13 @@ const Profile: React.FC = () => {
   };
 
   // Loading state
-  if (self.isPending) {
+  if (self.fetching) {
     return <ActivityIndicator />;
   }
 
   return (
     <BaseLayout>
-      <Text style={{ color: colors('textPrimary') }}>Signed in as {self.data.email}</Text>
+      <Text style={{ color: colors('textPrimary') }}>Signed in as {self.data?.me.email}</Text>
       <Button title='Sign Out' onPress={handleSignOut} />
     </BaseLayout>
   );

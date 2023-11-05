@@ -10,9 +10,8 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { IconButton } from '../components';
 import useLocation from '../components/context/LocationContext';
 import { wrap } from '../utils/math';
-import { useGetUser } from '../api/users';
-import { useGetLocation } from '../api/locations';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery } from 'urql';
+import { graphql } from '../gql';
 
 const UPDATE_DELAY = 1000 * 10; // 10 seconds
 
@@ -24,13 +23,32 @@ interface CompassViewProps {
   route: CompassViewRouteProp;
 }
 
+const CompassRootQuery = graphql(`
+  query CompassRootQuery($id: String!) {
+    getUserById(id: $id) {
+      id
+      nickname
+      location {
+        altitude
+        latitude
+        longitude
+        timestamp
+      }
+    }
+  }
+`);
+
 const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
   const { userId } = route.params;
 
   const { location, heading } = useLocation();
-  const user = useGetUser(userId);
-  const userLocation = useGetLocation(userId);
-  const queryClient = useQueryClient();
+  const [result, refresh] = useQuery({
+    query: CompassRootQuery,
+    variables: {
+      id: userId,
+    },
+  });
+
   const colors = useColors();
 
   const styles = StyleSheet.create({
@@ -67,11 +85,11 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
 
   // Force location refetch
   useInterval(() => {
-    queryClient.invalidateQueries({ queryKey: ['locations', userId] });
+    refresh();
   }, UPDATE_DELAY);
 
   // Loading state
-  if (!location || !heading || user.isPending || userLocation.isPending) {
+  if (!location || !heading || result.fetching) {
     return (
       <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
         <Text style={styles.title}>Loading {userId}...</Text>
@@ -79,16 +97,24 @@ const CompassView: React.FC<CompassViewProps> = ({ navigation, route }) => {
     );
   }
 
-  const bearing = computeHeading(location, userLocation.data);
+  if (result.error) {
+    return (
+      <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
+        <Text style={styles.title}>Error {result.error.toString()}</Text>
+      </BaseLayout>
+    );
+  }
+
+  const bearing = computeHeading(location, result.data.getUserById.location);
   const rotation = wrap(bearing + heading, -180, 180);
-  const distance = formatDistance(calculateDistance(location, userLocation.data));
+  const distance = formatDistance(calculateDistance(location, result.data.getUserById.location));
 
   return (
     <BaseLayout backgroundColor={colors('accent')} statusBarStyle={'light'}>
       <View style={styles.content}>
         <View>
           <Text style={styles.title}>Tracking</Text>
-          <Text style={styles.name}>{user.data.nickname}</Text>
+          <Text style={styles.name}>{result.data.getUserById.nickname}</Text>
           <Text style={styles.title}>Heading: {bearing}</Text>
           <Text style={styles.title}>Phone: {heading}</Text>
           <Text style={styles.title}>Result: {rotation}</Text>

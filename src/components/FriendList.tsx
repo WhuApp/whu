@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -10,18 +10,28 @@ import {
 import { useColors } from '../hooks';
 import { calculateDistance, formatDistance } from '../utils/location';
 import Compass from './Compass';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, TimedLocation } from '../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import useLocation from './context/LocationContext';
-import { useGetLocation } from '../api/locations';
-import { useGetFriends } from '../api/friends';
-import { useGetUser } from '../api/users';
 import Button from './button/Button';
 import dayjs from 'dayjs';
+import { useQuery } from 'urql';
+import { isDevelopmentBuild } from 'expo-dev-client';
+import { graphql } from '../gql/gql';
+import { FragmentType, getFragmentData, makeFragmentData } from '../gql';
+import { FriendListItemFragmentFragment, FriendListItemFragmentFragmentDoc } from '../gql/graphql';
 
 // TODO: sort friends by timestamp
 const FriendList: React.FC = () => {
-  const friends = useGetFriends();
+  const [friends, reloadFriends] = useQuery({
+    query: graphql(`
+      query FriendList {
+        friends {
+          ...FriendListItemFragment
+        }
+      }
+    `),
+  });
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -32,45 +42,66 @@ const FriendList: React.FC = () => {
 
   // Loading state
   // TODO: render skeleton model
-  if (friends.isPending) {
+  if (friends.fetching) {
     return <ActivityIndicator />;
   }
 
   // Error state
-  if (friends.isError) {
+  if (friends.error) {
     return (
       <>
         <Text style={styles.text}>An error occurred</Text>
-        <Button title='Try Again' onPress={friends.refetch} />
+        {isDevelopmentBuild() && <Text style={styles.text}>{friends.error.toString()}</Text>}
+        <Button title='Try Again' onPress={reloadFriends} />
       </>
     );
   }
 
   // Friend list empty
-  if (friends.data && friends.data.length === 0) {
+  if (friends.data && friends.data.friends.length === 0) {
     return <Text style={styles.text}>You dont have any friends</Text>;
   }
 
   return (
     <VirtualizedList
-      data={friends.data}
+      data={friends.data.friends as FriendListItemFragmentFragment[]}
       initialNumToRender={100}
-      renderItem={({ item }) => <FriendListItem userId={item} />}
-      keyExtractor={(item: string) => item}
+      renderItem={(obj) => (
+        <FriendListItem {...makeFragmentData(obj.item, FriendListItemFragmentFragmentDoc)} />
+      )}
+      keyExtractor={(item: FriendListItemFragmentFragment) => item.id}
       getItemCount={(o): number => o.length}
-      getItem={(o, i): string => o[i]}
+      getItem={(o, i): FriendListItemFragmentFragment => o[i]}
     />
   );
 };
 
-interface FriendListItemProps {
-  userId: string;
-}
+const TimedLocationFragment = graphql(`
+  fragment TimedLocationFragment on Location {
+    altitude
+    latitude
+    longitude
+    timestamp
+  }
+`);
 
-const FriendListItem: React.FC<FriendListItemProps> = ({ userId }) => {
+const FriendListItemFragment = graphql(`
+  fragment FriendListItemFragment on User {
+    id
+    nickname
+    location {
+      ...TimedLocationFragment
+    }
+  }
+`);
+
+const FriendListItem: React.FC<FragmentType<typeof FriendListItemFragment>> = (fragment) => {
   const { location } = useLocation();
-  const friend = useGetUser(userId);
-  const friendLocation = useGetLocation(userId);
+  const {
+    id,
+    nickname,
+    location: friendLocationFrag,
+  } = getFragmentData(FriendListItemFragment, fragment);
 
   const colors = useColors();
   const styles = StyleSheet.create({
@@ -91,29 +122,31 @@ const FriendListItem: React.FC<FriendListItemProps> = ({ userId }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handlePress = () => {
-    navigation.navigate('CompassView', { userId: userId });
+    navigation.navigate('CompassView', { userId: id });
   };
 
-  // Loading state
-  if (!location || friend.isPending || friendLocation.isPending) {
-    return <Text style={styles.text}>Loading</Text>;
-  }
+  const friendLocation = getFragmentData(TimedLocationFragment, friendLocationFrag);
 
-  const distance = formatDistance(calculateDistance(location, friendLocation.data));
-  const updatedAt = dayjs(friendLocation.data.timestamp).fromNow();
+  const distance = useMemo(
+    () => location && friendLocation && formatDistance(calculateDistance(location, friendLocation)),
+    [location, friendLocation]
+  );
+  const updatedAt = dayjs(friendLocation.timestamp).fromNow();
 
   return (
     <TouchableOpacity onPress={handlePress}>
       <View style={styles.item}>
-        <Text style={styles.text}>{friend.data.nickname}</Text>
+        <Text style={styles.text}>{nickname}</Text>
         {location && friendLocation && (
-          <Text style={styles.text}>
-            {distance.value}
-            {distance.unit}
-          </Text>
+          <>
+            <Text style={styles.text}>
+              {distance.value}
+              {distance.unit}
+            </Text>
+            <Compass loc={friendLocation} />
+            <Text style={styles.text}>{updatedAt}</Text>
+          </>
         )}
-        <Compass loc={friendLocation.data} />
-        {friendLocation && <Text style={styles.text}>{updatedAt}</Text>}
       </View>
     </TouchableOpacity>
   );
